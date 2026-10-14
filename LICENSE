@@ -1,14 +1,8 @@
 MIT License
 
 Copyright (c) 2026 Popout Authenticator contributors
-
-This project references and reuses code from the following MIT-licensed projects:
-
 Copyright (c) 2017 Authenticator Extension
-(https://github.com/Authenticator-Extension/Authenticator)
-
 Copyright (c) 2026 Authenticator.sh
-(https://github.com/authenticator-sh/2fa)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

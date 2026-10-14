@@ -114,4 +114,4 @@ Bug reports and import or code-fill problems: [open an issue](https://github.com
 
 ## License
 
-MIT, see [LICENSE](LICENSE). Includes code from Authenticator Extension and Authenticator.sh, both MIT.
+MIT, see [LICENSE](LICENSE). Includes code from [Authenticator Extension](https://github.com/Authenticator-Extension/Authenticator) and [Authenticator.sh](https://github.com/authenticator-sh/2fa), both MIT.
