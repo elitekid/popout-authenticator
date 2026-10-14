@@ -1,0 +1,19 @@
+{
+  "appName": { "message": "Popout Authenticator" },
+  "appDesc": { "message": "Tarayıcınız için ücretsiz 2FA kimlik doğrulayıcı. Tek kullanımlık kodlar üretir; açılır pencere veya ayrı pencere olarak açılır." },
+  "cmdExecuteAction": { "message": "Açılır pencereyi aç" },
+  "cmdQuickFill": { "message": "2FA kodunu bu sayfaya doldur" },
+  "cmdScanQr": { "message": "Ekrandaki bir QR kodunu tara" },
+  "cmdAutofill": { "message": "En uygun hesabın kodunu doldur" },
+  "cmdHideCodes": { "message": "Kodları gizle veya göster" },
+  "cmdOpenWindow": { "message": "Ayrı pencerede aç" },
+  "menuOpenWindow": { "message": "Ayrı pencerede aç" },
+  "menuQuickFill": { "message": "2FA kodunu doldur" },
+  "fillCopied": { "message": "Kod kopyalandı. Kodu siteye yapıştırın." },
+  "fillManual": {
+    "message": "Kod: $CODE$",
+    "placeholders": { "code": { "content": "$1" } }
+  },
+  "fillPickAccount": { "message": "Bir hesap seçin" },
+  "fieldFillButton": { "message": "Kodu doldur" }
+}

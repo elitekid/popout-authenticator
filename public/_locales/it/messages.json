@@ -1,0 +1,19 @@
+{
+  "appName": { "message": "Popout Authenticator" },
+  "appDesc": { "message": "Autenticatore 2FA gratuito per il tuo browser. Genera codici monouso e si apre come popup o finestra separata." },
+  "cmdExecuteAction": { "message": "Apri il popup" },
+  "cmdQuickFill": { "message": "Inserisci il codice 2FA in questa pagina" },
+  "cmdScanQr": { "message": "Scansiona un codice QR sullo schermo" },
+  "cmdAutofill": { "message": "Inserisci il codice dell’account più pertinente" },
+  "cmdHideCodes": { "message": "Nascondi o mostra i codici" },
+  "cmdOpenWindow": { "message": "Apri in una finestra separata" },
+  "menuOpenWindow": { "message": "Apri in una finestra separata" },
+  "menuQuickFill": { "message": "Inserisci il codice 2FA" },
+  "fillCopied": { "message": "Codice copiato. Incollalo." },
+  "fillManual": {
+    "message": "Codice: $CODE$",
+    "placeholders": { "code": { "content": "$1" } }
+  },
+  "fillPickAccount": { "message": "Scegli un account" },
+  "fieldFillButton": { "message": "Inserisci codice" }
+}

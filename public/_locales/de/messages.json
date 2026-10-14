@@ -1,0 +1,19 @@
+{
+  "appName": { "message": "Popout Authenticator" },
+  "appDesc": { "message": "Kostenloser 2FA-Authenticator für Ihren Browser. Erzeugt Einmalcodes und öffnet sich als Popup oder eigenes Fenster." },
+  "cmdExecuteAction": { "message": "Popup öffnen" },
+  "cmdQuickFill": { "message": "2FA-Code auf dieser Seite einfügen" },
+  "cmdScanQr": { "message": "QR-Code auf dem Bildschirm scannen" },
+  "cmdAutofill": { "message": "Code des am besten passenden Kontos einfügen" },
+  "cmdHideCodes": { "message": "Codes aus- oder einblenden" },
+  "cmdOpenWindow": { "message": "In eigenem Fenster öffnen" },
+  "menuOpenWindow": { "message": "In eigenem Fenster öffnen" },
+  "menuQuickFill": { "message": "2FA-Code einfügen" },
+  "fillCopied": { "message": "Code kopiert. Fügen Sie ihn ein." },
+  "fillManual": {
+    "message": "Code: $CODE$",
+    "placeholders": { "code": { "content": "$1" } }
+  },
+  "fillPickAccount": { "message": "Konto auswählen" },
+  "fieldFillButton": { "message": "Code einfügen" }
+}

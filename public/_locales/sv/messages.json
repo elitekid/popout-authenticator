@@ -1,0 +1,19 @@
+{
+  "appName": { "message": "Popout Authenticator" },
+  "appDesc": { "message": "Gratis 2FA-autentiserare för din webbläsare. Skapar engångskoder och öppnas som popup eller separat fönster." },
+  "cmdExecuteAction": { "message": "Öppna popupen" },
+  "cmdQuickFill": { "message": "Fyll i 2FA-koden på den här sidan" },
+  "cmdScanQr": { "message": "Skanna en QR-kod på skärmen" },
+  "cmdAutofill": { "message": "Fyll i koden för det bäst matchande kontot" },
+  "cmdHideCodes": { "message": "Dölj eller visa koder" },
+  "cmdOpenWindow": { "message": "Öppna i ett separat fönster" },
+  "menuOpenWindow": { "message": "Öppna i ett separat fönster" },
+  "menuQuickFill": { "message": "Fyll i 2FA-kod" },
+  "fillCopied": { "message": "Koden har kopierats. Klistra in den." },
+  "fillManual": {
+    "message": "Kod: $CODE$",
+    "placeholders": { "code": { "content": "$1" } }
+  },
+  "fillPickAccount": { "message": "Välj ett konto" },
+  "fieldFillButton": { "message": "Fyll i kod" }
+}

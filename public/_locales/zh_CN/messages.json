@@ -1,0 +1,19 @@
+{
+  "appName": { "message": "Popout Authenticator" },
+  "appDesc": { "message": "免费的浏览器 2FA 验证器。生成一次性验证码，可在弹出窗口或独立窗口中打开。" },
+  "cmdExecuteAction": { "message": "打开弹出窗口" },
+  "cmdQuickFill": { "message": "在此页面填入 2FA 验证码" },
+  "cmdScanQr": { "message": "扫描屏幕上的二维码" },
+  "cmdAutofill": { "message": "填入最匹配账户的验证码" },
+  "cmdHideCodes": { "message": "隐藏或显示验证码" },
+  "cmdOpenWindow": { "message": "在独立窗口中打开" },
+  "menuOpenWindow": { "message": "在独立窗口中打开" },
+  "menuQuickFill": { "message": "填入 2FA 验证码" },
+  "fillCopied": { "message": "验证码已复制。请粘贴到网站中。" },
+  "fillManual": {
+    "message": "验证码：$CODE$",
+    "placeholders": { "code": { "content": "$1" } }
+  },
+  "fillPickAccount": { "message": "请选择账户" },
+  "fieldFillButton": { "message": "填入验证码" }
+}

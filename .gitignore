@@ -1,0 +1,8 @@
+node_modules/
+dist/
+dist-*/
+dist-share/
+popout-authenticator.zip
+popout-authenticator-*.zip
+.DS_Store
+store/.raw/

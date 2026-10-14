@@ -1,0 +1,78 @@
+{
+  "h-a": {
+    "dataType": "OTPStorage",
+    "encrypted": false,
+    "hash": "h-a",
+    "index": 0,
+    "type": "totp",
+    "secret": "JBSWY3DPEHPK3PXP",
+    "issuer": "Example",
+    "account": "alice@example.com",
+    "pinned": true
+  },
+  "h-b": {
+    "dataType": "OTPStorage",
+    "encrypted": false,
+    "hash": "h-b",
+    "index": 1,
+    "type": "totp",
+    "secret": "GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQGEZA",
+    "issuer": "Corp",
+    "account": "ops",
+    "algorithm": "SHA256",
+    "digits": 8,
+    "period": 60
+  },
+  "h-c": {
+    "dataType": "OTPStorage",
+    "encrypted": false,
+    "hash": "h-c",
+    "index": 2,
+    "type": "hotp",
+    "secret": "GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ",
+    "issuer": "Counter",
+    "account": "hotp-test",
+    "counter": 5
+  },
+  "h-d": {
+    "dataType": "OTPStorage",
+    "encrypted": false,
+    "hash": "h-d",
+    "index": 3,
+    "type": "hex",
+    "secret": "48656c6c6f21deadbeef",
+    "issuer": "HexCo",
+    "account": "hex-test"
+  },
+  "h-e": {
+    "dataType": "OTPStorage",
+    "encrypted": false,
+    "hash": "h-e",
+    "index": 4,
+    "type": "battle",
+    "secret": "JBSWY3DPEHPK3PXP",
+    "issuer": "Battle.net",
+    "account": "battle-test"
+  },
+  "h-f": {
+    "dataType": "OTPStorage",
+    "encrypted": false,
+    "hash": "h-f",
+    "index": 5,
+    "type": "steam",
+    "secret": "JBSWY3DPEHPK3PXP",
+    "issuer": "Steam",
+    "account": "steam-test"
+  },
+  "h-g": {
+    "dataType": "OTPStorage",
+    "encrypted": false,
+    "hash": "h-g",
+    "index": 6,
+    "type": "totp",
+    "secret": "JBSWY3DPEHPK3PXP",
+    "issuer": "Gost",
+    "account": "gost-test",
+    "algorithm": "GOST3411_2012_256"
+  }
+}

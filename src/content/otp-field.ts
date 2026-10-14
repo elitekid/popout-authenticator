@@ -1,0 +1,215 @@
+// 사용자가 허락한 사이트의 OTP 입력칸 옆에 '코드 넣기' 단추를 띄운다.
+// 등록된 페이지 스크립트(고전 스크립트)로 돈다: 다른 모듈을 값으로 import 하지 않고 export 도 두지 않는다.
+// 단추를 누를 때만 서비스 워커에 넣기를 청구한다. 코드는 이 스크립트가 받지 않는다.
+import type { FieldCheckMessage, FieldCheckReply, FieldFillMessage } from '../store/field-buttons';
+
+(() => {
+  const FLAG = '__popoutOtpFieldLoaded';
+  const g = globalThis as unknown as Record<string, unknown>;
+  if (g[FLAG]) return;
+  g[FLAG] = true;
+
+  const MAX_BUTTONS = 3;
+  const RESCAN_MS = 300;
+  const GAP = 4;
+  const HEIGHT = 24;
+  const TYPES = new Set(['text', 'tel', 'number', 'password', '']);
+  const HINT = /otp|totp|2fa|two.?factor|mfa|one.?time|verification.?code|auth.?code|security.?code/i;
+
+  type Entry = { input: HTMLInputElement; host: HTMLElement };
+  const entries: Entry[] = [];
+  const known = new WeakMap<HTMLInputElement, Entry>();
+  let stopped = false;
+  let started = false;
+  let checkSequence = 0;
+  let frame = 0;
+  let timer = 0;
+
+  function visible(el: HTMLElement): boolean {
+    const rect = el.getBoundingClientRect();
+    if (rect.width <= 0 || rect.height <= 0) return false;
+    const style = getComputedStyle(el);
+    return style.display !== 'none' && style.visibility !== 'hidden';
+  }
+
+  // 속성을 먼저 보고 필요할 때만 연결된 라벨을 읽는다. OTP 힌트가 있어야 배치를 확인한다.
+  function looksLikeOtp(input: HTMLInputElement): boolean {
+    if (input.disabled || input.readOnly) return false;
+    if (!TYPES.has(input.getAttribute('type')?.toLowerCase() ?? '')) return false;
+    let hinted =
+      input.autocomplete.toLowerCase().includes('one-time-code') ||
+      [input.name, input.id, input.placeholder, input.getAttribute('aria-label') ?? ''].some((s) => HINT.test(s));
+    if (!hinted && input.labels) {
+      for (const label of input.labels) {
+        if (HINT.test(label.textContent ?? '')) {
+          hinted = true;
+          break;
+        }
+      }
+    }
+    // password 타입도 OTP 힌트가 명확할 때만 허용한다. 일반 비밀번호 칸은 제외한다.
+    return hinted && visible(input);
+  }
+
+  function groupOf(input: HTMLInputElement): unknown {
+    return input.form ?? input.parentElement?.parentElement ?? document;
+  }
+
+  function place(entry: Entry): void {
+    const rect = entry.input.getBoundingClientRect();
+    const width = entry.host.offsetWidth;
+    const left = rect.right + window.scrollX - GAP - width;
+    const top = rect.top + window.scrollY + (rect.height - HEIGHT) / 2;
+    entry.host.style.left = `${Math.max(0, left)}px`;
+    entry.host.style.top = `${Math.max(0, top)}px`;
+  }
+
+  function drop(entry: Entry): void {
+    entry.host.remove();
+    known.delete(entry.input);
+    const i = entries.indexOf(entry);
+    if (i >= 0) entries.splice(i, 1);
+  }
+
+  function makeButton(input: HTMLInputElement): Entry {
+    const host = document.createElement('popout-otp-button');
+    host.style.cssText = 'all:initial;position:absolute;z-index:2147483647;top:0;left:0;';
+    const root = host.attachShadow({ mode: 'closed' });
+    const style = document.createElement('style');
+    style.textContent =
+      'button{all:initial;box-sizing:border-box;display:block;height:24px;padding:0 8px;' +
+      'border-radius:6px;background:#2c64d6;color:#fff;font:12px/24px system-ui,-apple-system,"Segoe UI",sans-serif;' +
+      'cursor:pointer;white-space:nowrap;}button:disabled{opacity:.6;cursor:default;}';
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.textContent = chrome.i18n.getMessage('fieldFillButton');
+    button.title = chrome.i18n.getMessage('appName');
+    // 칸의 포커스를 빼앗지 않는다.
+    button.addEventListener('mousedown', (event) => event.preventDefault());
+    button.addEventListener('click', (event) => {
+      // 페이지 스크립트가 만든 가짜 클릭은 무시한다.
+      if (!event.isTrusted || button.disabled) return;
+      button.disabled = true;
+      input.focus();
+      const message: FieldFillMessage = { type: 'field-fill' };
+      void (async () => {
+        try {
+          const reply = (await chrome.runtime.sendMessage(message)) as { ok?: boolean } | undefined;
+          // 더는 켜져 있지 않거나 이 문서에서 쓸 수 없다고 답하면 단추를 모두 거둔다.
+          if (reply?.ok === false) {
+            stop();
+            return;
+          }
+        } catch {
+          // 확장이 다시 불러와졌거나 서비스 워커가 응답하지 못했다. 단추만 되살린다.
+        } finally {
+          button.disabled = false;
+        }
+      })();
+    });
+    root.append(style, button);
+    document.documentElement.append(host);
+    return { input, host };
+  }
+
+  function scan(): void {
+    if (stopped) return;
+    for (const entry of [...entries]) {
+      if (!entry.input.isConnected || !visible(entry.input)) drop(entry);
+    }
+    if (entries.length >= MAX_BUTTONS) return;
+    const seenGroups = new Set<unknown>();
+    // 이미 단추가 있는 분할 칸의 그룹에는 다른 칸에 단추를 또 두지 않는다.
+    for (const entry of entries) {
+      if (entry.input.maxLength === 1) seenGroups.add(groupOf(entry.input));
+    }
+    for (const input of document.querySelectorAll('input')) {
+      if (entries.length >= MAX_BUTTONS) break;
+      if (known.has(input) || !looksLikeOtp(input)) continue;
+      // 한 글자씩 나뉜 칸은 첫 칸에만 단추를 둔다.
+      if (input.maxLength === 1) {
+        const group = groupOf(input);
+        if (seenGroups.has(group)) continue;
+        seenGroups.add(group);
+      }
+      const entry = makeButton(input);
+      known.set(input, entry);
+      entries.push(entry);
+      place(entry);
+    }
+  }
+
+  function schedulePlace(): void {
+    if (stopped || frame !== 0) return;
+    frame = requestAnimationFrame(() => {
+      frame = 0;
+      for (const entry of [...entries]) {
+        if (!entry.input.isConnected || !visible(entry.input)) drop(entry);
+        else place(entry);
+      }
+    });
+  }
+
+  function scheduleScan(): void {
+    if (stopped || timer !== 0) return;
+    timer = window.setTimeout(() => {
+      timer = 0;
+      scan();
+    }, RESCAN_MS);
+  }
+
+  const observer = new MutationObserver(scheduleScan);
+
+  // 꺼졌거나 쓸 수 없는 문서면 단추·관찰·예약·리스너를 모두 거둔다.
+  function stop(): void {
+    if (stopped) return;
+    stopped = true;
+    for (const entry of [...entries]) drop(entry);
+    observer.disconnect();
+    window.removeEventListener('scroll', schedulePlace, { capture: true });
+    window.removeEventListener('resize', schedulePlace);
+    if (timer !== 0) window.clearTimeout(timer);
+    if (frame !== 0) cancelAnimationFrame(frame);
+    timer = 0;
+    frame = 0;
+    try {
+      chrome.storage.onChanged.removeListener(onStorageChanged);
+    } catch {
+      // 확장 문맥이 이미 닫혔다.
+    }
+    g[FLAG] = false;
+  }
+
+  function onStorageChanged(changes: Record<string, chrome.storage.StorageChange>, area: string): void {
+    if (area !== 'local' || (!('fieldButtons' in changes) && !('autoFieldButtons' in changes))) return;
+    checkEnabled();
+  }
+
+  function start(): void {
+    if (stopped || started) return;
+    started = true;
+    window.addEventListener('scroll', schedulePlace, { capture: true, passive: true });
+    window.addEventListener('resize', schedulePlace, { passive: true });
+    observer.observe(document.documentElement, { childList: true, subtree: true });
+    scan();
+  }
+
+  function checkEnabled(): void {
+    const sequence = ++checkSequence;
+    const message: FieldCheckMessage = { type: 'field-check' };
+    void (async () => {
+      try {
+        const reply = (await chrome.runtime.sendMessage(message)) as FieldCheckReply | undefined;
+        if (stopped || sequence !== checkSequence) return;
+        if (reply?.enabled === true) start();
+        else stop();
+      } catch {
+        // 처음부터 계정을 확인하지 못한 페이지에는 단추를 붙이지 않는다.
+        if (!started && sequence === checkSequence) stop();
+      }
+    })();
+  }
+
+  chrome.storage.onChanged.addListener(onStorageChanged);
+  checkEnabled();
+})();

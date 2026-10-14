@@ -1,0 +1,27 @@
+import { register as registerMenus } from './menus';
+import { register as registerCommands } from './commands';
+import { register as registerOpenMode } from './open-mode';
+import { register as registerFill } from './fill';
+import { register as registerAutolock } from './autolock';
+import { register as registerHousekeeping } from './housekeeping';
+import { register as registerClipboard } from './clipboard';
+import { register as registerSync } from './sync';
+import { register as registerCapture } from './capture';
+import { register as registerWhatsNew } from './whats-new';
+import { register as registerFieldButtons } from './field-buttons';
+import { register as registerCodeAccess } from './code-access';
+import { registerNormalWindowTracking } from '../store/browser-window';
+
+registerNormalWindowTracking();
+registerMenus();
+registerCommands();
+registerOpenMode();
+registerFill();
+registerCodeAccess();
+registerAutolock();
+registerHousekeeping();
+registerClipboard();
+registerSync();
+registerCapture();
+registerWhatsNew();
+registerFieldButtons();

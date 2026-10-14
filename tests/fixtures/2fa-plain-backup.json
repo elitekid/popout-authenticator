@@ -1,0 +1,28 @@
+{
+  "version": "2.0",
+  "exportDate": "2026-10-13T00:00:00.000Z",
+  "accountCount": 2,
+  "accounts": [
+    {
+      "id": "a1",
+      "name": "alice@example.com",
+      "issuer": "Example",
+      "secret": "JBSWY3DPEHPK3PXP",
+      "algorithm": "SHA1",
+      "digits": 6,
+      "period": 30,
+      "createdAt": 1700000000000,
+      "group": "Work"
+    },
+    {
+      "id": "a2",
+      "name": "ops",
+      "issuer": "Corp",
+      "secret": "GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQGEZA",
+      "algorithm": "SHA256",
+      "digits": 8,
+      "period": 60,
+      "createdAt": 1700000000001
+    }
+  ]
+}

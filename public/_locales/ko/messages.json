@@ -1,0 +1,49 @@
+{
+  "appName": {
+    "message": "팝업 인증 도구"
+  },
+  "appDesc": {
+    "message": "브라우저에서 쓰는 무료 2단계 인증 도구. 일회용 코드를 만들고 팝업·별도 창으로 열 수 있습니다."
+  },
+  "cmdExecuteAction": {
+    "message": "팝업 열기"
+  },
+  "cmdQuickFill": {
+    "message": "이 페이지에 인증 코드 넣기"
+  },
+  "cmdScanQr": {
+    "message": "화면의 QR 코드 읽기"
+  },
+  "cmdAutofill": {
+    "message": "사이트에 맞는 계정의 코드 넣기"
+  },
+  "cmdHideCodes": {
+    "message": "코드 가리기·보이기"
+  },
+  "cmdOpenWindow": {
+    "message": "별도 창으로 열기"
+  },
+  "menuOpenWindow": {
+    "message": "별도 창으로 열기"
+  },
+  "menuQuickFill": {
+    "message": "인증 코드 넣기"
+  },
+  "fillCopied": {
+    "message": "코드를 복사했습니다. 입력칸에 붙여 넣어 주세요."
+  },
+  "fillManual": {
+    "message": "코드: $CODE$",
+    "placeholders": {
+      "code": {
+        "content": "$1"
+      }
+    }
+  },
+  "fillPickAccount": {
+    "message": "계정을 골라 주세요."
+  },
+  "fieldFillButton": {
+    "message": "코드 넣기"
+  }
+}

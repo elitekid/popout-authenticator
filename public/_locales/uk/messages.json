@@ -1,0 +1,19 @@
+{
+  "appName": { "message": "Popout Authenticator" },
+  "appDesc": { "message": "Безкоштовний автентифікатор 2FA для вашого браузера. Генерує одноразові коди, відкривається як спливне або окреме вікно." },
+  "cmdExecuteAction": { "message": "Відкрити спливне вікно" },
+  "cmdQuickFill": { "message": "Вставити код 2FA на цій сторінці" },
+  "cmdScanQr": { "message": "Сканувати QR-код на екрані" },
+  "cmdAutofill": { "message": "Вставити код найбільш відповідного облікового запису" },
+  "cmdHideCodes": { "message": "Приховати або показати коди" },
+  "cmdOpenWindow": { "message": "Відкрити в окремому вікні" },
+  "menuOpenWindow": { "message": "Відкрити в окремому вікні" },
+  "menuQuickFill": { "message": "Вставити код 2FA" },
+  "fillCopied": { "message": "Код скопійовано. Вставте його." },
+  "fillManual": {
+    "message": "Код: $CODE$",
+    "placeholders": { "code": { "content": "$1" } }
+  },
+  "fillPickAccount": { "message": "Виберіть обліковий запис" },
+  "fieldFillButton": { "message": "Вставити код" }
+}

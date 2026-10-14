@@ -1,0 +1,19 @@
+{
+  "appName": { "message": "Popout Authenticator" },
+  "appDesc": { "message": "Gratis 2FA-authenticator voor je browser. Genereert eenmalige codes en opent als pop-up of apart venster." },
+  "cmdExecuteAction": { "message": "De pop-up openen" },
+  "cmdQuickFill": { "message": "De 2FA-code op deze pagina invullen" },
+  "cmdScanQr": { "message": "Een QR-code op het scherm scannen" },
+  "cmdAutofill": { "message": "De code van het best passende account invullen" },
+  "cmdHideCodes": { "message": "Codes verbergen of tonen" },
+  "cmdOpenWindow": { "message": "Openen in een apart venster" },
+  "menuOpenWindow": { "message": "Openen in een apart venster" },
+  "menuQuickFill": { "message": "2FA-code invullen" },
+  "fillCopied": { "message": "Code gekopieerd. Plak hem erin." },
+  "fillManual": {
+    "message": "Code: $CODE$",
+    "placeholders": { "code": { "content": "$1" } }
+  },
+  "fillPickAccount": { "message": "Kies een account" },
+  "fieldFillButton": { "message": "Code invullen" }
+}

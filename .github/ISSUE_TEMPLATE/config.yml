@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Privacy policy
+    url: https://github.com/elitekid/popout-authenticator/blob/main/PRIVACY.md
+    about: How Popout Authenticator handles your data. Never post secrets, QR codes, or backup files in an issue.

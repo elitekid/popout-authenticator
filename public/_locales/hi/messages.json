@@ -1,0 +1,19 @@
+{
+  "appName": { "message": "Popout Authenticator" },
+  "appDesc": { "message": "आपके ब्राउज़र के लिए मुफ़्त 2FA ऑथेंटिकेटर। एक बार इस्तेमाल होने वाले कोड बनाता है और पॉपअप या अलग विंडो में खुलता है।" },
+  "cmdExecuteAction": { "message": "पॉपअप खोलें" },
+  "cmdQuickFill": { "message": "इस पेज पर 2FA कोड भरें" },
+  "cmdScanQr": { "message": "स्क्रीन पर QR कोड स्कैन करें" },
+  "cmdAutofill": { "message": "सबसे मेल खाते खाते का कोड भरें" },
+  "cmdHideCodes": { "message": "कोड छिपाएँ या दिखाएँ" },
+  "cmdOpenWindow": { "message": "अलग विंडो में खोलें" },
+  "menuOpenWindow": { "message": "अलग विंडो में खोलें" },
+  "menuQuickFill": { "message": "2FA कोड भरें" },
+  "fillCopied": { "message": "कोड कॉपी हो गया। इसे साइट पर चिपकाएँ।" },
+  "fillManual": {
+    "message": "कोड: $CODE$",
+    "placeholders": { "code": { "content": "$1" } }
+  },
+  "fillPickAccount": { "message": "कोई खाता चुनें" },
+  "fieldFillButton": { "message": "कोड भरें" }
+}

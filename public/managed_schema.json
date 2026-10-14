@@ -1,0 +1,46 @@
+{
+  "type": "object",
+  "properties": {
+    "storageArea": {
+      "title": "Storage area",
+      "description": "Where accounts are stored: sync or local.",
+      "type": "string",
+      "enum": ["sync", "local"]
+    },
+    "disableBackup": {
+      "title": "Disable backup",
+      "description": "Hide the backup feature.",
+      "type": "boolean"
+    },
+    "disableExport": {
+      "title": "Disable export",
+      "description": "Hide the export feature.",
+      "type": "boolean"
+    },
+    "enforcePassword": {
+      "title": "Enforce password",
+      "description": "Require users to set a password.",
+      "type": "boolean"
+    },
+    "enforceAutolock": {
+      "title": "Enforce auto lock",
+      "description": "Minutes of inactivity before the vault locks.",
+      "type": "number"
+    },
+    "passwordPolicy": {
+      "title": "Password policy",
+      "description": "Regular expression a password must match.",
+      "type": "string"
+    },
+    "passwordPolicyHint": {
+      "title": "Password policy hint",
+      "description": "Text shown when a password does not match the policy.",
+      "type": "string"
+    },
+    "feedbackURL": {
+      "title": "Feedback URL",
+      "description": "Address of the feedback page.",
+      "type": "string"
+    }
+  }
+}

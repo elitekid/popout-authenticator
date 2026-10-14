@@ -1,0 +1,19 @@
+{
+  "appName": { "message": "Popout Authenticator" },
+  "appDesc": { "message": "مصادِق 2FA مجاني لمتصفحك. يولّد رموزًا لمرة واحدة، ويُفتح كنافذة منبثقة أو نافذة منفصلة." },
+  "cmdExecuteAction": { "message": "فتح النافذة المنبثقة" },
+  "cmdQuickFill": { "message": "إدخال رمز 2FA في هذه الصفحة" },
+  "cmdScanQr": { "message": "قراءة رمز QR من الشاشة" },
+  "cmdAutofill": { "message": "إدخال رمز الحساب الأكثر مطابقة" },
+  "cmdHideCodes": { "message": "إخفاء الرموز أو إظهارها" },
+  "cmdOpenWindow": { "message": "فتح في نافذة منفصلة" },
+  "menuOpenWindow": { "message": "فتح في نافذة منفصلة" },
+  "menuQuickFill": { "message": "إدخال رمز 2FA" },
+  "fillCopied": { "message": "تم نسخ الرمز. الصقه في الموقع." },
+  "fillManual": {
+    "message": "الرمز: $CODE$",
+    "placeholders": { "code": { "content": "$1" } }
+  },
+  "fillPickAccount": { "message": "اختر حسابًا" },
+  "fieldFillButton": { "message": "إدخال الرمز" }
+}

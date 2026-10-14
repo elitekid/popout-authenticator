@@ -1,0 +1,49 @@
+{
+  "appName": {
+    "message": "Popout Authenticator"
+  },
+  "appDesc": {
+    "message": "Free 2FA authenticator for your browser. Generates one-time codes, opens as a popup or separate window."
+  },
+  "cmdExecuteAction": {
+    "message": "Open the popup"
+  },
+  "cmdQuickFill": {
+    "message": "Fill the 2FA code on this page"
+  },
+  "cmdScanQr": {
+    "message": "Scan a QR code on the screen"
+  },
+  "cmdAutofill": {
+    "message": "Fill the code of the best matching account"
+  },
+  "cmdHideCodes": {
+    "message": "Hide or show codes"
+  },
+  "cmdOpenWindow": {
+    "message": "Open in a separate window"
+  },
+  "menuOpenWindow": {
+    "message": "Open in a separate window"
+  },
+  "menuQuickFill": {
+    "message": "Fill 2FA code"
+  },
+  "fillCopied": {
+    "message": "Code copied. Paste it into the input field."
+  },
+  "fillManual": {
+    "message": "Code: $CODE$",
+    "placeholders": {
+      "code": {
+        "content": "$1"
+      }
+    }
+  },
+  "fillPickAccount": {
+    "message": "Choose an account."
+  },
+  "fieldFillButton": {
+    "message": "Fill code"
+  }
+}

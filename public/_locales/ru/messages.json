@@ -1,0 +1,19 @@
+{
+  "appName": { "message": "Popout Authenticator" },
+  "appDesc": { "message": "Бесплатный 2FA-аутентификатор для вашего браузера. Создаёт одноразовые коды, открывается во всплывающем или отдельном окне." },
+  "cmdExecuteAction": { "message": "Открыть всплывающее окно" },
+  "cmdQuickFill": { "message": "Ввести 2FA-код на этой странице" },
+  "cmdScanQr": { "message": "Сканировать QR-код на экране" },
+  "cmdAutofill": { "message": "Ввести код наиболее подходящего аккаунта" },
+  "cmdHideCodes": { "message": "Скрыть или показать коды" },
+  "cmdOpenWindow": { "message": "Открыть в отдельном окне" },
+  "menuOpenWindow": { "message": "Открыть в отдельном окне" },
+  "menuQuickFill": { "message": "Ввести 2FA-код" },
+  "fillCopied": { "message": "Код скопирован. Вставьте его на сайте." },
+  "fillManual": {
+    "message": "Код: $CODE$",
+    "placeholders": { "code": { "content": "$1" } }
+  },
+  "fillPickAccount": { "message": "Выберите аккаунт" },
+  "fieldFillButton": { "message": "Ввести код" }
+}

@@ -1,0 +1,19 @@
+{
+  "appName": { "message": "Popout Authenticator" },
+  "appDesc": { "message": "ブラウザ用の無料 2FA 認証アプリです。ワンタイムコードを生成し、ポップアップや別ウィンドウで開けます。" },
+  "cmdExecuteAction": { "message": "ポップアップを開く" },
+  "cmdQuickFill": { "message": "このページに 2FA コードを入力" },
+  "cmdScanQr": { "message": "画面上の QR コードをスキャン" },
+  "cmdAutofill": { "message": "最も一致するアカウントのコードを入力" },
+  "cmdHideCodes": { "message": "コードの表示/非表示を切り替え" },
+  "cmdOpenWindow": { "message": "別ウィンドウで開く" },
+  "menuOpenWindow": { "message": "別ウィンドウで開く" },
+  "menuQuickFill": { "message": "2FA コードを入力" },
+  "fillCopied": { "message": "コードをコピーしました。貼り付けてください。" },
+  "fillManual": {
+    "message": "コード: $CODE$",
+    "placeholders": { "code": { "content": "$1" } }
+  },
+  "fillPickAccount": { "message": "アカウントを選択" },
+  "fieldFillButton": { "message": "コードを入力" }
+}

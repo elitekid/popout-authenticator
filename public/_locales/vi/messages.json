@@ -1,0 +1,19 @@
+{
+  "appName": { "message": "Popout Authenticator" },
+  "appDesc": { "message": "Ứng dụng xác thực 2FA miễn phí cho trình duyệt của bạn. Tạo mã dùng một lần, mở trong cửa sổ bật lên hoặc cửa sổ riêng." },
+  "cmdExecuteAction": { "message": "Mở cửa sổ bật lên" },
+  "cmdQuickFill": { "message": "Điền mã 2FA vào trang này" },
+  "cmdScanQr": { "message": "Quét mã QR trên màn hình" },
+  "cmdAutofill": { "message": "Điền mã của tài khoản phù hợp nhất" },
+  "cmdHideCodes": { "message": "Ẩn hoặc hiện mã" },
+  "cmdOpenWindow": { "message": "Mở trong cửa sổ riêng" },
+  "menuOpenWindow": { "message": "Mở trong cửa sổ riêng" },
+  "menuQuickFill": { "message": "Điền mã 2FA" },
+  "fillCopied": { "message": "Đã sao chép mã. Hãy dán mã vào trang web." },
+  "fillManual": {
+    "message": "Mã: $CODE$",
+    "placeholders": { "code": { "content": "$1" } }
+  },
+  "fillPickAccount": { "message": "Chọn một tài khoản" },
+  "fieldFillButton": { "message": "Điền mã" }
+}

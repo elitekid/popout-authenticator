@@ -1,0 +1,70 @@
+{
+  "manifest_version": 3,
+  "name": "__MSG_appName__",
+  "description": "__MSG_appDesc__",
+  "default_locale": "en",
+  "version": "1.0.0",
+  "minimum_chrome_version": "127",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png"
+    }
+  },
+  "background": {
+    "service_worker": "bg/sw.js",
+    "type": "module"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "permissions": [
+    "storage",
+    "unlimitedStorage",
+    "activeTab",
+    "scripting",
+    "alarms",
+    "contextMenus",
+    "clipboardWrite",
+    "offscreen",
+    "sidePanel"
+  ],
+  "optional_permissions": ["tabs", "clipboardRead"],
+  "optional_host_permissions": ["https://*/*", "*://127.0.0.1/*", "*://localhost/*"],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  },
+  "storage": {
+    "managed_schema": "managed_schema.json"
+  },
+  "commands": {
+    "_execute_action": {
+      "description": "__MSG_cmdExecuteAction__"
+    },
+    "quick-fill": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Y",
+        "mac": "Command+Shift+Y"
+      },
+      "description": "__MSG_cmdQuickFill__"
+    },
+    "scan-qr": {
+      "description": "__MSG_cmdScanQr__"
+    },
+    "autofill": {
+      "description": "__MSG_cmdAutofill__"
+    },
+    "hide-codes": {
+      "description": "__MSG_cmdHideCodes__"
+    },
+    "open-window": {
+      "description": "__MSG_cmdOpenWindow__"
+    }
+  }
+}

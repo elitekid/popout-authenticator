@@ -1,0 +1,19 @@
+{
+  "appName": { "message": "Popout Authenticator" },
+  "appDesc": { "message": "Darmowy uwierzytelniacz 2FA w przeglądarce. Generuje kody jednorazowe, otwiera się jako okienko lub osobne okno." },
+  "cmdExecuteAction": { "message": "Otwórz okienko" },
+  "cmdQuickFill": { "message": "Wpisz kod 2FA na tej stronie" },
+  "cmdScanQr": { "message": "Zeskanuj kod QR z ekranu" },
+  "cmdAutofill": { "message": "Wpisz kod najlepiej pasującego konta" },
+  "cmdHideCodes": { "message": "Ukryj lub pokaż kody" },
+  "cmdOpenWindow": { "message": "Otwórz w osobnym oknie" },
+  "menuOpenWindow": { "message": "Otwórz w osobnym oknie" },
+  "menuQuickFill": { "message": "Wpisz kod 2FA" },
+  "fillCopied": { "message": "Kod skopiowano. Wklej go." },
+  "fillManual": {
+    "message": "Kod: $CODE$",
+    "placeholders": { "code": { "content": "$1" } }
+  },
+  "fillPickAccount": { "message": "Wybierz konto" },
+  "fieldFillButton": { "message": "Wpisz kod" }
+}

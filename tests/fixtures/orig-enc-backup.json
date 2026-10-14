@@ -1,0 +1,15 @@
+{
+  "b06d79fd-e3b7-458f-ac70-580f50034e49": {
+    "dataType": "EncOTPStorage",
+    "data": "U2FsdGVkX1+D1BiYoeLT6I29/D+1fP1kj6gIShDJtyRaPx3bZdfpQoAi5t5jxJaV7Pkd238dkptFwg8cU/qn6pNi38sWGJ6j6BSA0exOIZPdEgaCdltHxlLBYtVNNoTeIjso6TZvll4YzB4fn/EIVnPjnFqfzwzY/tQxh0YZ7mR46AllCNIK7pvueOJV8FYBfMDLyz5F9z1DDQUsFoAUU4C0qSJQZuXpREu9rpWhYJANxNCg6QUooJAIJLKbi7rgmYFiExqKGMpPQ6ygzXQTI10XHMNgaV1DR7l44NlHk+4WM+ag4si2wJH/LpoBYXtjbvh+kTtCGiaExAObtK/eHYgyHpZ6LtLyRCIQcDwBoul9dKTPGO54VTUGsHEwdAP3",
+    "keyId": "5d4cb42c-6b51-4952-b0f2-8653175c844f",
+    "index": 1
+  },
+  "5d4cb42c-6b51-4952-b0f2-8653175c844f": {
+    "dataType": "Key",
+    "hash": "$argon2id$v=19$m=19456,t=2,p=1$YTE2Y2I0MWRlNWQ4NWZkN2RjOTJhMTA5NWMxZDM2Ng$weM3tKw1NLZ657lOYOb086bQU1OPDBOtMlEQGOj5nYE",
+    "id": "5d4cb42c-6b51-4952-b0f2-8653175c844f",
+    "salt": "dc83ff87bd322742db1e135be7575f0d",
+    "version": 3
+  }
+}

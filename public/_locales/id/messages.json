@@ -1,0 +1,19 @@
+{
+  "appName": { "message": "Popout Authenticator" },
+  "appDesc": { "message": "Autentikator 2FA gratis untuk browser Anda. Menghasilkan kode sekali pakai dan dibuka sebagai popup atau jendela terpisah." },
+  "cmdExecuteAction": { "message": "Buka popup" },
+  "cmdQuickFill": { "message": "Isi kode 2FA di halaman ini" },
+  "cmdScanQr": { "message": "Pindai kode QR di layar" },
+  "cmdAutofill": { "message": "Isi kode akun yang paling cocok" },
+  "cmdHideCodes": { "message": "Sembunyikan atau tampilkan kode" },
+  "cmdOpenWindow": { "message": "Buka di jendela terpisah" },
+  "menuOpenWindow": { "message": "Buka di jendela terpisah" },
+  "menuQuickFill": { "message": "Isi kode 2FA" },
+  "fillCopied": { "message": "Kode telah disalin. Tempelkan di situs." },
+  "fillManual": {
+    "message": "Kode: $CODE$",
+    "placeholders": { "code": { "content": "$1" } }
+  },
+  "fillPickAccount": { "message": "Pilih akun" },
+  "fieldFillButton": { "message": "Isi kode" }
+}
