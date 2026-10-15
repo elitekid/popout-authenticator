@@ -1,11 +1,23 @@
 import { defineConfig, type Plugin } from 'vite';
 import preact from '@preact/preset-vite';
 import { fileURLToPath } from 'node:url';
-import { copyFileSync, readFileSync, writeFileSync } from 'node:fs';
+import { copyFileSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 
 const here = (p: string) => fileURLToPath(new URL(p, import.meta.url));
 const browserTargets = ['chrome', 'edge', 'firefox', 'safari'] as const;
 type BrowserTarget = typeof browserTargets[number];
+
+const SAFARI_SHORT_DESCRIPTIONS: Record<string, string> = {
+  de: 'Kostenloser 2FA-Authenticator. Erzeugt Einmalcodes und öffnet sich als Popup oder eigenes Fenster.',
+  es: 'Autenticador 2FA gratuito. Genera códigos de un solo uso en ventana emergente o independiente.',
+  fr: 'Authentificateur 2FA gratuit. Génère des codes à usage unique, en fenêtre contextuelle ou séparée.',
+  hi: 'मुफ़्त 2FA ऑथेंटिकेटर। एक बार इस्तेमाल होने वाले कोड बनाता है, पॉपअप या अलग विंडो में।',
+  id: 'Autentikator 2FA gratis. Menghasilkan kode sekali pakai di popup atau jendela terpisah.',
+  ru: 'Бесплатный 2FA-аутентификатор. Создаёт одноразовые коды во всплывающем или отдельном окне.',
+  tr: 'Ücretsiz 2FA kimlik doğrulayıcı. Tek kullanımlık kodlar üretir; açılır veya ayrı pencerede açılır.',
+  uk: 'Безкоштовний 2FA-автентифікатор. Генерує одноразові коди у спливному або окремому вікні.',
+  vi: 'Ứng dụng xác thực 2FA miễn phí. Tạo mã dùng một lần trong cửa sổ bật lên hoặc cửa sổ riêng.',
+};
 
 // 정본 manifest 하나를 각 브라우저가 실제 제공하는 API에 맞춰 낸다.
 function browserManifest(target: BrowserTarget): Plugin {
@@ -46,6 +58,17 @@ function browserManifest(target: BrowserTarget): Plugin {
           permission !== 'clipboardRead');
         delete manifest.storage;
         manifest.browser_specific_settings = { safari: { strict_min_version: '18.4' } };
+        // App Store 검증은 사파리 확장 설명을 언어마다 112자까지만 받는다. 넘는 언어만 짧은 문구로 바꾼다.
+        for (const [locale, description] of Object.entries(SAFARI_SHORT_DESCRIPTIONS)) {
+          const file = `${options.dir}/_locales/${locale}/messages.json`;
+          const messages = JSON.parse(readFileSync(file, 'utf8'));
+          messages.appDesc.message = description;
+          writeFileSync(file, `${JSON.stringify(messages, null, 2)}\n`);
+        }
+        for (const locale of readdirSync(`${options.dir}/_locales`)) {
+          const messages = JSON.parse(readFileSync(`${options.dir}/_locales/${locale}/messages.json`, 'utf8'));
+          if ([...messages.appDesc.message].length > 112) throw new Error(`Safari appDesc over 112 characters: ${locale}`);
+        }
       }
       writeFileSync(`${options.dir}/manifest.json`, `${JSON.stringify(manifest, null, 2)}\n`);
     },
