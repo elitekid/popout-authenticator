@@ -1,16 +1,20 @@
 # Popout Authenticator
 
-A free, open-source 2FA / OTP authenticator browser extension. Codes live in an encrypted vault on your device and open in the toolbar popup, a separate window, or the side panel. No account, no server, no analytics, no account limits.
+An open-source 2FA / OTP authenticator browser extension. Codes live in an encrypted vault on your device and open in the toolbar popup, a separate window, or the side panel. No account, no server, no analytics, no account limits.
+
+Website: [elitekid.github.io/popout-authenticator](https://elitekid.github.io/popout-authenticator/?utm_source=github&utm_medium=readme&utm_campaign=pa-readme)
 
 ## Install
 
 | Browser | Store |
 | --- | --- |
-| Chrome | Chrome Web Store (link after publication) |
-| Edge | Microsoft Edge Add-ons (link after publication) |
-| Firefox | Firefox Add-ons (link after publication) |
-| Whale | Naver Whale Store (link after publication) |
-| Safari | Mac App Store (link after publication) |
+| Chrome | [Chrome Web Store](https://chromewebstore.google.com/detail/nakgmloofpboegibcjhainbpjjokmbgj?utm_source=github&utm_medium=readme&utm_campaign=pa-readme) |
+| Edge | [Microsoft Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/edipphpgdmfabonchodjfnejlbjoknhh?utm_source=github&utm_medium=readme&utm_campaign=pa-readme) |
+| Firefox | Firefox Add-ons (in review) |
+| Whale | Naver Whale Store (in review) |
+| Safari (macOS) | Mac App Store (in review) |
+
+Moving from another authenticator: [from the Authenticator extension](https://elitekid.github.io/popout-authenticator/guides/from-authenticator-extension/?utm_source=github&utm_medium=readme&utm_campaign=pa-readme) · [from Authy and other apps](https://elitekid.github.io/popout-authenticator/guides/from-authy-and-other-apps/?utm_source=github&utm_medium=readme&utm_campaign=pa-readme)
 
 Privacy policy: [PRIVACY.md](PRIVACY.md) · Changes: [CHANGELOG.md](CHANGELOG.md)
 
