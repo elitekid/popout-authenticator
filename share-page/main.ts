@@ -200,5 +200,40 @@ function load(): void {
   void start(fragment);
 }
 
+// 하단 소개 줄: 확장의 기존 번역에서 appName 만 번들에 넣는다(설명의 '무료' 문구는 쓰지 않음).
+type Localized = { message: string };
+const appNames = import.meta.glob<Localized>('../public/_locales/*/messages.json', {
+  eager: true,
+  import: 'appName',
+});
+
+function aboutLocale(): string {
+  const folders = Object.keys(appNames).map((path) => path.split('/').slice(-2)[0]);
+  const tag = navigator.language.toLowerCase().replace('-', '_');
+  const base = tag.split('_')[0];
+  const exact = folders.find((f) => f.toLowerCase() === tag);
+  if (exact) return exact;
+  const byBase = folders.find((f) => f.toLowerCase() === base || f.toLowerCase().startsWith(`${base}_`));
+  return byBase ?? 'en';
+}
+
+function showAbout(): void {
+  const locale = aboutLocale();
+  const pick = (all: Record<string, Localized>): string =>
+    all[`../public/_locales/${locale}/messages.json`]?.message ?? '';
+  const home = locale === 'ko' ? '../ko/' : '../';
+  const link = el(
+    'a',
+    {
+      href: `${home}?utm_source=share&utm_medium=product&utm_campaign=pa-share`,
+      target: '_blank',
+      rel: 'noopener noreferrer',
+    },
+    pick(appNames),
+  );
+  document.getElementById('about')!.append(link);
+}
+
+showAbout();
 window.addEventListener('hashchange', load);
 load();

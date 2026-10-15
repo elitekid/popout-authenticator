@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Moving from Authy Desktop and other apps — Popout Authenticator</title>
+<meta name="description" content="How to bring your accounts from Authy Desktop, Google Authenticator and other authenticator apps into Popout Authenticator.">
+<link rel="canonical" href="https://elitekid.github.io/popout-authenticator/guides/from-authy-and-other-apps/">
+<link rel="alternate" hreflang="en" href="https://elitekid.github.io/popout-authenticator/guides/from-authy-and-other-apps/">
+<link rel="alternate" hreflang="ko" href="https://elitekid.github.io/popout-authenticator/ko/guides/from-authy-and-other-apps/">
+<link rel="alternate" hreflang="x-default" href="https://elitekid.github.io/popout-authenticator/guides/from-authy-and-other-apps/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Popout Authenticator">
+<meta property="og:title" content="Moving from Authy Desktop and other apps">
+<meta property="og:description" content="How to bring your accounts from Authy Desktop, Google Authenticator and other authenticator apps into Popout Authenticator.">
+<meta property="og:url" content="https://elitekid.github.io/popout-authenticator/guides/from-authy-and-other-apps/">
+<meta property="og:image" content="https://elitekid.github.io/popout-authenticator/img/en/03-window.png">
+<meta property="og:locale" content="en">
+<meta property="og:locale:alternate" content="ko">
+<link rel="icon" href="../../img/logo.png">
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/site.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="../../" data-keep-utm><img src="../../img/logo.png" width="36" height="36" alt="">Popout Authenticator</a>
+    <nav class="main" aria-label="Main">
+      <a href="../../" data-keep-utm>Home</a>
+      <a href="../../#guides" data-keep-utm>Guides</a>
+      <a href="https://github.com/elitekid/popout-authenticator">GitHub</a>
+      <a class="lang" href="../../ko/guides/from-authy-and-other-apps/" data-keep-utm hreflang="ko" lang="ko">한국어</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="wrap">
+  <h1>Moving from Authy Desktop and other apps</h1>
+  <p>Pick your app below. For the original Authenticator extension, see <a href="../from-authenticator-extension/" data-keep-utm>its own guide</a>.</p>
+
+  <h2>Get Popout Authenticator</h2>
+  <div class="stores" data-campaign="pa-guide-authy"></div>
+  <noscript><p><a href="https://github.com/elitekid/popout-authenticator">Get it from the GitHub repository</a></p></noscript>
+
+  <h2 id="authy">Authy</h2>
+  <p>Twilio ended Authy Desktop (Windows, macOS, Linux) on 2024-03-19 — <a href="https://help.twilio.com/articles/22771146070299-User-guide-End-of-Life-EOL-for-Twilio-Authy-Desktop-app">Twilio's end-of-life guide</a> (checked 2026-10-15). Authy does not offer exporting tokens — <a href="https://help.twilio.com/articles/19753420684059-Export-or-Import-Tokens-in-the-Authy-app">Export or Import Tokens in the Authy app</a> (checked 2026-10-15).</p>
+  <p>So you set each account up again:</p>
+  <ol>
+    <li>For each service, sign in and open its two-factor settings.</li>
+    <li>Set up the authenticator app again. The service shows a new QR code.</li>
+    <li>Add the new QR code in Popout: + → "Find QR on screen", or + → "Add account" → "QR code" tab.</li>
+    <li>Keep Authy until every account works in Popout.</li>
+  </ol>
+  <p>If you already have a JSON list of otpauth:// links from an earlier export, Popout can read it via "Backup file".</p>
+
+  <h2 id="google">Google Authenticator</h2>
+  <ol>
+    <li>On the phone, open the app's Menu → Transfer codes → Export codes (English app labels; see <a href="https://support.google.com/accounts/answer/1066447?hl=en">Google's instructions</a>, checked 2026-10-15).</li>
+    <li>Unlock, select the accounts, and choose Next. The app shows one or more QR codes.</li>
+    <li>In Popout, select + → "Read QR with camera", or + → "Add account" → "QR code" → "Choose QR code images" (you can choose several images at once).</li>
+    <li>If there are several QR codes, scan each one.</li>
+  </ol>
+  <div class="card note">
+    <p>These QR codes contain your secret keys. Don't share them, and delete any screenshots or photos afterwards.</p>
+  </div>
+
+  <h2 id="others">Other apps</h2>
+  <p>Use an unencrypted export unless the table says otherwise. For encrypted Aegis, 2FAS, and Bitwarden files, Popout says "Export an unencrypted file from the {app} app and use that."</p>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th scope="col">App</th><th scope="col">What to export</th><th scope="col">Notes</th></tr>
+      </thead>
+      <tbody>
+        <tr><th scope="row">Aegis</th><td>Unencrypted vault export (JSON)</td><td>Encrypted export is not supported.</td></tr>
+        <tr><th scope="row">2FAS</th><td>2FAS Backup → Export, without setting a password (<a href="https://2fas.com/support/2fas-auth-mobile-app/i-want-to-move-copy-transfer-tokens-codes-between-ios-and-android/">2FAS support</a>, checked 2026-10-15)</td><td>The file ends in .2fas. If the file picker doesn't let you select it, rename the file to end in .json.</td></tr>
+        <tr><th scope="row">Bitwarden Authenticator</th><td>Settings → Export → file format .json → Export items (<a href="https://bitwarden.com/help/authenticator-import-export/">Bitwarden help</a>, checked 2026-10-15)</td><td>CSV is not supported. An unencrypted Bitwarden password-manager JSON export also works (TOTP fields are read).</td></tr>
+        <tr><th scope="row">FreeOTP+</th><td>Its JSON export, or a text file of otpauth:// links</td><td></td></tr>
+        <tr><th scope="row">andOTP</th><td>Plain (unencrypted) JSON backup</td><td>Encrypted backups are not supported.</td></tr>
+        <tr><th scope="row">Raivo</th><td>Settings → Export OTPs to ZIP archive (per <a href="https://bitwarden.com/help/authenticator-import-export/">Bitwarden help</a>, checked 2026-10-15)</td><td>Unzip it with the password you chose, then import raivo-otp-export.json. Popout cannot open the ZIP itself.</td></tr>
+        <tr><th scope="row">2FA Authenticator (authenticator.sh)</th><td>Its backup file, plain or encrypted</td><td>For an encrypted file, Popout asks for the password.</td></tr>
+        <tr><th scope="row">Any app</th><td>A .txt file with one otpauth:// or otpauth-migration:// link per line</td><td>You can also paste links in the "Links" tab.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="import">Import into Popout</h2>
+  <ol>
+    <li>In Popout, select + → "Add account" → "Backup file" tab → "Choose a backup file." From the toolbar popup, a small window opens for choosing the file.</li>
+    <li>For an encrypted backup from 2FA Authenticator, Popout asks: "This backup is encrypted. Enter its password." Type it in "Backup password" and select "OK". If the password is wrong, you see "The password is incorrect."</li>
+    <li>A result message shows how many accounts were added. Accounts that already exist (same type and same secret) are skipped. Existing accounts are never overwritten.</li>
+  </ol>
+  <p>If the file is not recognized, Popout shows "Unknown format".</p>
+
+  <h2>Afterwards</h2>
+  <ul>
+    <li>Compare a code in both apps before you remove anything.</li>
+    <li>Delete unencrypted export files. They contain your secret keys.</li>
+  </ul>
+
+  <p><a href="../../" data-keep-utm>← Back to home</a></p>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <ul>
+      <li><a href="https://github.com/elitekid/popout-authenticator">GitHub</a></li>
+      <li><a href="https://github.com/elitekid/popout-authenticator/blob/main/PRIVACY.md">Privacy</a></li>
+      <li><a href="https://github.com/elitekid/popout-authenticator/issues">Issues</a></li>
+      <li>MIT License</li>
+    </ul>
+  </div>
+</footer>
+</body>
+</html>

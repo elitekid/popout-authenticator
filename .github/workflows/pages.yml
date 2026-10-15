@@ -1,10 +1,15 @@
-# Publishes the code-share receiving page to https://elitekid.github.io/popout-authenticator/share/
-name: Share page
+# Publishes the project website to https://elitekid.github.io/popout-authenticator/
+# (site/ at the root, the code-share receiving page under /share/, store images under /img/)
+name: Website
 
 on:
   push:
     branches: [main]
     paths:
+      - 'site/**'
+      - 'store/screenshots/**'
+      - 'store/brand/**'
+      - 'public/_locales/**'
       - 'share-page/**'
       - 'src/core/**'
       - 'package-lock.json'
@@ -31,7 +36,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build:share
-      - run: mkdir -p _site/share && cp -R dist-share/. _site/share/
+      - run: mkdir -p _site/share _site/img && cp -R site/. _site/ && cp -R dist-share/. _site/share/ && cp -R store/screenshots/. _site/img/ && cp store/brand/logo-300x300.png _site/img/logo.png
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
@@ -41,7 +46,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}share/
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4

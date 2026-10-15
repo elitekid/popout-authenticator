@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Popout Authenticator — 2FA &amp; OTP Codes</title>
+<meta name="description" content="브라우저에서 쓰는 2단계 인증 앱. 암호화된 코드를 팝업·창·사이드 패널로 보고, 허용한 사이트에 바로 넣습니다.">
+<link rel="canonical" href="https://elitekid.github.io/popout-authenticator/ko/">
+<link rel="alternate" hreflang="en" href="https://elitekid.github.io/popout-authenticator/">
+<link rel="alternate" hreflang="ko" href="https://elitekid.github.io/popout-authenticator/ko/">
+<link rel="alternate" hreflang="x-default" href="https://elitekid.github.io/popout-authenticator/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Popout Authenticator">
+<meta property="og:title" content="Popout Authenticator — 2FA &amp; OTP Codes">
+<meta property="og:description" content="브라우저에서 쓰는 2단계 인증 앱. 암호화된 코드를 팝업·창·사이드 패널로 보고, 허용한 사이트에 바로 넣습니다.">
+<meta property="og:url" content="https://elitekid.github.io/popout-authenticator/ko/">
+<meta property="og:image" content="https://elitekid.github.io/popout-authenticator/img/ko/03-window.png">
+<meta property="og:locale" content="ko">
+<meta property="og:locale:alternate" content="en">
+<link rel="icon" href="../img/logo.png">
+<link rel="stylesheet" href="../assets/site.css">
+<script src="../assets/site.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">본문으로 건너뛰기</a>
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="./" data-keep-utm><img src="../img/logo.png" width="36" height="36" alt="">Popout Authenticator</a>
+    <nav class="main" aria-label="주 메뉴">
+      <a href="./" data-keep-utm>홈</a>
+      <a href="#guides">가이드</a>
+      <a href="https://github.com/elitekid/popout-authenticator">GitHub</a>
+      <a class="lang" href="../" data-keep-utm hreflang="en" lang="en">English</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="wrap">
+  <section aria-labelledby="hero">
+    <h1 id="hero">Popout Authenticator — 2FA &amp; OTP Codes</h1>
+    <p class="lead">브라우저에서 쓰는 2단계 인증 앱. 암호화된 코드를 팝업·창·사이드 패널로 보고, 허용한 사이트에 바로 넣습니다.</p>
+    <div class="stores" data-campaign="pa-home"></div>
+    <noscript><p><a href="https://github.com/elitekid/popout-authenticator">GitHub 저장소에서 받기</a></p></noscript>
+    <p class="facts">오픈소스(MIT) · 계정 수 제한 없음 · 가입 없음 · 분석 도구 없음</p>
+    <figure>
+      <img src="../img/ko/03-window.png" width="1280" height="800" alt="웹 페이지 옆 별도 창에 계정과 일회용 코드가 보이는 Popout Authenticator 화면">
+    </figure>
+  </section>
+
+  <section aria-labelledby="codes">
+    <h2 id="codes">필요한 곳에서 바로 보는 코드</h2>
+    <div class="feature">
+      <div>
+        <ul>
+          <li>툴바 팝업, 분리 창, 사이드 패널(파이어폭스는 사이드바)에서 코드를 볼 수 있습니다.</li>
+          <li>검색, 그룹, 고정, 좁은 보기로 계정이 많아도 깔끔하게 정리됩니다.</li>
+          <li>지금 보고 있는 사이트의 계정을 먼저 알려 주고, 클릭·오른쪽 클릭·단축키로 코드를 넣습니다.</li>
+          <li>고른 사이트에서는 코드 입력 칸 옆에 넣기 단추를 띄울 수 있습니다.</li>
+        </ul>
+      </div>
+      <figure>
+        <img src="../img/ko/02-fill.png" width="1280" height="800" loading="lazy" alt="Popout Authenticator에서 로그인 화면에 코드를 넣는 모습">
+      </figure>
+    </div>
+  </section>
+
+  <section aria-labelledby="add">
+    <h2 id="add">편한 방법으로 계정 추가</h2>
+    <div class="feature">
+      <div>
+        <ul>
+          <li>지금 탭, 카메라, 이미지, 클립보드에서 QR 코드를 읽습니다.</li>
+          <li>otpauth:// 링크를 붙여 넣거나 비밀키를 직접 입력할 수 있습니다.</li>
+          <li>여러 인증 앱의 평문 백업, 이동용 QR 코드, 표준 자격 증명 교환(CXF) 파일을 가져옵니다.</li>
+          <li>TOTP, HOTP, Steam, Battle.net 코드와 SHA-1·SHA-256·SHA-512, 6~10자리를 지원합니다.</li>
+        </ul>
+      </div>
+      <figure>
+        <img src="../img/ko/04-add.png" width="1280" height="800" loading="lazy" alt="QR 코드, 링크, 백업 파일 방법이 보이는 계정 추가 화면">
+      </figure>
+    </div>
+  </section>
+
+  <section aria-labelledby="private">
+    <h2 id="private">안전한 보관</h2>
+    <div class="feature">
+      <div>
+        <ul>
+          <li>계정은 기기 안의 암호화된 금고(AES-256-GCM)에 보관합니다.</li>
+          <li>비밀번호(Argon2id), 복구 코드, 패스키 잠금 해제(파이어폭스 제외)로 잠글 수 있고, 자동 잠금 시점을 고를 수 있습니다.</li>
+          <li>코드를 쓰기 전에 기기 인증을 요구하거나, 직접 정한 단축키로 코드를 가릴 수 있습니다.</li>
+          <li>분석 도구·광고·개발자 서버가 없습니다. 소스 코드는 공개되어 있습니다.</li>
+        </ul>
+      </div>
+      <figure>
+        <img src="../img/ko/05-lock.png" width="1280" height="800" loading="lazy" alt="금고 비밀번호를 묻는 잠금 화면">
+      </figure>
+    </div>
+  </section>
+
+  <section aria-labelledby="backup">
+    <h2 id="backup">백업과 복구</h2>
+    <div class="feature">
+      <div>
+        <ul>
+          <li>암호화 백업, otpauth 텍스트·CXF·QR 코드로 내보내기를 지원합니다.</li>
+          <li>브라우저 자체 동기화로 내 기기끼리 암호화해서 동기화합니다(크롬·엣지·파이어폭스).</li>
+          <li>복구 스냅샷, 30일 휴지통, 계정 변경 기록을 제공합니다.</li>
+          <li>컴퓨터 시계가 틀려 코드가 맞지 않을 때 시계 확인으로 알려 줍니다.</li>
+        </ul>
+      </div>
+      <figure>
+        <img src="../img/ko/06-backup.png" width="1280" height="800" loading="lazy" alt="백업과 내보내기 설정 화면">
+      </figure>
+    </div>
+  </section>
+
+  <section aria-labelledby="share">
+    <h2 id="share">비밀키 대신 코드만 공유</h2>
+    <p>앞으로 5~60분 동안의 코드만 보여 주는 링크를 보낼 수 있고, 비밀번호도 걸 수 있습니다. 링크에는 비밀키가 담기지 않습니다.</p>
+  </section>
+
+  <section id="guides" aria-labelledby="moving">
+    <h2 id="moving">다른 인증 앱에서 옮기시나요?</h2>
+    <ul>
+      <li><a href="guides/from-authenticator-extension/" data-keep-utm>기존 Authenticator 확장 프로그램에서 옮기기</a></li>
+      <li><a href="guides/from-authy-and-other-apps/" data-keep-utm>Authy 데스크톱과 다른 앱에서 옮기기</a></li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="privacy">
+    <h2 id="privacy">개인정보</h2>
+    <p>개발자 서버, 분석 도구, 광고가 없습니다. 시계 확인은 time.akamai.com, timeapi.io, cloudflare.com에 현재 시각만 묻고 계정 정보는 보내지 않으며, 끌 수 있습니다. 크롬·엣지·파이어폭스에서는 비밀번호 잠금을 설정하면 브라우저 동기화가 금고 키로 암호화한 계정을 브라우저 자체 동기화 서비스로 보내며, 끌 수 있습니다. 자세한 내용은 개인정보처리방침에 있습니다.</p>
+    <p><a href="https://github.com/elitekid/popout-authenticator/blob/main/PRIVACY.md">개인정보처리방침</a> · <a href="https://github.com/elitekid/popout-authenticator">소스 코드</a></p>
+  </section>
+
+  <section aria-labelledby="limits">
+    <h2 id="limits">제한 사항</h2>
+    <ul>
+      <li>클라우드 백업은 없습니다. 파일 백업과 브라우저 자체 동기화를 쓸 수 있습니다.</li>
+      <li>패스키 잠금 해제는 파이어폭스에서 쓸 수 없습니다.</li>
+      <li>사파리 버전은 macOS용이며 iOS 버전은 없습니다.</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="credits">
+    <h2 id="credits">출처</h2>
+    <p>Popout Authenticator는 기존 <a href="https://github.com/Authenticator-Extension/Authenticator">Authenticator 확장 프로그램</a>의 MIT 라이선스 코드와 번역을 바탕으로 만들었습니다. Popout Authenticator는 MIT 라이선스로 배포됩니다.</p>
+  </section>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <ul>
+      <li><a href="https://github.com/elitekid/popout-authenticator">GitHub</a></li>
+      <li><a href="https://github.com/elitekid/popout-authenticator/blob/main/PRIVACY.md">개인정보처리방침</a></li>
+      <li><a href="https://github.com/elitekid/popout-authenticator/issues">이슈</a></li>
+      <li>MIT 라이선스</li>
+    </ul>
+  </div>
+</footer>
+</body>
+</html>

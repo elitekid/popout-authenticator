@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Moving from the original Authenticator extension — Popout Authenticator</title>
+<meta name="description" content="Move your accounts from the original Authenticator extension to Popout Authenticator with its backup file.">
+<link rel="canonical" href="https://elitekid.github.io/popout-authenticator/guides/from-authenticator-extension/">
+<link rel="alternate" hreflang="en" href="https://elitekid.github.io/popout-authenticator/guides/from-authenticator-extension/">
+<link rel="alternate" hreflang="ko" href="https://elitekid.github.io/popout-authenticator/ko/guides/from-authenticator-extension/">
+<link rel="alternate" hreflang="x-default" href="https://elitekid.github.io/popout-authenticator/guides/from-authenticator-extension/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Popout Authenticator">
+<meta property="og:title" content="Moving from the original Authenticator extension">
+<meta property="og:description" content="Move your accounts from the original Authenticator extension to Popout Authenticator with its backup file.">
+<meta property="og:url" content="https://elitekid.github.io/popout-authenticator/guides/from-authenticator-extension/">
+<meta property="og:image" content="https://elitekid.github.io/popout-authenticator/img/en/03-window.png">
+<meta property="og:locale" content="en">
+<meta property="og:locale:alternate" content="ko">
+<link rel="icon" href="../../img/logo.png">
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/site.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="../../" data-keep-utm><img src="../../img/logo.png" width="36" height="36" alt="">Popout Authenticator</a>
+    <nav class="main" aria-label="Main">
+      <a href="../../" data-keep-utm>Home</a>
+      <a href="../../#guides" data-keep-utm>Guides</a>
+      <a href="https://github.com/elitekid/popout-authenticator">GitHub</a>
+      <a class="lang" href="../../ko/guides/from-authenticator-extension/" data-keep-utm hreflang="ko" lang="ko">한국어</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="wrap">
+  <h1>Moving from the original Authenticator extension</h1>
+  <p>The original "Authenticator" extension's latest GitHub release is v8.0.2 (2024-09-15) — see its <a href="https://github.com/Authenticator-Extension/Authenticator/releases">releases</a> (checked 2026-10-15). Popout Authenticator reads its backups directly, and it builds on the original extension's MIT-licensed code.</p>
+
+  <h2>Get Popout Authenticator</h2>
+  <div class="stores" data-campaign="pa-guide-authext"></div>
+  <noscript><p><a href="https://github.com/elitekid/popout-authenticator">Get it from the GitHub repository</a></p></noscript>
+
+  <h2>Steps</h2>
+  <ol>
+    <li>
+      <p>In the original extension, go to Settings → Backup and choose "Download Backup File" or "Download Password-Protected Backup". (Menu names are from its v8.0.2 source; other versions may differ.)</p>
+      <ul>
+        <li>"Download Backup File" is a plain backup. It saves <code>authenticator.txt</code>, or <code>authenticator.json</code> if you have Steam or Battle.net accounts.</li>
+        <li>"Download Password-Protected Backup" saves an encrypted <code>authenticator.json</code>. The button appears after you set a password in Settings → Security.</li>
+      </ul>
+    </li>
+    <li>Install Popout Authenticator with the buttons above.</li>
+    <li>In Popout, select + → "Add account" → "Backup file" tab → "Choose a backup file." From the toolbar popup, a small window opens for choosing the file.</li>
+    <li>If the backup is encrypted, Popout asks: "This backup is encrypted. Enter its password." Type the password you set in the original extension in "Backup password" and select "OK". If the password is wrong, you see "The password is incorrect."</li>
+    <li>A result message shows how many accounts were added. Accounts that already exist (same type and same secret) are skipped. Existing accounts are never overwritten.</li>
+    <li>
+      <p>Afterwards:</p>
+      <ul>
+        <li>Compare a code in both extensions before you remove anything.</li>
+        <li>Delete the downloaded backup file if it was plain. It contains your secret keys.</li>
+        <li>Consider setting a password in Popout.</li>
+      </ul>
+    </li>
+  </ol>
+
+  <div class="card note">
+    <p>Encrypted backups made by much older versions of the original extension may not open. If that happens, download a plain backup instead.</p>
+  </div>
+
+  <p><a href="../../" data-keep-utm>← Back to home</a> · <a href="../from-authy-and-other-apps/" data-keep-utm>Moving from Authy Desktop and other apps</a></p>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <ul>
+      <li><a href="https://github.com/elitekid/popout-authenticator">GitHub</a></li>
+      <li><a href="https://github.com/elitekid/popout-authenticator/blob/main/PRIVACY.md">Privacy</a></li>
+      <li><a href="https://github.com/elitekid/popout-authenticator/issues">Issues</a></li>
+      <li>MIT License</li>
+    </ul>
+  </div>
+</footer>
+</body>
+</html>

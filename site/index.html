@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Popout Authenticator — 2FA &amp; OTP Codes</title>
+<meta name="description" content="2FA authenticator for your browser. Encrypted codes in a popup, window or side panel, filled into the sites you allow.">
+<link rel="canonical" href="https://elitekid.github.io/popout-authenticator/">
+<link rel="alternate" hreflang="en" href="https://elitekid.github.io/popout-authenticator/">
+<link rel="alternate" hreflang="ko" href="https://elitekid.github.io/popout-authenticator/ko/">
+<link rel="alternate" hreflang="x-default" href="https://elitekid.github.io/popout-authenticator/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Popout Authenticator">
+<meta property="og:title" content="Popout Authenticator — 2FA &amp; OTP Codes">
+<meta property="og:description" content="2FA authenticator for your browser. Encrypted codes in a popup, window or side panel, filled into the sites you allow.">
+<meta property="og:url" content="https://elitekid.github.io/popout-authenticator/">
+<meta property="og:image" content="https://elitekid.github.io/popout-authenticator/img/en/03-window.png">
+<meta property="og:locale" content="en">
+<meta property="og:locale:alternate" content="ko">
+<link rel="icon" href="img/logo.png">
+<link rel="stylesheet" href="assets/site.css">
+<script src="assets/site.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="./" data-keep-utm><img src="img/logo.png" width="36" height="36" alt="">Popout Authenticator</a>
+    <nav class="main" aria-label="Main">
+      <a href="./" data-keep-utm>Home</a>
+      <a href="#guides">Guides</a>
+      <a href="https://github.com/elitekid/popout-authenticator">GitHub</a>
+      <a class="lang" href="ko/" data-keep-utm hreflang="ko" lang="ko">한국어</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="wrap">
+  <section aria-labelledby="hero">
+    <h1 id="hero">Popout Authenticator — 2FA &amp; OTP Codes</h1>
+    <p class="lead">2FA authenticator for your browser. Encrypted codes in a popup, window or side panel, filled into the sites you allow.</p>
+    <div class="stores" data-campaign="pa-home"></div>
+    <noscript><p><a href="https://github.com/elitekid/popout-authenticator">Get it from the GitHub repository</a></p></noscript>
+    <p class="facts">Open source (MIT) · No account limits · No sign-up · No analytics</p>
+    <figure>
+      <img src="img/en/03-window.png" width="1280" height="800" alt="Popout Authenticator open in a separate window next to a web page, showing accounts with one-time codes">
+    </figure>
+  </section>
+
+  <section aria-labelledby="codes">
+    <h2 id="codes">Your codes, where you need them</h2>
+    <div class="feature">
+      <div>
+        <ul>
+          <li>Open your codes in the toolbar popup, a separate window, or the side panel (sidebar in Firefox).</li>
+          <li>Search, groups, pinned accounts, and a compact view keep long lists tidy.</li>
+          <li>See which account belongs to the site you are on, and fill its code with one click, a right-click, or a keyboard shortcut.</li>
+          <li>Optional buttons next to code fields on the sites you choose.</li>
+        </ul>
+      </div>
+      <figure>
+        <img src="img/en/02-fill.png" width="1280" height="800" loading="lazy" alt="A code being filled into a sign-in page from Popout Authenticator">
+      </figure>
+    </div>
+  </section>
+
+  <section aria-labelledby="add">
+    <h2 id="add">Add accounts your way</h2>
+    <div class="feature">
+      <div>
+        <ul>
+          <li>Scan a QR code from the current tab, your camera, an image, or the clipboard.</li>
+          <li>Paste otpauth:// links, or type the secret by hand.</li>
+          <li>Import plain-text backups from many authenticator apps, migration QR codes, and standard credential exchange (CXF) files.</li>
+          <li>Supports TOTP, HOTP, Steam, and Battle.net codes with SHA-1, SHA-256, or SHA-512 and 6 to 10 digits.</li>
+        </ul>
+      </div>
+      <figure>
+        <img src="img/en/04-add.png" width="1280" height="800" loading="lazy" alt="The Add account screen with QR code, links, and backup file options">
+      </figure>
+    </div>
+  </section>
+
+  <section aria-labelledby="private">
+    <h2 id="private">Private and protected</h2>
+    <div class="feature">
+      <div>
+        <ul>
+          <li>Accounts are stored in an encrypted vault on your device (AES-256-GCM).</li>
+          <li>Lock it with a password (Argon2id), a recovery code, and optional passkey unlock (not available in Firefox). Choose when it locks automatically.</li>
+          <li>Optionally require device verification before a code is used, and hide codes with a keyboard shortcut you assign.</li>
+          <li>No analytics, no ads, no developer server. The source code is public.</li>
+        </ul>
+      </div>
+      <figure>
+        <img src="img/en/05-lock.png" width="1280" height="800" loading="lazy" alt="The lock screen asking for the vault password">
+      </figure>
+    </div>
+  </section>
+
+  <section aria-labelledby="backup">
+    <h2 id="backup">Backup and recovery</h2>
+    <div class="feature">
+      <div>
+        <ul>
+          <li>Encrypted backups, plus exports to otpauth text, CXF, and QR codes.</li>
+          <li>Encrypted sync between your devices through your browser's own sync (Chrome, Edge, Firefox).</li>
+          <li>Recovery snapshots, a 30-day trash, and an account change history.</li>
+          <li>Clock check warns you when your computer's time would make codes fail.</li>
+        </ul>
+      </div>
+      <figure>
+        <img src="img/en/06-backup.png" width="1280" height="800" loading="lazy" alt="The backup and export settings">
+      </figure>
+    </div>
+  </section>
+
+  <section aria-labelledby="share">
+    <h2 id="share">Share a code, not the secret</h2>
+    <p>Send a link that shows the codes for the next 5 to 60 minutes, with an optional password. The link never contains the secret.</p>
+  </section>
+
+  <section id="guides" aria-labelledby="moving">
+    <h2 id="moving">Moving from another authenticator?</h2>
+    <ul>
+      <li><a href="guides/from-authenticator-extension/" data-keep-utm>Moving from the original Authenticator extension</a></li>
+      <li><a href="guides/from-authy-and-other-apps/" data-keep-utm>Moving from Authy Desktop and other apps</a></li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="privacy">
+    <h2 id="privacy">Privacy</h2>
+    <p>There is no developer server, no analytics, and no ads. A clock check asks time.akamai.com, timeapi.io, and cloudflare.com for the current time, with no account data; you can turn it off. On Chrome, Edge, and Firefox, browser sync carries your accounts, encrypted with your vault key, through the browser's own sync service once you set a password lock; you can turn it off. Details are in the privacy policy.</p>
+    <p><a href="https://github.com/elitekid/popout-authenticator/blob/main/PRIVACY.md">Privacy policy</a> · <a href="https://github.com/elitekid/popout-authenticator">Source code</a></p>
+  </section>
+
+  <section aria-labelledby="limits">
+    <h2 id="limits">Limits</h2>
+    <ul>
+      <li>There is no cloud backup. You have file backups and your browser's own sync.</li>
+      <li>Passkey unlock is not available in Firefox.</li>
+      <li>The Safari version is for macOS; there is no iOS version.</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="credits">
+    <h2 id="credits">Credits</h2>
+    <p>Popout Authenticator builds on the MIT-licensed code and translations of the original <a href="https://github.com/Authenticator-Extension/Authenticator">Authenticator extension</a>. Popout Authenticator is released under the MIT License.</p>
+  </section>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <ul>
+      <li><a href="https://github.com/elitekid/popout-authenticator">GitHub</a></li>
+      <li><a href="https://github.com/elitekid/popout-authenticator/blob/main/PRIVACY.md">Privacy</a></li>
+      <li><a href="https://github.com/elitekid/popout-authenticator/issues">Issues</a></li>
+      <li>MIT License</li>
+    </ul>
+  </div>
+</footer>
+</body>
+</html>
