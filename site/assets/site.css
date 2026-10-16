@@ -102,6 +102,11 @@ a.store {
 a.store:hover { filter: brightness(1.08); }
 .store-pending { background: var(--card); color: var(--muted); font-weight: 400; }
 
+.review-ask { margin: 48px 0 24px; padding: 16px 20px; border: 1px solid var(--accent); border-radius: 12px; background: var(--card); }
+.review-ask p { margin: 0; }
+.review-ask .stores { margin: 12px 0 0; }
+.review-ask[hidden] { display: none; }
+
 figure { margin: 24px 0; }
 figure img, figure video {
   display: block;

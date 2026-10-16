@@ -1,10 +1,11 @@
 // Store list: the ONLY place to edit when a store goes live (set live: true).
+// review 는 확장의 STORE_REVIEW_URLS(src/ui/popup/logic.ts)와 같게 둔다.
 var STORES = [
-  { id: 'chrome', name: 'Chrome', url: 'https://chromewebstore.google.com/detail/nakgmloofpboegibcjhainbpjjokmbgj', live: true },
-  { id: 'edge', name: 'Edge', url: 'https://microsoftedge.microsoft.com/addons/detail/edipphpgdmfabonchodjfnejlbjoknhh', live: true },
-  { id: 'firefox', name: 'Firefox', url: 'https://addons.mozilla.org/firefox/addon/popout-authenticator/', live: false },
-  { id: 'whale', name: 'Whale', url: 'https://store.whale.naver.com/detail/bcfobdldplagmohdgaiocjddlokiolgc', live: false },
-  { id: 'safari', name: 'Safari (macOS)', url: 'https://apps.apple.com/app/id6823010294', live: false }
+  { id: 'chrome', name: 'Chrome', url: 'https://chromewebstore.google.com/detail/nakgmloofpboegibcjhainbpjjokmbgj', review: 'https://chromewebstore.google.com/detail/nakgmloofpboegibcjhainbpjjokmbgj/reviews', live: true },
+  { id: 'edge', name: 'Edge', url: 'https://microsoftedge.microsoft.com/addons/detail/edipphpgdmfabonchodjfnejlbjoknhh', review: 'https://microsoftedge.microsoft.com/addons/detail/edipphpgdmfabonchodjfnejlbjoknhh', live: true },
+  { id: 'firefox', name: 'Firefox', url: 'https://addons.mozilla.org/firefox/addon/popout-authenticator/', review: 'https://addons.mozilla.org/firefox/addon/popout-authenticator/reviews/', live: false },
+  { id: 'whale', name: 'Whale', url: 'https://store.whale.naver.com/detail/bcfobdldplagmohdgaiocjddlokiolgc', review: 'https://store.whale.naver.com/detail/bcfobdldplagmohdgaiocjddlokiolgc', live: false },
+  { id: 'safari', name: 'Safari (macOS)', url: 'https://apps.apple.com/app/id6823010294', review: 'https://apps.apple.com/app/id6823010294?action=write-review', live: false }
 ];
 
 (function () {
@@ -30,7 +31,7 @@ var STORES = [
     return u.toString();
   }
 
-  document.querySelectorAll('.stores').forEach(function (box) {
+  document.querySelectorAll('.stores:not(.reviews)').forEach(function (box) {
     var campaign = box.getAttribute('data-campaign') || 'pa-home';
     box.textContent = '';
     STORES.forEach(function (s) {
@@ -48,6 +49,25 @@ var STORES = [
       }
       box.appendChild(el);
     });
+  });
+
+  // 평가 남기기: 공개된 스토어의 리뷰 주소만 단추로 보이고, 하나도 없으면 상자째 숨긴 채 둔다.
+  var rateOn = lang === 'ko' ? '평가' : 'Review on';
+  document.querySelectorAll('.review-ask').forEach(function (ask) {
+    var box = ask.querySelector('.reviews');
+    if (!box) return;
+    var campaign = box.getAttribute('data-campaign') || 'pa-review';
+    box.textContent = '';
+    STORES.forEach(function (s) {
+      if (!s.live) return;
+      var a = document.createElement('a');
+      a.className = 'store store-review';
+      a.href = withUtm(s.review, campaign);
+      a.rel = 'noopener';
+      a.textContent = lang === 'ko' ? s.name + ' ' + rateOn : rateOn + ' ' + s.name;
+      box.appendChild(a);
+    });
+    if (box.firstChild) ask.hidden = false;
   });
 
   // data-autoplay 영상은 화면에 보일 때만 소리 없이 돌리고(preload="none" 이라 그때 받는다),
