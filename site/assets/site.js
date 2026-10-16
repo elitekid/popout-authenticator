@@ -4,7 +4,7 @@ var STORES = [
   { id: 'chrome', name: 'Chrome', url: 'https://chromewebstore.google.com/detail/nakgmloofpboegibcjhainbpjjokmbgj', review: 'https://chromewebstore.google.com/detail/nakgmloofpboegibcjhainbpjjokmbgj/reviews', live: true },
   { id: 'edge', name: 'Edge', url: 'https://microsoftedge.microsoft.com/addons/detail/edipphpgdmfabonchodjfnejlbjoknhh', review: 'https://microsoftedge.microsoft.com/addons/detail/edipphpgdmfabonchodjfnejlbjoknhh', live: true },
   { id: 'firefox', name: 'Firefox', url: 'https://addons.mozilla.org/firefox/addon/popout-authenticator/', review: 'https://addons.mozilla.org/firefox/addon/popout-authenticator/reviews/', live: false },
-  { id: 'whale', name: 'Whale', url: 'https://store.whale.naver.com/detail/bcfobdldplagmohdgaiocjddlokiolgc', review: 'https://store.whale.naver.com/detail/bcfobdldplagmohdgaiocjddlokiolgc', live: false },
+  { id: 'whale', name: 'Whale', url: 'https://store.whale.naver.com/detail/bcfobdldplagmohdgaiocjddlokiolgc', review: 'https://store.whale.naver.com/detail/bcfobdldplagmohdgaiocjddlokiolgc', live: true },
   { id: 'safari', name: 'Safari (macOS)', url: 'https://apps.apple.com/app/id6823010294', review: 'https://apps.apple.com/app/id6823010294?action=write-review', live: false }
 ];
 
