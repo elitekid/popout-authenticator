@@ -30,6 +30,9 @@ body {
   font: 16px/1.65 system-ui, -apple-system, "Segoe UI", Roboto, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
 }
 
+/* 한국어는 낱말 중간에서 줄을 바꾸지 않는다 */
+:lang(ko) { word-break: keep-all; overflow-wrap: anywhere; }
+
 a { color: var(--accent); }
 a:focus-visible, button:focus-visible {
   outline: 3px solid var(--accent);
@@ -100,17 +103,67 @@ a.store:hover { filter: brightness(1.08); }
 .store-pending { background: var(--card); color: var(--muted); font-weight: 400; }
 
 figure { margin: 24px 0; }
-figure img {
+figure img, figure video {
   display: block;
   width: 100%;
   height: auto;
   border: 1px solid var(--line);
   border-radius: 10px;
+  background: var(--card);
 }
+figcaption { color: var(--muted); font-size: 0.92rem; margin-top: 8px; }
 
-.feature { display: grid; gap: 20px; align-items: center; margin: 32px 0; }
+.feature { display: grid; gap: 20px; align-items: center; margin: 16px 0 32px; }
+.feature ul { margin: 0; }
 @media (min-width: 800px) {
   .feature { grid-template-columns: 1fr 1fr; }
+}
+
+/* 첫 화면: 왼쪽 글, 오른쪽 세로 영상 */
+.hero { display: grid; gap: 8px 40px; align-items: start; }
+.hero .short { margin: 8px auto 0; width: min(300px, 80vw); }
+.hero .short video { aspect-ratio: 9 / 16; border-radius: 16px; }
+@media (min-width: 800px) {
+  .hero { grid-template-columns: 1fr 300px; }
+  .hero .short { margin: 40px 0 0; width: 300px; }
+}
+.tour video { aspect-ratio: 16 / 9; }
+
+/* 가이드 */
+.crumbs { margin-top: 24px; font-size: 0.95rem; color: var(--muted); }
+.crumbs a { color: var(--muted); }
+.crumbs + h1 { margin-top: 8px; }
+.guide figure video { aspect-ratio: 16 / 9; max-width: 720px; }
+.toc ol { margin: 0; padding-left: 1.4em; }
+.toc h2 { font-size: 1rem; margin: 0 0 4px; }
+.ver {
+  border-left: 4px solid var(--line);
+  padding: 2px 0 2px 12px;
+  color: var(--muted);
+}
+.ver strong { color: var(--fg); }
+.guide-nav { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--line); }
+.guide-list { list-style: none; padding: 0; display: grid; gap: 12px; }
+@media (min-width: 700px) { .guide-list { grid-template-columns: 1fr 1fr; } }
+.guide-list li { max-width: none; }
+.guide-list a {
+  display: block;
+  height: 100%;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 14px 18px;
+  text-decoration: none;
+}
+.guide-list a:hover { border-color: var(--accent); }
+.guide-list strong { display: block; }
+.guide-list span { display: block; color: var(--muted); font-size: 0.95rem; }
+kbd {
+  border: 1px solid var(--line);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  padding: 0 5px;
+  font: 0.9em ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
 .card {
@@ -119,12 +172,24 @@ figure img {
   border-radius: 10px;
   padding: 16px 20px;
 }
-.note { border-left: 4px solid var(--accent); }
+.card > :first-child { margin-top: 0; }
+.card > :last-child { margin-bottom: 0; }
+.note { border-left: 4px solid var(--accent); margin: 16px 0; }
 
 .table-wrap { overflow-x: auto; }
 table { border-collapse: collapse; width: 100%; margin: 16px 0; }
 th, td { border: 1px solid var(--line); padding: 8px 12px; text-align: left; vertical-align: top; }
 th { background: var(--card); }
+/* 좁은 화면에서는 표의 행을 카드처럼 세로로 쌓는다(td 의 data-label 을 머리말로) */
+@media (max-width: 600px) {
+  table.stack thead { display: none; }
+  table.stack, table.stack tbody, table.stack tr, table.stack th, table.stack td { display: block; width: 100%; }
+  table.stack tr { border: 1px solid var(--line); border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
+  table.stack th, table.stack td { border: 0; border-top: 1px solid var(--line); }
+  table.stack tr > :first-child { border-top: 0; }
+  table.stack td[data-label]::before { content: attr(data-label); display: block; color: var(--muted); font-size: 0.85rem; }
+  table.stack td:empty { display: none; }
+}
 
 code {
   background: var(--card);

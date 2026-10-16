@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; media-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>백업·내보내기·동기화 — Popout Authenticator</title>
+<meta name="description" content="암호화 백업을 만들고, 다른 앱용으로 내보내고, 복구 스냅샷과 휴지통에서 되살리고, 기기 사이에 동기화합니다.">
+<link rel="canonical" href="https://elitekid.github.io/popout-authenticator/ko/guides/backup-and-sync/">
+<link rel="alternate" hreflang="en" href="https://elitekid.github.io/popout-authenticator/guides/backup-and-sync/">
+<link rel="alternate" hreflang="ko" href="https://elitekid.github.io/popout-authenticator/ko/guides/backup-and-sync/">
+<link rel="alternate" hreflang="x-default" href="https://elitekid.github.io/popout-authenticator/guides/backup-and-sync/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Popout Authenticator">
+<meta property="og:title" content="백업·내보내기·동기화">
+<meta property="og:description" content="암호화 백업을 만들고, 다른 앱용으로 내보내고, 복구 스냅샷과 휴지통에서 되살리고, 기기 사이에 동기화합니다.">
+<meta property="og:url" content="https://elitekid.github.io/popout-authenticator/ko/guides/backup-and-sync/">
+<meta property="og:image" content="https://elitekid.github.io/popout-authenticator/img/ko/03-window.png">
+<meta property="og:locale" content="ko">
+<meta property="og:locale:alternate" content="en">
+<link rel="icon" href="../../../img/logo.png">
+<link rel="stylesheet" href="../../../assets/site.css">
+<script src="../../../assets/site.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">본문으로 건너뛰기</a>
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="../../" data-keep-utm><img src="../../../img/logo.png" width="36" height="36" alt="">Popout Authenticator</a>
+    <nav class="main" aria-label="주 메뉴">
+      <a href="../../" data-keep-utm>홈</a>
+      <a href="../" data-keep-utm>가이드</a>
+      <a href="https://github.com/elitekid/popout-authenticator">GitHub</a>
+      <a class="lang" href="../../../guides/backup-and-sync/" data-keep-utm hreflang="en" lang="en">English</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="wrap guide">
+  <nav class="crumbs" aria-label="이동 경로"><a href="../../" data-keep-utm>홈</a> › <a href="../" data-keep-utm>가이드</a></nav>
+  <h1>백업·내보내기·동기화</h1>
+  <p class="lead">암호화 백업을 만들고, 다른 앱용으로 내보내고, 복구 스냅샷과 휴지통에서 되살리고, 기기 사이에 동기화합니다.</p>
+
+  <nav class="toc card" aria-label="이 쪽의 내용">
+    <ol>
+      <li><a href="#encrypted-backup">암호화 백업 만들기</a></li>
+      <li><a href="#formats">형식 비교</a></li>
+      <li><a href="#reminder">백업 알림</a></li>
+      <li><a href="#restore">백업 파일에서 복원</a></li>
+      <li><a href="#exports">다른 앱으로 내보내기</a></li>
+      <li><a href="#snapshots">복구용 스냅샷</a></li>
+      <li><a href="#trash">휴지통</a></li>
+      <li><a href="#history">계정 변경 기록</a></li>
+      <li><a href="#sync">기기 사이 동기화</a></li>
+    </ol>
+  </nav>
+
+  <h2 id="encrypted-backup">암호화 백업 만들기</h2>
+  <p>백업 파일은 만일을 위한 안전장치입니다. 확장을 삭제하면 계정·스냅샷도 함께 삭제되므로, 삭제하거나 다시 설치하기 전에 백업 파일을 안전한 곳에 저장해 주세요.</p>
+  <ol>
+    <li>관리 화면(팝업의 "설정" 단추)을 열고 "백업"을 고릅니다. 툴바 팝업에서는 "내보내기"를 누르면 작은 창이 열리고, 이어지는 단계는 그 창에서 합니다.</li>
+    <li>"내보내기" 아래 "형식"을 "암호화 백업 (권장)"으로 둡니다.</li>
+    <li>"백업 비밀번호 (8자 이상)"를 입력하고 "비밀번호 다시 입력"에 한 번 더 입력합니다. 짧으면 "비밀번호는 8자 이상이어야 합니다.", 서로 다르면 "두 비밀번호가 다릅니다."가 나옵니다.</li>
+    <li>비밀번호 잠금을 쓰고 있다면 "현재 비밀번호를 한 번 더 입력해 주세요." 칸에 현재 비밀번호를 입력합니다.</li>
+    <li>"백업 만들기"를 누릅니다.</li>
+    <li>만든 파일을 다시 읽어 "백업에 11개 중 11개 포함"처럼 확인 결과를 보여 줍니다. 빠진 계정이 있으면 "누락된 계정: …. 이 파일로는 모든 계정을 복원할 수 없습니다."라고 알립니다.</li>
+    <li>"다운로드"를 누릅니다. 파일 이름은 <code>popout-authenticator-</code> 뒤에 날짜가 붙고 <code>.json</code>으로 끝납니다.</li>
+  </ol>
+  <p>백업 비밀번호는 잠금 비밀번호와 별개입니다. 파일은 백업 비밀번호만으로 열리며, Popout이 비밀번호를 재설정해 줄 수는 없습니다. 비밀번호는 파일과 따로 보관해 주세요.</p>
+  <p>파일에는 사용 중인 계정이 그룹, 메모, 중요 표시, 사이트 주소, HOTP 카운터와 함께 담깁니다. 휴지통의 계정은 들어가지 않습니다. 관리자가 내보내기를 막았다면 "관리자 정책에 따라 내보내기를 사용할 수 없습니다."가 보입니다.</p>
+
+  <h2 id="formats">형식 비교</h2>
+  <p>"형식"에는 여섯 가지가 있습니다. 첫 번째가 암호화되는 형식이고, 나머지는 암호화되지 않습니다.</p>
+  <div class="table-wrap">
+    <table class="stack">
+      <thead>
+        <tr><th scope="col">형식</th><th scope="col">결과물</th><th scope="col">읽을 수 있는 앱</th><th scope="col">빠지는 계정</th></tr>
+      </thead>
+      <tbody>
+        <tr><th scope="row">"암호화 백업 (권장)"</th><td data-label="결과물">백업 비밀번호로 암호화한 <code>.json</code> 파일</td><td data-label="읽을 수 있는 앱">Popout Authenticator (비밀번호 필요)</td><td data-label="빠지는 계정">휴지통의 계정</td></tr>
+        <tr><th scope="row">"암호화하지 않은 백업 (JSON)"</th><td data-label="결과물">비밀키가 그대로 보이는 <code>.json</code> 파일</td><td data-label="읽을 수 있는 앱">Popout Authenticator</td><td data-label="빠지는 계정">휴지통의 계정</td></tr>
+        <tr><th scope="row">"otpauth 링크 텍스트"</th><td data-label="결과물">한 줄에 <code>otpauth://</code> 링크 하나씩 담은 <code>.txt</code> 파일</td><td data-label="읽을 수 있는 앱">otpauth:// 링크를 가져올 수 있는 앱</td><td data-label="빠지는 계정">Steam, Battle.net 계정</td></tr>
+        <tr><th scope="row">"CXF"</th><td data-label="결과물">FIDO 자격 증명 교환 형식(CXF)의 <code>.json</code> 파일</td><td data-label="읽을 수 있는 앱">CXF를 가져올 수 있는 앱</td><td data-label="빠지는 계정">시간 기반(TOTP) 외의 모든 계정</td></tr>
+        <tr><th scope="row">"계정별 QR"</th><td data-label="결과물">계정마다 화면에 QR 코드 하나</td><td data-label="읽을 수 있는 앱">일반적인 인증 앱 QR 코드를 읽는 앱</td><td data-label="빠지는 계정">Steam, Battle.net 계정</td></tr>
+        <tr><th scope="row">"Google 묶음 QR"</th><td data-label="결과물">Google Authenticator 내보내기와 같은 형식의 QR 코드(코드 하나에 계정 여러 개)</td><td data-label="읽을 수 있는 앱">Google Authenticator 내보내기 코드를 읽는 앱</td><td data-label="빠지는 계정">Steam, Battle.net, 그리고 6자리·8자리가 아니거나 갱신 주기가 30초가 아닌 계정</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>선택한 형식에 담을 수 없는 계정은 "선택한 형식으로 내보낼 수 없는 계정입니다." 아래에 나열됩니다.</p>
+  <div class="card note">
+    <p>암호화 백업을 뺀 나머지 형식에는 비밀키가 누구나 읽을 수 있는 상태로 담깁니다. 이때는 "계정의 비밀키가 암호화되지 않은 채 저장됩니다. 다른 사람이 볼 수 없는 안전한 곳에 보관해 주세요."라는 안내가 나오고, "암호화 없이 저장되는 위험을 이해했습니다."를 선택해야 "백업 만들기"를 누를 수 있습니다. 다 쓴 파일은 지우고 QR 코드는 닫아 주세요.</p>
+  </div>
+
+  <h2 id="reminder">백업 알림</h2>
+  <p>계정이 3개 이상이면 팝업에 "계정을 백업해 두세요." 띠가 나올 수 있습니다. 단추는 "백업"과 "나중에"입니다.</p>
+  <ul>
+    <li>백업한 적이 없으면 나옵니다. 백업한 뒤에는 마지막 백업이 30일을 넘었고 그 뒤 계정이 바뀐 경우에만 다시 나옵니다.</li>
+    <li>"백업"은 "백업" 화면을 엽니다. "나중에"는 띠를 7일 동안 숨깁니다.</li>
+    <li>"다운로드"를 눌렀고, 고른 형식이 담을 수 있는 계정이 확인 결과에서 모두 나오면 백업한 것으로 칩니다. 1.0.0에서는 형식 때문에 빠진 계정이 있어도 알림이 사라질 수 있으니, 모든 계정을 담으려면 "암호화 백업 (권장)"을 쓰세요. QR 코드는 백업으로 치지 않습니다.</li>
+  </ul>
+  <p class="ver"><strong>1.0.1</strong> 1.0.1부터 일부 계정이 빠진 채 내보내도 백업 알림이 사라지지 않습니다.</p>
+
+  <h2 id="restore">백업 파일에서 복원</h2>
+  <ol>
+    <li>+ → "계정 추가" → "백업 파일" 탭 → "백업 파일을 골라 주세요."를 누릅니다.</li>
+    <li>Popout 백업 파일을 고릅니다. 암호화된 파일이면 "암호화된 백업입니다. 비밀번호를 입력해 주세요."가 나옵니다. "백업 비밀번호"에 입력하고 "확인"을 누릅니다. 틀리면 "비밀번호가 맞지 않습니다."가 나옵니다.</li>
+    <li>추가한 계정 수와 중복으로 건너뛴 계정 수가 결과로 나옵니다. 이미 있는 계정은 덮어쓰지 않습니다.</li>
+  </ol>
+  <p>같은 탭에서 Popout이 내보낸 otpauth 텍스트와 CXF 파일도 읽습니다. 다른 앱의 파일은 <a href="../from-authy-and-other-apps/" data-keep-utm>Authy 데스크톱 등 다른 앱에서 옮기기</a> 가이드를 보세요.</p>
+  <p class="ver"><strong>1.0.1</strong> 1.0.1부터 파일 선택 창에 <code>.2fas</code> 파일도 보이고, CXF 가져오기에서 읽지 못한 항목을 목록으로 알려 줍니다.</p>
+  <h3 id="compare">바꾸지 않고 백업 확인하기</h3>
+  <p>"백업"에서 "백업 대조 열기"를 누르고 "백업 파일 선택"으로 파일을 고릅니다. 비밀번호를 물으면 "백업 비밀번호"를 입력하고 "대조"를 누릅니다. 계정마다 "일치", "백업에 없음", "인증 정보 다름", "확인 필요"로 표시하고, "백업에만 있음" 계정도 보여 줍니다. 계정은 바뀌지 않습니다. 파일에 담긴 인증 정보를 비교할 뿐, 실제 사이트의 로그인 성공을 보장하지는 않습니다.</p>
+
+  <h2 id="exports">다른 앱으로 내보내기</h2>
+  <ol>
+    <li>"백업" → "내보내기"의 "형식"에서 "otpauth 링크 텍스트", "CXF", "계정별 QR", "Google 묶음 QR" 중 하나를 고릅니다.</li>
+    <li>"암호화 없이 저장되는 위험을 이해했습니다."를 선택하고, 물으면 현재 비밀번호를 입력합니다.</li>
+    <li>"백업 만들기"를 누릅니다. 파일 형식이면 "다운로드" 단추가 나옵니다.</li>
+    <li>QR 형식이면 다른 앱으로 코드를 읽습니다. "이전"·"다음"으로 코드를 넘기고("2장 중 1장"처럼 표시됩니다), 끝나면 "닫기"를 누릅니다.</li>
+  </ol>
+  <p>받는 앱이 어떤 가져오기를 지원하는지 먼저 확인하세요. 고른 형식을 읽지 못하면 위 표에서 다른 형식을 시도해 보세요.</p>
+
+  <h2 id="snapshots">복구용 스냅샷</h2>
+  <p>계정 목록이 바뀔 때마다 Popout이 바뀌기 전 목록을 스냅샷으로 저장합니다. 가장 최근 30개와, 최근 30일 동안 날짜별 마지막 하나를 보관합니다. 스냅샷은 파일이 아니라 확장 안에 있으므로 확장을 삭제하면 함께 사라집니다.</p>
+  <ol>
+    <li>"백업"의 "스냅샷 복원"을 엽니다. 각 줄에 "… · 계정 5개"처럼 시각과 계정 수가 나옵니다. "잠금 있음"은 잠금을 켠 상태에서 저장한 스냅샷이며, 현재 금고 키로 열 수 없으면 그때의 비밀번호를 묻습니다. 없으면 "스냅샷이 없습니다."가 나옵니다.</li>
+    <li>지금 목록에 없는 계정만 되살리려면 "없는 계정만 추가"를 누릅니다.</li>
+    <li>목록을 통째로 되돌리려면 "목록 전체 복원"을 누릅니다. 현재 목록은 새 스냅샷으로 보관된다는 안내가 나오고, "복원"을 누르면 진행합니다.</li>
+    <li>다른 비밀번호로 저장된 스냅샷이면 "이 스냅샷을 저장할 때 사용한 비밀번호를 입력해 주세요."에 따라 입력하고 "확인"을 누릅니다.</li>
+    <li>끝나면 "N개 계정을 복원했습니다."가 나옵니다.</li>
+  </ol>
+  <p class="ver"><strong>1.0.1</strong> 1.0.1부터 비밀번호 잠금을 켜면 이전 스냅샷도 함께 다시 암호화해, 읽을 수 있는 비밀키가 남지 않습니다.</p>
+  <h3 id="raw-copy">원시 사본</h3>
+  <p>"원시 사본 저장"은 저장된 금고와 설정을 그대로 복사해 파일로 저장합니다. "원시 사본에서 가져오기"는 그 사본의 계정을 다시 넣으며, 필요하면 "이 사본의 비밀번호"를 묻습니다. "계정 데이터를 읽지 못했습니다. 초기화하거나 확장을 삭제하지 말고 아래 복구 방법을 확인해 주세요."가 보이면, 먼저 원시 사본을 저장하고 그 화면의 복구 방법을 확인하세요.</p>
+  <p class="ver"><strong>1.0.1</strong> 1.0.1부터 현재 금고가 손상된 상태에서도 원시 사본을 가져올 수 있습니다.</p>
+
+  <h2 id="trash">휴지통</h2>
+  <p>계정을 삭제하면 "휴지통으로 이동" 단추가 나오고, 30일 뒤 영구 삭제된다는 안내가 보입니다.</p>
+  <ol>
+    <li>관리 화면에서 "휴지통"을 고릅니다. 줄마다 "30일 남음"처럼 남은 날수가 나옵니다.</li>
+    <li>"복원"을 누르면 계정이 돌아옵니다.</li>
+    <li>"영구 삭제"를 누르고 확인하면 그 계정이 완전히 지워집니다. "휴지통 비우기"는 모두 지웁니다. 둘 다 되돌릴 수 없다는 안내가 먼저 나옵니다.</li>
+  </ol>
+  <p class="ver"><strong>1.0.1</strong> 1.0.1부터 휴지통에서 복원해도 같은 계정이 중복으로 생기지 않습니다.</p>
+
+  <h2 id="history">계정 변경 기록</h2>
+  <p>변경 기록은 다른 계정은 그대로 두고 계정 하나만 이전 상태로 되돌립니다. 위의 스냅샷을 쓰므로, 스냅샷이 남아 있는 기간까지만 거슬러 올라갑니다.</p>
+  <ol>
+    <li>고치던 내용이 있으면 먼저 저장합니다. 저장하지 않은 입력은 기록에 포함되지 않습니다.</li>
+    <li>계정을 편집 화면으로 열고 "계정 변경 기록"을 누릅니다.</li>
+    <li>이전 상태에서 "변경 내용 보기"를 누릅니다. 더 오래된 기록은 "이전 기록 더 보기"로 불러옵니다.</li>
+    <li>"이 상태로 되돌리기"를 누릅니다. 보이는 항목만 바뀌고 다른 계정과 목록 순서는 유지됩니다.</li>
+  </ol>
+  <div class="card note">
+    <p>"옛 비밀키로 되돌려도 사이트에 등록된 비밀키는 바뀌지 않습니다." HOTP가 포함된 기록은 코드 재사용을 막기 위해 비밀키·방식·카운터 등 인증 정보를 바꾸지 않습니다.</p>
+  </div>
+
+  <h2 id="sync">기기 사이 동기화</h2>
+  <p>동기화는 브라우저 자체 동기화 서비스를 씁니다. 크롬·엣지·파이어폭스에서 쓸 수 있습니다. 사파리에서는 설정 화면에 "이 브라우저는 기기 간 동기화를 지원하지 않습니다. 다른 기기로 옮길 때 백업 파일을 사용해 주세요."라고 나옵니다. Popout이 운영하는 서버는 없습니다.</p>
+  <h3 id="sync-start">켜기</h3>
+  <ol>
+    <li>먼저 비밀번호 잠금을 설정합니다. <a href="../lock-and-protect/" data-keep-utm>잠금과 보호</a>를 보세요. 동기화는 기본으로 켜져 있지만 잠금이 있어야 동작합니다. 잠금이 없으면 "계정을 암호화해 동기화하려면 잠금을 설정해 주세요."라고 나옵니다.</li>
+    <li>관리 화면 → "설정" → "동기화"에서 "같은 브라우저 계정으로 로그인한 기기와 동기화"를 켭니다.</li>
+    <li>다른 기기에서 같은 브라우저 계정으로 로그인하고 Popout을 준비합니다. "다른 기기에서 동기화한 계정이 있습니다. 해당 기기에서 설정한 금고 비밀번호로 계정을 합쳐 주세요."가 나오면 그 안내를 따릅니다.</li>
+    <li>바로 맞추려면 "지금 동기화"를 누릅니다. 상태가 "동기화했습니다."로 바뀝니다.</li>
+  </ol>
+  <p>계정마다 비밀키, 서비스 이름, 계정 이름, 메모, 그룹, 사이트 주소를 금고 키로 암호화한 뒤 올립니다. 계정 삭제는 다른 기기에도 전해집니다. 설정, 코드 입력 단추, 사이트 사용 기록은 동기화하지 않습니다.</p>
+  <div class="card note">
+    <p>"잠금 없이 동기화 허용"을 켜면 비밀키가 암호화되지 않은 채 전송됩니다. "잠금 없이 동기화하면 계정의 비밀키가 암호화되지 않은 채 같은 브라우저 계정의 다른 기기로 전송됩니다." 가능하면 잠금을 설정하세요.</p>
+  </div>
+  <h3 id="firefox-consent">파이어폭스</h3>
+  <p>파이어폭스는 Firefox 동기화로 데이터를 보내기 전에 허용을 묻습니다. 허용하기 전까지 상태에는 "Firefox 동기화로 암호화된 계정을 보내려면 허용이 필요합니다."가 나옵니다. "허용"을 누르세요.</p>
+  <p class="ver"><strong>1.0.1</strong> 1.0.1부터 잠금이 없을 때는 "Firefox 동기화로 계정을 보내려면 허용이 필요합니다. 잠금을 켜면 암호화해 보냅니다."라고 나옵니다.</p>
+  <h3 id="hotp-counters">HOTP 카운터</h3>
+  <p>HOTP 계정에는 코드를 쓸 때마다 올라가는 카운터가 있습니다. 백업과 동기화에는 카운터가 함께 담겨, 복원하거나 동기화한 계정은 저장된 지점부터 이어집니다. 기기마다 값이 다르면 같은 코드를 두 번 쓸 수 있습니다.</p>
+  <p class="ver"><strong>1.0.1</strong> 1.0.1부터 동기화 중 HOTP 카운터가 뒤로 돌아가지 않습니다. "목록 전체 복원"으로 지운 계정도 동기화 뒤에 되살아나지 않습니다.</p>
+  <h3 id="sync-off">끄기와 동기화 데이터 삭제</h3>
+  <ul>
+    <li>동기화를 멈추려면 "같은 브라우저 계정으로 로그인한 기기와 동기화"를 끕니다. 상태에 "동기화가 꺼져 있습니다."가 나옵니다.</li>
+    <li>공유 중인 사본을 지우려면 "다른 기기와 공유하는 동기화 데이터를 삭제합니다. 각 기기에 저장된 계정은 유지됩니다." 확인란을 선택하고 "동기화 데이터 삭제"를 누릅니다. "동기화 데이터를 삭제했습니다."가 나옵니다.</li>
+  </ul>
+  <p class="ver"><strong>1.0.1</strong> 1.0.1부터 "동기화 데이터 삭제"는 이 기기의 동기화도 함께 꺼서 데이터가 다시 올라가지 않습니다.</p>
+  <p>그 밖에 "브라우저의 동기화 저장 공간이 부족합니다.", "잠겨 있어서 동기화하지 못했습니다. 잠금을 해제해 주세요.", "다른 기기의 데이터를 확인하고 있습니다. 잠시 뒤 다시 시도해 주세요." 같은 안내가 나올 수 있습니다.</p>
+
+
+  <nav class="guide-nav" aria-label="다른 가이드"><a href="../lock-and-protect/" data-keep-utm>← 잠금과 보호</a><a href="../share-codes/" data-keep-utm>링크로 코드 공유 →</a></nav>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <ul>
+      <li><a href="https://github.com/elitekid/popout-authenticator">GitHub</a></li>
+      <li><a href="https://github.com/elitekid/popout-authenticator/blob/main/PRIVACY.md">개인정보처리방침</a></li>
+      <li><a href="https://github.com/elitekid/popout-authenticator/issues">이슈</a></li>
+      <li>MIT 라이선스</li>
+    </ul>
+  </div>
+</footer>
+</body>
+</html>

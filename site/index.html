@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; media-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>Popout Authenticator — 2FA &amp; OTP Codes</title>
 <meta name="description" content="2FA authenticator for your browser. Encrypted codes in a popup, window or side panel, filled into the sites you allow.">
@@ -30,7 +30,7 @@
     <a class="brand" href="./" data-keep-utm><img src="img/logo.png" width="36" height="36" alt="">Popout Authenticator</a>
     <nav class="main" aria-label="Main">
       <a href="./" data-keep-utm>Home</a>
-      <a href="#guides">Guides</a>
+      <a href="guides/" data-keep-utm>Guides</a>
       <a href="https://github.com/elitekid/popout-authenticator">GitHub</a>
       <a class="lang" href="ko/" data-keep-utm hreflang="ko" lang="ko">한국어</a>
     </nav>
@@ -38,14 +38,25 @@
 </header>
 
 <main id="main" class="wrap">
-  <section aria-labelledby="hero">
-    <h1 id="hero">Popout Authenticator — 2FA &amp; OTP Codes</h1>
-    <p class="lead">2FA authenticator for your browser. Encrypted codes in a popup, window or side panel, filled into the sites you allow.</p>
-    <div class="stores" data-campaign="pa-home"></div>
-    <noscript><p><a href="https://github.com/elitekid/popout-authenticator">Get it from the GitHub repository</a></p></noscript>
-    <p class="facts">Open source (MIT) · No account limits · No sign-up · No analytics</p>
+  <section class="hero" aria-labelledby="hero">
+    <div>
+      <h1 id="hero">Popout Authenticator — 2FA &amp; OTP Codes</h1>
+      <p class="lead">2FA authenticator for your browser. Encrypted codes in a popup, window or side panel, filled into the sites you allow.</p>
+      <div class="stores" data-campaign="pa-home"></div>
+      <noscript><p><a href="https://github.com/elitekid/popout-authenticator">Get it from the GitHub repository</a></p></noscript>
+      <p class="facts">Open source (MIT) · No account limits · No sign-up · No analytics</p>
+      <p><a href="guides/getting-started/" data-keep-utm>Get started guide →</a></p>
+    </div>
+    <figure class="short">
+      <video src="media/en/short.mp4" poster="media/en/short.jpg" width="720" height="1280" muted loop playsinline controls preload="none" data-autoplay aria-label="17-second clip of Popout Authenticator filling a sign-in code"></video>
+    </figure>
+  </section>
+
+  <section class="tour" aria-labelledby="tour">
+    <h2 id="tour">See it in about a minute</h2>
+    <p>Opening views, filling a code, adding from a QR code, importing a backup, sharing a code, and locking. Demo accounts only.</p>
     <figure>
-      <img src="img/en/03-window.png" width="1280" height="800" alt="Popout Authenticator open in a separate window next to a web page, showing accounts with one-time codes">
+      <video src="media/en/overview.mp4" poster="media/en/overview.jpg" width="1280" height="720" controls playsinline preload="none" aria-label="Overview video, 68 seconds, with music"></video>
     </figure>
   </section>
 
@@ -122,11 +133,21 @@
     <p>Send a link that shows the codes for the next 5 to 60 minutes, with an optional password. The link never contains the secret.</p>
   </section>
 
-  <section id="guides" aria-labelledby="moving">
-    <h2 id="moving">Moving from another authenticator?</h2>
-    <ul>
-      <li><a href="guides/from-authenticator-extension/" data-keep-utm>Moving from the original Authenticator extension</a></li>
-      <li><a href="guides/from-authy-and-other-apps/" data-keep-utm>Moving from Authy Desktop and other apps</a></li>
+  <section id="guides" aria-labelledby="guides-h">
+    <h2 id="guides-h">Guides</h2>
+    <ul class="guide-list">
+      <li><a href="guides/getting-started/" data-keep-utm><strong>Get started</strong><span>Install and add your first account.</span></a></li>
+      <li><a href="guides/open-and-organize/" data-keep-utm><strong>Popup, window, and side panel</strong><span>Where to open your codes, and how to keep the list tidy.</span></a></li>
+      <li><a href="guides/fill-codes/" data-keep-utm><strong>Fill codes into sign-in pages</strong><span>One click, right-click, shortcut, or a button next to the field.</span></a></li>
+      <li><a href="guides/lock-and-protect/" data-keep-utm><strong>Lock and protect</strong><span>Password, recovery code, passkey, and auto-lock.</span></a></li>
+      <li><a href="guides/backup-and-sync/" data-keep-utm><strong>Backup, export, and sync</strong><span>Keep a copy and move between devices.</span></a></li>
+      <li><a href="guides/share-codes/" data-keep-utm><strong>Share a code with a link</strong><span>Codes for a limited time, never the secret.</span></a></li>
+      <li><a href="guides/troubleshooting/" data-keep-utm><strong>Troubleshooting</strong><span>Wrong codes, filling, and forgotten passwords.</span></a></li>
+    </ul>
+    <h3 id="moving">Moving from another authenticator?</h3>
+    <ul class="guide-list">
+      <li><a href="guides/from-authenticator-extension/" data-keep-utm><strong>From the original Authenticator extension</strong><span>Import its backup file directly.</span></a></li>
+      <li><a href="guides/from-authy-and-other-apps/" data-keep-utm><strong>From Authy Desktop and other apps</strong><span>Google Authenticator, Aegis, 2FAS, Bitwarden, and more.</span></a></li>
     </ul>
   </section>
 

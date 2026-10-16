@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; media-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>Authy 데스크톱과 다른 앱에서 옮기기 — Popout Authenticator</title>
 <meta name="description" content="Authy 데스크톱, Google Authenticator, 다른 인증 앱의 계정을 Popout Authenticator로 옮기는 방법입니다.">
@@ -30,14 +30,15 @@
     <a class="brand" href="../../" data-keep-utm><img src="../../../img/logo.png" width="36" height="36" alt="">Popout Authenticator</a>
     <nav class="main" aria-label="주 메뉴">
       <a href="../../" data-keep-utm>홈</a>
-      <a href="../../#guides" data-keep-utm>가이드</a>
+      <a href="../" data-keep-utm>가이드</a>
       <a href="https://github.com/elitekid/popout-authenticator">GitHub</a>
       <a class="lang" href="../../../guides/from-authy-and-other-apps/" data-keep-utm hreflang="en" lang="en">English</a>
     </nav>
   </div>
 </header>
 
-<main id="main" class="wrap">
+<main id="main" class="wrap guide">
+  <nav class="crumbs" aria-label="이동 경로"><a href="../../" data-keep-utm>홈</a> › <a href="../" data-keep-utm>가이드</a></nav>
   <h1>Authy 데스크톱과 다른 앱에서 옮기기</h1>
   <p>쓰는 앱에 맞는 부분을 봐 주세요. 기존 Authenticator 확장 프로그램은 <a href="../from-authenticator-extension/" data-keep-utm>별도 가이드</a>가 있습니다.</p>
 
@@ -68,21 +69,21 @@
   </div>
 
   <h2 id="others">다른 앱</h2>
-  <p>표에 따로 적지 않았으면 암호화하지 않은 내보내기 파일을 써 주세요. Aegis·2FAS·Bitwarden의 암호화된 파일이면 Popout이 "{app} 앱에서 암호화 없이 내보낸 파일을 써 주세요."라고 알려 줍니다.</p>
+  <p>표에 따로 적지 않았으면 암호화하지 않은 내보내기 파일을 써 주세요. Aegis·2FAS·Bitwarden의 암호화된 파일이면 Popout이 그 앱에서 암호화 없이 내보낸 파일을 쓰라고 알려 줍니다(예: "Aegis 앱에서 암호화 없이 내보낸 파일을 써 주세요.").</p>
   <div class="table-wrap">
-    <table>
+    <table class="stack">
       <thead>
         <tr><th scope="col">앱</th><th scope="col">내보낼 것</th><th scope="col">참고</th></tr>
       </thead>
       <tbody>
-        <tr><th scope="row">Aegis</th><td>암호화하지 않은 금고 내보내기(JSON)</td><td>암호화된 내보내기는 지원하지 않습니다.</td></tr>
-        <tr><th scope="row">2FAS</th><td>2FAS Backup → Export, 비밀번호 설정 없이 (<a href="https://2fas.com/support/2fas-auth-mobile-app/i-want-to-move-copy-transfer-tokens-codes-between-ios-and-android/">2FAS 안내</a>, 2026-10-15 확인)</td><td>파일 이름이 .2fas로 끝납니다. 파일 선택 창에서 고를 수 없으면 파일 이름 끝을 .json으로 바꿔 주세요.</td></tr>
-        <tr><th scope="row">Bitwarden Authenticator</th><td>Settings → Export → file format .json → Export items (<a href="https://bitwarden.com/help/authenticator-import-export/">Bitwarden 안내</a>, 2026-10-15 확인)</td><td>CSV는 지원하지 않습니다. 암호화하지 않은 Bitwarden 비밀번호 관리자 JSON 내보내기도 읽을 수 있습니다(TOTP 필드를 읽습니다).</td></tr>
-        <tr><th scope="row">FreeOTP+</th><td>JSON 내보내기, 또는 otpauth:// 링크가 담긴 텍스트 파일</td><td></td></tr>
-        <tr><th scope="row">andOTP</th><td>암호화하지 않은 JSON 백업</td><td>암호화된 백업은 지원하지 않습니다.</td></tr>
-        <tr><th scope="row">Raivo</th><td>Settings → Export OTPs to ZIP archive (<a href="https://bitwarden.com/help/authenticator-import-export/">Bitwarden 안내</a> 기준, 2026-10-15 확인)</td><td>정해 둔 비밀번호로 ZIP 파일을 풀고 raivo-otp-export.json을 가져옵니다. Popout은 ZIP 파일을 직접 열 수 없습니다.</td></tr>
-        <tr><th scope="row">2FA Authenticator (authenticator.sh)</th><td>백업 파일(암호화 여부 상관없음)</td><td>암호화된 파일이면 Popout이 비밀번호를 묻습니다.</td></tr>
-        <tr><th scope="row">그 밖의 앱</th><td>한 줄에 otpauth:// 또는 otpauth-migration:// 링크 하나씩 적은 .txt 파일</td><td>"링크" 탭에 링크를 붙여 넣어도 됩니다.</td></tr>
+        <tr><th scope="row">Aegis</th><td data-label="내보낼 것">암호화하지 않은 금고 내보내기(JSON)</td><td data-label="참고">암호화된 내보내기는 지원하지 않습니다.</td></tr>
+        <tr><th scope="row">2FAS</th><td data-label="내보낼 것">2FAS Backup → Export, 비밀번호 설정 없이 (<a href="https://2fas.com/support/2fas-auth-mobile-app/i-want-to-move-copy-transfer-tokens-codes-between-ios-and-android/">2FAS 안내</a>, 2026-10-15 확인)</td><td data-label="참고">파일 이름이 .2fas로 끝납니다. 파일 선택 창에서 고를 수 없으면 파일 이름 끝을 .json으로 바꿔 주세요. 1.0.1부터는 .2fas 파일도 고를 수 있습니다.</td></tr>
+        <tr><th scope="row">Bitwarden Authenticator</th><td data-label="내보낼 것">Settings → Export → file format .json → Export items (<a href="https://bitwarden.com/help/authenticator-import-export/">Bitwarden 안내</a>, 2026-10-15 확인)</td><td data-label="참고">CSV는 지원하지 않습니다. 암호화하지 않은 Bitwarden 비밀번호 관리자 JSON 내보내기도 읽을 수 있습니다(TOTP 필드를 읽습니다).</td></tr>
+        <tr><th scope="row">FreeOTP+</th><td data-label="내보낼 것">JSON 내보내기, 또는 otpauth:// 링크가 담긴 텍스트 파일</td><td data-label="참고"></td></tr>
+        <tr><th scope="row">andOTP</th><td data-label="내보낼 것">암호화하지 않은 JSON 백업</td><td data-label="참고">암호화된 백업은 지원하지 않습니다.</td></tr>
+        <tr><th scope="row">Raivo</th><td data-label="내보낼 것">Settings → Export OTPs to ZIP archive (<a href="https://bitwarden.com/help/authenticator-import-export/">Bitwarden 안내</a> 기준, 2026-10-15 확인)</td><td data-label="참고">정해 둔 비밀번호로 ZIP 파일을 풀고 raivo-otp-export.json을 가져옵니다. Popout은 ZIP 파일을 직접 열 수 없습니다.</td></tr>
+        <tr><th scope="row">2FA Authenticator (authenticator.sh)</th><td data-label="내보낼 것">백업 파일(암호화 여부 상관없음)</td><td data-label="참고">암호화된 파일이면 Popout이 비밀번호를 묻습니다.</td></tr>
+        <tr><th scope="row">그 밖의 앱</th><td data-label="내보낼 것">한 줄에 otpauth:// 또는 otpauth-migration:// 링크 하나씩 적은 .txt 파일</td><td data-label="참고">"링크" 탭에 링크를 붙여 넣어도 됩니다.</td></tr>
       </tbody>
     </table>
   </div>
@@ -101,7 +102,7 @@
     <li>암호화하지 않은 내보내기 파일은 지워 주세요. 파일에 비밀키가 들어 있습니다.</li>
   </ul>
 
-  <p><a href="../../" data-keep-utm>← 홈으로</a></p>
+  <nav class="guide-nav" aria-label="다른 가이드"><a href="../" data-keep-utm>← 모든 가이드</a><a href="../from-authenticator-extension/" data-keep-utm>기존 Authenticator 확장 프로그램에서 옮기기 →</a></nav>
 </main>
 
 <footer class="site">

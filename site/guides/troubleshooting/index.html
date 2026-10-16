@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; media-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Troubleshooting — Popout Authenticator</title>
+<meta name="description" content="What to do when codes are rejected, filling does not work, the vault will not unlock, or an import fails.">
+<link rel="canonical" href="https://elitekid.github.io/popout-authenticator/guides/troubleshooting/">
+<link rel="alternate" hreflang="en" href="https://elitekid.github.io/popout-authenticator/guides/troubleshooting/">
+<link rel="alternate" hreflang="ko" href="https://elitekid.github.io/popout-authenticator/ko/guides/troubleshooting/">
+<link rel="alternate" hreflang="x-default" href="https://elitekid.github.io/popout-authenticator/guides/troubleshooting/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Popout Authenticator">
+<meta property="og:title" content="Troubleshooting">
+<meta property="og:description" content="What to do when codes are rejected, filling does not work, the vault will not unlock, or an import fails.">
+<meta property="og:url" content="https://elitekid.github.io/popout-authenticator/guides/troubleshooting/">
+<meta property="og:image" content="https://elitekid.github.io/popout-authenticator/img/en/03-window.png">
+<meta property="og:locale" content="en">
+<meta property="og:locale:alternate" content="ko">
+<link rel="icon" href="../../img/logo.png">
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/site.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="../../" data-keep-utm><img src="../../img/logo.png" width="36" height="36" alt="">Popout Authenticator</a>
+    <nav class="main" aria-label="Main">
+      <a href="../../" data-keep-utm>Home</a>
+      <a href="../" data-keep-utm>Guides</a>
+      <a href="https://github.com/elitekid/popout-authenticator">GitHub</a>
+      <a class="lang" href="../../ko/guides/troubleshooting/" data-keep-utm hreflang="ko" lang="ko">한국어</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="wrap guide">
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="../../" data-keep-utm>Home</a> › <a href="../" data-keep-utm>Guides</a></nav>
+  <h1>Troubleshooting</h1>
+  <p class="lead">What to do when codes are rejected, filling does not work, the vault will not unlock, or an import fails.</p>
+
+  <nav class="toc card" aria-label="On this page">
+    <ol>
+      <li><a href="#codes-rejected">A site rejects the code</a></li>
+      <li><a href="#fill">Filling does not work</a></li>
+      <li><a href="#shortcut">A shortcut does not work</a></li>
+      <li><a href="#unlock">You cannot unlock</a></li>
+      <li><a href="#import">Import errors</a></li>
+      <li><a href="#side-panel">The side panel is missing</a></li>
+      <li><a href="#sync">Sync does not show up</a></li>
+      <li><a href="#damaged">The vault cannot be read</a></li>
+      <li><a href="#report">Report a problem</a></li>
+    </ol>
+  </nav>
+
+  <h2 id="codes-rejected">A site rejects the code</h2>
+  <p>Work through these checks in order.</p>
+  <h3>1. Check the clock</h3>
+  <p>Codes depend on the time. If your computer's clock is off by more than a minute or so, the site rejects every code.</p>
+  <ol>
+    <li>Open Settings → "Clock check". Make sure "Compare with internet time when the authenticator opens" is on, then select "Check now".</li>
+    <li>Read the result. "The clock is accurate (difference N s)." means the clock is fine. "The clock is off by N s." means it is not. Small differences are corrected for you ("Codes use the measured clock offset."). For a large one you see "The difference is too large to correct. Fix the device time."</li>
+    <li>In that case, turn on automatic date and time in your operating system and try again.</li>
+  </ol>
+  <p>The check asks <code>time.akamai.com</code>, <code>timeapi.io</code>, and <code>cloudflare.com</code> for the current time. The requests contain no account data, and these services can see your IP address. If you turn the check off, Popout uses the device clock as it is ("Off. The device clock is used as is."). If it cannot reach the servers, you see "Could not check. The device clock is used as is."</p>
+  <h3>2. Check the account settings</h3>
+  <p>A correct clock can still give wrong codes if the account was saved with different settings than the service uses. Compare the type, algorithm, digits, and period ("Period (seconds)") with what the service showed when you set it up. If you just added the account, select "Codes not matching?" → "Check settings", compare with your phone app's code, and pick the combination that matches ("SHA-1 · 6 digits" style). See <a href="../getting-started/" data-keep-utm>Getting started</a>.</p>
+  <h3>3. Use the current code</h3>
+  <p>Wait for a new code, or use "Copy next code" when the old one is about to expire.</p>
+
+  <h2 id="fill">Filling does not work</h2>
+  <p>Popout fills codes into pages whose address it can check. See <a href="../fill-codes/" data-keep-utm>Fill codes into sign-in pages</a> for the full steps. Common causes:</p>
+  <ul>
+    <li><strong>Site access is missing.</strong> You see "Permission to fill on this site is missing. Allow site access, or open the extension from the browser toolbar on the target site and try again." Select "Allow filling on example.com" (with the site's own address) in the prompt.</li>
+    <li><strong>The page is not https.</strong> "Codes are not filled on pages without a secure (https) connection." The exceptions are <code>localhost</code> and <code>127.0.0.1</code>.</li>
+    <li><strong>The code field is inside a frame from another site.</strong> The frame's address must be secure and must be a saved site for the account, or you see "This site is not saved for this account. Check the address and try again." Use "Fill once" or "Remember and fill" when the address is right.</li>
+    <li><strong>The vault is locked.</strong> "The vault is locked. Unlock it and try again."</li>
+    <li><strong>The page cannot be filled</strong> (for example a browser page): "Codes cannot be filled on this page. Try again on the site where you want to sign in."</li>
+    <li><strong>The field was not detected.</strong> Popout then copies the code: "Could not find an input field, so the code was copied. Paste it on the site." Click the code field once and try again, or paste the code yourself.</li>
+  </ul>
+  <p class="ver"><strong>1.0.1</strong> From version 1.0.1, filling no longer picks a phone-number field that has no sign of being a code field. If a code is not filled on such a page, click the real code field and try again, or copy the code.</p>
+
+  <h2 id="shortcut">A shortcut does not work</h2>
+  <p>The fill shortcut is <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Y</kbd> (<kbd>Command</kbd>+<kbd>Shift</kbd>+<kbd>Y</kbd> on a Mac). Other actions (scan a QR code on the screen, fill the best matching account, hide or show codes, open in a separate window) have no default key.</p>
+  <ol>
+    <li>Open your browser's extension keyboard shortcuts page.</li>
+    <li>Find Popout Authenticator. Set a key for the action, or change the one that is there.</li>
+    <li>If another extension or the browser uses the same keys, choose a different combination.</li>
+    <li>Put the cursor in the code field before you press the key. Then check <a href="#fill">Filling does not work</a>.</li>
+  </ol>
+  <p>The right-click menu item "Fill 2FA code" does the same without a shortcut.</p>
+
+  <h2 id="unlock">You cannot unlock</h2>
+  <ul>
+    <li>"The password is incorrect." Check the keyboard layout and Caps Lock.</li>
+    <li>Select "Unlock with a recovery code" and enter your recovery code. "The recovery code is incorrect." means a typo or an older code that was replaced.</li>
+    <li>You can also try "Unlock with passkey". In Firefox, passkeys are not available.</li>
+  </ul>
+  <p>If you have lost the password and the recovery code, try a registered passkey. If none of the three works, the vault cannot be opened. See <a href="../lock-and-protect/#forgot" data-keep-utm>If you forget the password</a>.</p>
+
+  <h2 id="import">Import errors</h2>
+  <p>These are the messages you may see when adding accounts from a file, links, or a QR image. For app-specific steps, see <a href="../from-authy-and-other-apps/" data-keep-utm>moving from other apps</a>.</p>
+  <div class="table-wrap">
+    <table class="stack">
+      <thead>
+        <tr><th scope="col">Message</th><th scope="col">What it means</th><th scope="col">What to do</th></tr>
+      </thead>
+      <tbody>
+        <tr><th scope="row">"Unknown format"</th><td data-label="What it means">The file is not a backup Popout recognizes.</td><td data-label="What to do">Export again from the app, in a supported format.</td></tr>
+        <tr><th scope="row">"Export an unencrypted file from the Aegis app and use that."</th><td data-label="What it means">The file is an encrypted export (the app name changes: Aegis, 2FAS, Bitwarden).</td><td data-label="What to do">Export an unencrypted file from that app.</td></tr>
+        <tr><th scope="row">"This backup is encrypted. Enter its password." / "The password is incorrect."</th><td data-label="What it means">The backup needs a password, or the one you typed is wrong.</td><td data-label="What to do">Type the backup password in "Backup password" and select "OK".</td></tr>
+        <tr><th scope="row">"Could not read the file."</th><td data-label="What it means">Popout could not open the file you chose.</td><td data-label="What to do">Choose the file again, or export a new one.</td></tr>
+        <tr><th scope="row">"Could not read the link."</th><td data-label="What it means">A pasted link is not a valid <code>otpauth://</code> link.</td><td data-label="What to do">Paste one complete link per line.</td></tr>
+        <tr><th scope="row">"Only the first 500 links were imported. Paste the rest again."</th><td data-label="What it means">Popout reads up to 500 links at a time.</td><td data-label="What to do">Paste the remaining links in a second round.</td></tr>
+        <tr><th scope="row">"The secret key format is not valid."</th><td data-label="What it means">Popout cannot read the secret key as typed.</td><td data-label="What to do">Copy it again from the service, without extra characters.</td></tr>
+        <tr><th scope="row">"Digits must be a whole number from 6 to 10." / "Period must be a whole number from 1 to 3600 seconds."</th><td data-label="What it means">A manual field has a value out of range.</td><td data-label="What to do">Use the values the service showed.</td></tr>
+        <tr><th scope="row">"No QR code found." / "Not an authenticator QR code." / "Could not read the image."</th><td data-label="What it means">The image has no readable sign-in QR code.</td><td data-label="What to do">Use a sharper, larger image of the whole QR code.</td></tr>
+        <tr><th scope="row">"This is not a raw copy file." / "Could not open the copy."</th><td data-label="What it means">The file is not a raw copy, or the password is wrong.</td><td data-label="What to do">Check the file and the copy's password.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="side-panel">The side panel is missing</h2>
+  <p>Open Settings → "Display" → "Open as". "Side panel" is listed when your browser provides a side panel. In Safari, a saved "Side panel" choice falls back to "Popup". Choose "Popup" or "Separate window" instead.</p>
+
+  <h2 id="sync">Sync does not show up</h2>
+  <p>Open Settings → "Sync". The status line tells you why:</p>
+  <ul>
+    <li>"Sync is off." Turn on "Sync with devices signed in to the same browser account".</li>
+    <li>"Set up a lock to sync your accounts with encryption." Turn on the lock, or "Allow syncing without a lock" (secret keys are then sent unencrypted).</li>
+    <li>"Locked, so it could not sync. Unlock first."</li>
+    <li>"Accounts were synced from another device. Merge them using the vault password set on that device."</li>
+    <li>"Not enough sync space." or "Checking data from another device. Try again shortly."</li>
+  </ul>
+  <p>Select "Sync now" to try again. Firefox asks for permission first ("Firefox needs your permission to send encrypted accounts through Firefox Sync."). Safari shows "This browser does not support syncing between devices. Use a backup file to move your accounts to another device." Both devices must be signed in to the same browser account. More in <a href="../backup-and-sync/" data-keep-utm>Backup, export, and sync</a>.</p>
+
+  <h2 id="damaged">The vault cannot be read</h2>
+  <p>If you see "Could not read the vault. Do not reset or remove the extension. Check the recovery options below.", open "Backup".</p>
+  <ol>
+    <li>Select "Save raw copy" first, so nothing is lost.</li>
+    <li>Under "Restore from a snapshot", choose an earlier snapshot. In version 1.0.0, "Add missing accounts only" can fail while the current vault is damaged. "Restore entire list" replaces the current list with the snapshot.</li>
+    <li>In version 1.0.0, "Import from a raw copy" works only while the current vault can be read.</li>
+  </ol>
+  <p class="ver"><strong>1.0.1</strong> From version 1.0.1, importing a raw copy works even when the current vault is damaged.</p>
+  <div class="card note">
+    <p>Removing the extension also removes its accounts and snapshots. Save a backup file first.</p>
+  </div>
+
+  <h2 id="report">Report a problem</h2>
+  <p>Open an issue at <a href="https://github.com/elitekid/popout-authenticator/issues">github.com/elitekid/popout-authenticator/issues</a>. Include your browser and version, the Popout version (Settings shows "Version"), what you did, and the message you saw. Do not post secret keys, recovery codes, or codes.</p>
+
+
+  <nav class="guide-nav" aria-label="More guides"><a href="../share-codes/" data-keep-utm>← Share a code with a link</a><a href="../" data-keep-utm>All guides →</a></nav>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <ul>
+      <li><a href="https://github.com/elitekid/popout-authenticator">GitHub</a></li>
+      <li><a href="https://github.com/elitekid/popout-authenticator/blob/main/PRIVACY.md">Privacy</a></li>
+      <li><a href="https://github.com/elitekid/popout-authenticator/issues">Issues</a></li>
+      <li>MIT License</li>
+    </ul>
+  </div>
+</footer>
+</body>
+</html>

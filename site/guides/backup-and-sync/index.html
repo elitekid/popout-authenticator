@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; media-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Backup, export, and sync — Popout Authenticator</title>
+<meta name="description" content="Make encrypted backups, export to other apps, restore from snapshots or the trash, and sync between devices.">
+<link rel="canonical" href="https://elitekid.github.io/popout-authenticator/guides/backup-and-sync/">
+<link rel="alternate" hreflang="en" href="https://elitekid.github.io/popout-authenticator/guides/backup-and-sync/">
+<link rel="alternate" hreflang="ko" href="https://elitekid.github.io/popout-authenticator/ko/guides/backup-and-sync/">
+<link rel="alternate" hreflang="x-default" href="https://elitekid.github.io/popout-authenticator/guides/backup-and-sync/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Popout Authenticator">
+<meta property="og:title" content="Backup, export, and sync">
+<meta property="og:description" content="Make encrypted backups, export to other apps, restore from snapshots or the trash, and sync between devices.">
+<meta property="og:url" content="https://elitekid.github.io/popout-authenticator/guides/backup-and-sync/">
+<meta property="og:image" content="https://elitekid.github.io/popout-authenticator/img/en/03-window.png">
+<meta property="og:locale" content="en">
+<meta property="og:locale:alternate" content="ko">
+<link rel="icon" href="../../img/logo.png">
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/site.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="../../" data-keep-utm><img src="../../img/logo.png" width="36" height="36" alt="">Popout Authenticator</a>
+    <nav class="main" aria-label="Main">
+      <a href="../../" data-keep-utm>Home</a>
+      <a href="../" data-keep-utm>Guides</a>
+      <a href="https://github.com/elitekid/popout-authenticator">GitHub</a>
+      <a class="lang" href="../../ko/guides/backup-and-sync/" data-keep-utm hreflang="ko" lang="ko">한국어</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="wrap guide">
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="../../" data-keep-utm>Home</a> › <a href="../" data-keep-utm>Guides</a></nav>
+  <h1>Backup, export, and sync</h1>
+  <p class="lead">Make encrypted backups, export to other apps, restore from snapshots or the trash, and sync between devices.</p>
+
+  <nav class="toc card" aria-label="On this page">
+    <ol>
+      <li><a href="#encrypted-backup">Make an encrypted backup</a></li>
+      <li><a href="#formats">Compare the formats</a></li>
+      <li><a href="#reminder">The backup reminder</a></li>
+      <li><a href="#restore">Restore from a backup file</a></li>
+      <li><a href="#exports">Export to other apps</a></li>
+      <li><a href="#snapshots">Recovery snapshots</a></li>
+      <li><a href="#trash">Trash</a></li>
+      <li><a href="#history">Account history</a></li>
+      <li><a href="#sync">Sync between devices</a></li>
+    </ol>
+  </nav>
+
+  <h2 id="encrypted-backup">Make an encrypted backup</h2>
+  <p>A backup file is your safety net. Removing the extension also removes its accounts and snapshots, so save a backup file somewhere safe before you remove or reinstall it.</p>
+  <ol>
+    <li>Open the manage screen (the "Settings" button in the popup) and choose "Backup". In the toolbar popup, "Export" opens a small window for the next steps.</li>
+    <li>Under "Export", leave "Format" on "Encrypted backup (recommended)".</li>
+    <li>Type a "Backup password (8+ characters)" and repeat it in "Repeat the password". If it is too short you see "The password must be at least 8 characters."; if the two differ you see "The passwords do not match."</li>
+    <li>If you use a password lock, type your current password in the "Enter your current password again." field.</li>
+    <li>Select "Create backup".</li>
+    <li>Popout reads the new file back and shows a check such as "11 of 11 included in the backup". If accounts are missing it says "Missing accounts: …. This file cannot restore all accounts."</li>
+    <li>Select "Download". The file is named <code>popout-authenticator-</code> plus the date, with <code>.json</code> at the end.</li>
+  </ol>
+  <p>The backup password is separate from your lock password. The file opens with the backup password alone, and Popout cannot reset it. Store the password apart from the file.</p>
+  <p>The file holds your active accounts with their groups, notes, important marks, site addresses, and HOTP counters. Accounts in the trash are left out. If your administrator blocked exporting, you see "Your administrator has blocked exporting."</p>
+
+  <h2 id="formats">Compare the formats</h2>
+  <p>"Format" offers six choices. The first one is the encrypted choice; the rest are not encrypted.</p>
+  <div class="table-wrap">
+    <table class="stack">
+      <thead>
+        <tr><th scope="col">Format</th><th scope="col">What you get</th><th scope="col">Who can read it</th><th scope="col">Left out</th></tr>
+      </thead>
+      <tbody>
+        <tr><th scope="row">"Encrypted backup (recommended)"</th><td data-label="What you get">A <code>.json</code> file, encrypted with your backup password</td><td data-label="Who can read it">Popout Authenticator, with the password</td><td data-label="Left out">Trash</td></tr>
+        <tr><th scope="row">"Unencrypted backup (JSON)"</th><td data-label="What you get">A <code>.json</code> file with readable secret keys</td><td data-label="Who can read it">Popout Authenticator</td><td data-label="Left out">Trash</td></tr>
+        <tr><th scope="row">"otpauth link text"</th><td data-label="What you get">A <code>.txt</code> file, one <code>otpauth://</code> link per line</td><td data-label="Who can read it">Apps that import otpauth:// links</td><td data-label="Left out">Steam and Battle.net accounts</td></tr>
+        <tr><th scope="row">"CXF"</th><td data-label="What you get">A <code>.json</code> file in the FIDO Credential Exchange Format</td><td data-label="Who can read it">Apps that import CXF</td><td data-label="Left out">Everything except time-based (TOTP) accounts</td></tr>
+        <tr><th scope="row">"QR per account"</th><td data-label="What you get">One QR code on screen for each account</td><td data-label="Who can read it">Apps that scan standard authenticator QR codes</td><td data-label="Left out">Steam and Battle.net accounts</td></tr>
+        <tr><th scope="row">"Google batch QR"</th><td data-label="What you get">QR codes in the format of Google Authenticator's export, several accounts per code</td><td data-label="Who can read it">Apps that read Google Authenticator export codes</td><td data-label="Left out">Steam and Battle.net, and accounts that do not use 6 or 8 digits and a 30-second period</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Accounts that a format cannot hold are listed under "These accounts cannot be exported in the selected format."</p>
+  <div class="card note">
+    <p>Every format except the encrypted backup contains your secret keys in a form anyone can read. For these, Popout shows "Secret keys are saved without encryption. Keep the file somewhere others cannot access." and you tick "I understand the risk" before "Create backup" is enabled. Delete the files and close the QR codes when you are done.</p>
+  </div>
+
+  <h2 id="reminder">The backup reminder</h2>
+  <p>When you have at least three accounts, the popup can show a strip: "Back up your accounts." with "Back up" and "Later".</p>
+  <ul>
+    <li>It appears if you never made a backup. After that, it appears again only when your last backup is older than 30 days and your accounts have changed since.</li>
+    <li>"Back up" opens the "Backup" screen. "Later" hides the strip for 7 days.</li>
+    <li>A backup counts when you select "Download" and the check finds every account the chosen format can hold. In version 1.0.0 this can hide the reminder even when the format skipped some accounts, so use "Encrypted backup (recommended)" to include all of them. QR codes do not count.</li>
+  </ul>
+  <p class="ver"><strong>1.0.1</strong> From version 1.0.1, an export that skips some accounts no longer hides the reminder.</p>
+
+  <h2 id="restore">Restore from a backup file</h2>
+  <ol>
+    <li>Select + → "Add account" → the "Backup file" tab → "Choose a backup file."</li>
+    <li>Pick your Popout backup. For an encrypted one, Popout says "This backup is encrypted. Enter its password." Type it in "Backup password" and select "OK". A wrong one gives "The password is incorrect."</li>
+    <li>A result message shows how many accounts were added and how many were skipped as duplicates. Accounts you already have are never overwritten.</li>
+  </ol>
+  <p>The same tab reads the otpauth text and CXF files that Popout exports. For files from other apps, see <a href="../from-authy-and-other-apps/" data-keep-utm>Moving from Authy Desktop and other apps</a>.</p>
+  <p class="ver"><strong>1.0.1</strong> From version 1.0.1, the file picker also offers <code>.2fas</code> files, and CXF imports list the entries they could not read.</p>
+  <h3 id="compare">Check a backup without changing anything</h3>
+  <p>In "Backup", select "Open backup comparison", then "Choose backup file". Enter the "Backup password" if asked and select "Compare". Popout lists each account as "Match", "Missing from backup", "Authentication details differ", or "Review needed", and shows accounts that are "Only in backup". Your accounts do not change. It compares the details in the file and does not guarantee that a website sign-in works.</p>
+
+  <h2 id="exports">Export to other apps</h2>
+  <ol>
+    <li>In "Backup" → "Export", pick one of "otpauth link text", "CXF", "QR per account", or "Google batch QR" in "Format".</li>
+    <li>Tick "I understand the risk" and enter your current password if asked.</li>
+    <li>Select "Create backup". Files get a "Download" button.</li>
+    <li>For QR formats, scan the code from the other app. Use "Previous" and "Next" to step through the codes (for example "Code 1 of 2"), then "Close".</li>
+  </ol>
+  <p>Check the other app's import options first. If it cannot read the format you chose, try another row of the table above.</p>
+
+  <h2 id="snapshots">Recovery snapshots</h2>
+  <p>Popout saves the previous version of your account list as a snapshot each time the list changes. It keeps the latest 30 snapshots plus the newest one for each of the last 30 days. Snapshots live in the extension, not in a file, so they are gone if you remove it.</p>
+  <ol>
+    <li>Open "Backup" and find "Restore from a snapshot". Each row shows a time and a count, such as "… · 5 accounts". A "locked" mark means it was saved with a lock; if your current vault key cannot open it, Popout asks for that snapshot's password. If there are none, you see "No snapshots".</li>
+    <li>Choose "Add missing accounts only" to bring back accounts that are not in your list now.</li>
+    <li>Or choose "Restore entire list". Popout warns that your current list is replaced and saved as a new snapshot. Select "Restore" to continue.</li>
+    <li>If the snapshot used another password, enter "the password used to save this snapshot" and select "OK".</li>
+    <li>You see "Restored N accounts." when it is done.</li>
+  </ol>
+  <p class="ver"><strong>1.0.1</strong> From version 1.0.1, turning on the password lock also re-encrypts older snapshots, so none of them keeps readable secret keys.</p>
+  <h3 id="raw-copy">Raw copy</h3>
+  <p>"Save raw copy" saves a copy of the stored vault and settings. "Import from a raw copy" adds its accounts back and asks for "the password of this copy" if needed. If Popout cannot read your vault ("Could not read the vault. Do not reset or remove the extension."), save a raw copy first and check the recovery options on that screen.</p>
+  <p class="ver"><strong>1.0.1</strong> From version 1.0.1, importing a raw copy also works when the current vault is damaged.</p>
+
+  <h2 id="trash">Trash</h2>
+  <p>Deleting an account asks "Move this account to trash? It will be permanently deleted after 30 days." and offers "Move to trash".</p>
+  <ol>
+    <li>Open the manage screen and choose "Trash". Each row shows the days left, such as "30 days left".</li>
+    <li>Select "Restore" to bring the account back.</li>
+    <li>Select "Delete permanently" and confirm to remove one account for good. "Empty trash" removes all of them. Both say "This cannot be undone."</li>
+  </ol>
+  <p class="ver"><strong>1.0.1</strong> From version 1.0.1, restoring from the trash no longer creates a duplicate account.</p>
+
+  <h2 id="history">Account history</h2>
+  <p>History turns one account back to an earlier state without touching the others. It uses the snapshots above, so it reaches back only as far as they do.</p>
+  <ol>
+    <li>Save any edits first. Unsaved input is not part of the history.</li>
+    <li>Open the account for editing and select "Account history".</li>
+    <li>Choose "Review changes" on a saved version. "Load earlier versions" shows older ones.</li>
+    <li>Select "Restore this version". Only the listed fields change. Other accounts and the list order stay as they are.</li>
+  </ol>
+  <div class="card note">
+    <p>"Restoring an old key does not change the key registered with the website." For HOTP accounts, the key, type, and counter stay unchanged "to prevent code reuse".</p>
+  </div>
+
+  <h2 id="sync">Sync between devices</h2>
+  <p>Sync uses your browser's own sync service. It is offered on Chrome, Edge, and Firefox. On Safari, the Settings screen says "This browser does not support syncing between devices. Use a backup file to move your accounts to another device." Popout has no server of its own.</p>
+  <h3 id="sync-start">Turn it on</h3>
+  <ol>
+    <li>Set a password lock first. See <a href="../lock-and-protect/" data-keep-utm>Lock and protect your accounts</a>. Sync is on by default but only runs once a lock exists. Without one, the status reads "Set up a lock to sync your accounts with encryption."</li>
+    <li>Open the manage screen → "Settings" → "Sync" and check "Sync with devices signed in to the same browser account".</li>
+    <li>Sign in to the same browser account on your other device and set up Popout there. If it says "Accounts were synced from another device. Merge them using the vault password set on that device.", follow that message.</li>
+    <li>Select "Sync now" to sync at once. The status changes to "Synced."</li>
+  </ol>
+  <p>Each account (secret key, service, name, notes, group, site addresses) is encrypted with your vault key before upload. Deleting an account is passed on to your other devices. Your settings, field buttons, and site usage history are not synced.</p>
+  <div class="card note">
+    <p>"Allow syncing without a lock" sends secret keys without encryption. "Without a vault lock, secret keys are sent to other devices on the same browser account without encryption." Set a lock instead.</p>
+  </div>
+  <h3 id="firefox-consent">Firefox</h3>
+  <p>Firefox asks for permission to send data through Firefox Sync. Until you allow it, the status says "Firefox needs your permission to send encrypted accounts through Firefox Sync." Select "Allow".</p>
+  <p class="ver"><strong>1.0.1</strong> From version 1.0.1, if no lock is set the message reads "Firefox needs your permission to send accounts through Firefox Sync. Turn on a lock to send them encrypted."</p>
+  <h3 id="hotp-counters">HOTP counters</h3>
+  <p>A HOTP account has a counter that goes up each time you use a code. Backups and sync carry the counter, so a restored or synced account continues from where it was saved. If two devices disagree, a code could be used twice.</p>
+  <p class="ver"><strong>1.0.1</strong> From version 1.0.1, a HOTP counter never goes backwards during sync. Accounts removed by "Restore entire list" also stay removed.</p>
+  <h3 id="sync-off">Turn off or delete sync data</h3>
+  <ul>
+    <li>To stop syncing, clear "Sync with devices signed in to the same browser account". The status says "Sync is off."</li>
+    <li>To remove the shared copy, tick the box that says "Delete the sync data shared with other devices. Accounts saved on each device stay unchanged.", then select "Delete sync data". You see "Sync data deleted."</li>
+  </ul>
+  <p class="ver"><strong>1.0.1</strong> From version 1.0.1, "Delete sync data" also turns sync off on this device, so the data is not uploaded again.</p>
+  <p>Other messages you may see: "Not enough sync space.", "Locked, so it could not sync. Unlock first.", and "Checking data from another device. Try again shortly."</p>
+
+
+  <nav class="guide-nav" aria-label="More guides"><a href="../lock-and-protect/" data-keep-utm>← Lock and protect your accounts</a><a href="../share-codes/" data-keep-utm>Share a code with a link →</a></nav>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <ul>
+      <li><a href="https://github.com/elitekid/popout-authenticator">GitHub</a></li>
+      <li><a href="https://github.com/elitekid/popout-authenticator/blob/main/PRIVACY.md">Privacy</a></li>
+      <li><a href="https://github.com/elitekid/popout-authenticator/issues">Issues</a></li>
+      <li>MIT License</li>
+    </ul>
+  </div>
+</footer>
+</body>
+</html>

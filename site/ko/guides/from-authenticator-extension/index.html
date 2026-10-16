@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; media-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>기존 Authenticator 확장 프로그램에서 옮기기 — Popout Authenticator</title>
 <meta name="description" content="기존 Authenticator 확장 프로그램의 백업 파일로 계정을 Popout Authenticator로 옮깁니다.">
@@ -30,16 +30,22 @@
     <a class="brand" href="../../" data-keep-utm><img src="../../../img/logo.png" width="36" height="36" alt="">Popout Authenticator</a>
     <nav class="main" aria-label="주 메뉴">
       <a href="../../" data-keep-utm>홈</a>
-      <a href="../../#guides" data-keep-utm>가이드</a>
+      <a href="../" data-keep-utm>가이드</a>
       <a href="https://github.com/elitekid/popout-authenticator">GitHub</a>
       <a class="lang" href="../../../guides/from-authenticator-extension/" data-keep-utm hreflang="en" lang="en">English</a>
     </nav>
   </div>
 </header>
 
-<main id="main" class="wrap">
+<main id="main" class="wrap guide">
+  <nav class="crumbs" aria-label="이동 경로"><a href="../../" data-keep-utm>홈</a> › <a href="../" data-keep-utm>가이드</a></nav>
   <h1>기존 Authenticator 확장 프로그램에서 옮기기</h1>
   <p>기존 "Authenticator" 확장 프로그램의 GitHub 최신 릴리스는 v8.0.2(2024-09-15)입니다. <a href="https://github.com/Authenticator-Extension/Authenticator/releases">릴리스 페이지</a>(2026-10-15 확인)를 참고해 주세요. Popout Authenticator는 이 확장 프로그램의 백업을 바로 읽을 수 있고, 기존 확장 프로그램의 MIT 라이선스 코드를 바탕으로 만들었습니다.</p>
+
+  <figure>
+    <video src="../../../media/ko/import-backup.mp4" poster="../../../media/ko/import-backup.jpg" width="960" height="540" muted loop playsinline controls preload="none" data-autoplay aria-label="기존 Authenticator 확장 프로그램의 암호화 백업을 가져오는 짧은 영상"></video>
+    <figcaption>기존 확장 프로그램의 암호화 백업 가져오기(예시 계정).</figcaption>
+  </figure>
 
   <h2>Popout Authenticator 설치</h2>
   <div class="stores" data-campaign="pa-guide-authext"></div>
@@ -72,7 +78,7 @@
     <p>아주 오래된 버전의 기존 확장 프로그램에서 만든 암호화 백업은 열리지 않을 수 있습니다. 그럴 때는 암호화하지 않은 백업을 다시 내려받아 주세요.</p>
   </div>
 
-  <p><a href="../../" data-keep-utm>← 홈으로</a> · <a href="../from-authy-and-other-apps/" data-keep-utm>Authy 데스크톱과 다른 앱에서 옮기기</a></p>
+  <nav class="guide-nav" aria-label="다른 가이드"><a href="../" data-keep-utm>← 모든 가이드</a><a href="../from-authy-and-other-apps/" data-keep-utm>Authy 데스크톱과 다른 앱에서 옮기기 →</a></nav>
 </main>
 
 <footer class="site">

@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; media-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Get started: install and add your first account — Popout Authenticator</title>
+<meta name="description" content="Install Popout Authenticator and add accounts from a QR code, a link, or by typing the secret.">
+<link rel="canonical" href="https://elitekid.github.io/popout-authenticator/guides/getting-started/">
+<link rel="alternate" hreflang="en" href="https://elitekid.github.io/popout-authenticator/guides/getting-started/">
+<link rel="alternate" hreflang="ko" href="https://elitekid.github.io/popout-authenticator/ko/guides/getting-started/">
+<link rel="alternate" hreflang="x-default" href="https://elitekid.github.io/popout-authenticator/guides/getting-started/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Popout Authenticator">
+<meta property="og:title" content="Get started: install and add your first account">
+<meta property="og:description" content="Install Popout Authenticator and add accounts from a QR code, a link, or by typing the secret.">
+<meta property="og:url" content="https://elitekid.github.io/popout-authenticator/guides/getting-started/">
+<meta property="og:image" content="https://elitekid.github.io/popout-authenticator/img/en/03-window.png">
+<meta property="og:locale" content="en">
+<meta property="og:locale:alternate" content="ko">
+<link rel="icon" href="../../img/logo.png">
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/site.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="../../" data-keep-utm><img src="../../img/logo.png" width="36" height="36" alt="">Popout Authenticator</a>
+    <nav class="main" aria-label="Main">
+      <a href="../../" data-keep-utm>Home</a>
+      <a href="../" data-keep-utm>Guides</a>
+      <a href="https://github.com/elitekid/popout-authenticator">GitHub</a>
+      <a class="lang" href="../../ko/guides/getting-started/" data-keep-utm hreflang="ko" lang="ko">한국어</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="wrap guide">
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="../../" data-keep-utm>Home</a> › <a href="../" data-keep-utm>Guides</a></nav>
+  <h1>Get started: install and add your first account</h1>
+  <p class="lead">Install Popout Authenticator and add accounts from a QR code, a link, or by typing the secret.</p>
+
+  <figure>
+    <video src="../../media/en/add-qr.mp4" poster="../../media/en/add-qr.jpg" width="960" height="540" muted loop playsinline controls preload="none" data-autoplay aria-label="Short clip: adding an account from a QR code on screen"></video>
+    <figcaption>Demo accounts only.</figcaption>
+  </figure>
+
+  <nav class="toc card" aria-label="On this page">
+    <ol>
+      <li><a href="#what">What it is</a></li>
+      <li><a href="#install">Install and pin the icon</a></li>
+      <li><a href="#first-open">Open it for the first time</a></li>
+      <li><a href="#ways">Ways to add an account</a></li>
+      <li><a href="#qr">Add from a QR code</a></li>
+      <li><a href="#links">Add from an otpauth link</a></li>
+      <li><a href="#manual">Type the secret key</a></li>
+      <li><a href="#advanced">Type, algorithm, digits, and period</a></li>
+      <li><a href="#duplicates">Duplicates and checking codes</a></li>
+      <li><a href="#edit">Change a name later</a></li>
+      <li><a href="#next">Next steps</a></li>
+    </ol>
+  </nav>
+
+  <h2 id="what">What it is</h2>
+  <p>Popout Authenticator is a browser extension that makes two-factor (2FA) codes for your accounts. It is open source under the MIT license.</p>
+  <p>You open it from the toolbar, from a separate window, or from a side panel, and copy or fill the code when a site asks for it.</p>
+
+  <h2 id="install">Install and pin the icon</h2>
+  <ol>
+    <li>Go to the <a href="../../" data-keep-utm>home page</a> and use the store button for your browser.</li>
+    <li>Add the extension in the store, then confirm the browser's prompt.</li>
+    <li>Pin the Popout Authenticator icon so it stays on the toolbar. Where this is depends on your browser: look for the puzzle-piece or extensions menu next to the address bar and choose the pin option.</li>
+  </ol>
+
+  <h2 id="first-open">Open it for the first time</h2>
+  <p>Click the toolbar icon. With no accounts yet, you see "Add your first account." and an "Add account" button.</p>
+  <p>The header has these buttons: "Add" (+), "Pop out", "Lock now" or "Lock settings", and "Settings". You use "Add" from now on. To see how the popup, the separate window, and the side panel differ, read <a href="../open-and-organize/" data-keep-utm>Popup, separate window, and side panel</a>.</p>
+
+  <h2 id="ways">Ways to add an account</h2>
+  <p>Select + ("Add") to open a small menu with three items: "Add account", "Find QR on screen", and "Read QR with camera". "Add account" opens a screen with four tabs.</p>
+  <div class="table-wrap">
+    <table class="stack">
+      <thead>
+        <tr><th scope="col">Method</th><th scope="col">Where</th><th scope="col">Use it when</th></tr>
+      </thead>
+      <tbody>
+        <tr><th scope="row">Find QR on screen</th><td data-label="Where">+ menu</td><td data-label="Use it when">The site shows its QR code in a browser tab.</td></tr>
+        <tr><th scope="row">Read QR with camera</th><td data-label="Where">+ menu</td><td data-label="Use it when">The QR code is on another screen or on paper.</td></tr>
+        <tr><th scope="row">QR code</th><td data-label="Where">"Add account" tab</td><td data-label="Use it when">You have a QR image file, a screenshot, or a copied image.</td></tr>
+        <tr><th scope="row">Links</th><td data-label="Where">"Add account" tab</td><td data-label="Use it when">You have one or more otpauth links.</td></tr>
+        <tr><th scope="row">Manual</th><td data-label="Where">"Add account" tab</td><td data-label="Use it when">The site only shows a text secret key.</td></tr>
+        <tr><th scope="row">Backup file</th><td data-label="Where">"Add account" tab</td><td data-label="Use it when">You are moving accounts from another app.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="qr">Add from a QR code</h2>
+  <h3>A QR code on the screen</h3>
+  <ol>
+    <li>Open the site's 2FA setup page so the QR code is visible in the tab.</li>
+    <li>Select + → "Find QR on screen". A capture page opens with your screenshot.</li>
+    <li>Drag a box around the QR code. If it can't be read, you see "No QR code found. Drag over the QR code again."</li>
+  </ol>
+  <h3>The camera</h3>
+  <ol>
+    <li>Select + → "Read QR with camera". From the toolbar popup, a small window opens first.</li>
+    <li>Allow the camera when the browser asks. If you refused before, you see "Camera access is blocked. Allow it in the browser settings."</li>
+    <li>Hold the QR code up to the camera. If a Google Authenticator export is split across several QR codes, scan each one; the progress shows as "2 of 3 codes".</li>
+    <li>Select "Stop camera" when you are done.</li>
+  </ol>
+  <h3>An image or the clipboard</h3>
+  <ol>
+    <li>Select + → "Add account" → the "QR code" tab.</li>
+    <li>Paste an image with <kbd>Ctrl</kbd>+<kbd>V</kbd> (<kbd>Command</kbd>+<kbd>V</kbd> on a Mac), drag an image onto the box, or select "Choose QR code images". You can pick several images.</li>
+  </ol>
+  <p>If the image isn't an authenticator code, you see "Not an authenticator QR code."</p>
+  <div class="card note">
+    <p>A QR code contains your secret key. Delete screenshots when you are done.</p>
+  </div>
+
+  <h2 id="links">Add from an otpauth link</h2>
+  <ol>
+    <li>Select + → "Add account" → the "Links" tab.</li>
+    <li>Under "Paste one link per line.", paste the links, one per line. A link looks like <code>otpauth://totp/Acme%20Mail:alex@example.com?secret=JBSWY3DPEHPK3PXP&amp;issuer=Acme%20Mail</code>.</li>
+    <li>Select "Import".</li>
+  </ol>
+  <p>Google Authenticator export links (<code>otpauth-migration://</code>) work here too. Up to 500 links are read at a time. You can also paste a single otpauth link into any text box on the "Manual" tab, and the form fills itself in.</p>
+
+  <h2 id="manual">Type the secret key</h2>
+  <ol>
+    <li>Select + → "Add account" → the "Manual" tab.</li>
+    <li>Fill in "Service name" (for example, Acme Mail), "Account name" (for example, alex@example.com), and "Secret key" (for example, JBSWY3DPEHPK3PXP).</li>
+    <li>Select "Save".</li>
+  </ol>
+  <p>If the key can't be read, you see "The secret key format is not valid." Check for typos.</p>
+
+  <h2 id="advanced">Type, algorithm, digits, and period</h2>
+  <p>Most sites work with the defaults. Change these only if the site tells you to, or if the codes don't match.</p>
+  <div class="table-wrap">
+    <table class="stack">
+      <thead>
+        <tr><th scope="col">Field</th><th scope="col">Choices</th><th scope="col">Notes</th></tr>
+      </thead>
+      <tbody>
+        <tr><th scope="row">Authentication type</th><td data-label="Choices">TOTP, HOTP, Steam, Battle.net</td><td data-label="Notes">TOTP is the default. Steam and Battle.net have fixed settings, so the next three fields are hidden.</td></tr>
+        <tr><th scope="row">Algorithm</th><td data-label="Choices">SHA-1, SHA-256, SHA-512</td><td data-label="Notes">Default: SHA-1.</td></tr>
+        <tr><th scope="row">Digits</th><td data-label="Choices">6 to 10</td><td data-label="Notes">Default: 6. A whole number is required.</td></tr>
+        <tr><th scope="row">Period (seconds)</th><td data-label="Choices">1 to 3600</td><td data-label="Notes">Default: 30. TOTP only.</td></tr>
+        <tr><th scope="row">Counter</th><td data-label="Choices">0 or more</td><td data-label="Notes">HOTP only. A new code is made each time you refresh it.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="duplicates">Duplicates and checking codes</h2>
+  <p>After you add accounts, a message tells you what happened, for example "Added 2 accounts." Select "Done" to go on.</p>
+  <ul>
+    <li>An account that already exists (same type and same secret key) is skipped: "Skipped 2 accounts that already exist." Nothing is overwritten.</li>
+    <li>Items that can't be read are listed under "Could not add 2 items."</li>
+    <li>If a code doesn't match the one in your old app, select "Codes not matching?" → "Check settings" and pick the algorithm and digits that give the same code.</li>
+  </ul>
+  <p class="ver"><strong>1.0.1</strong> From version 1.0.1, the file picker on the "Backup file" tab also offers <code>.2fas</code> files.</p>
+
+  <h2 id="edit">Change a name later</h2>
+  <ol>
+    <li>On the account row, select the <code>⋯</code> button, or right-click the row.</li>
+    <li>Select "Edit".</li>
+    <li>Change "Service name" or "Account name", then select "Save".</li>
+  </ol>
+  <p>The same screen has the group, a note, and the site address list. See <a href="../open-and-organize/" data-keep-utm>Popup, separate window, and side panel</a> for groups and the important mark.</p>
+
+  <h2 id="next">Next steps</h2>
+  <ul>
+    <li><a href="../lock-and-protect/" data-keep-utm>Lock and protect your accounts</a> with a password.</li>
+    <li><a href="../backup-and-sync/" data-keep-utm>Back up and sync</a> so you don't lose your accounts.</li>
+    <li><a href="../fill-codes/" data-keep-utm>Fill codes into sign-in pages</a>.</li>
+    <li>Coming from another app? See <a href="../from-authenticator-extension/" data-keep-utm>the original Authenticator extension</a> or <a href="../from-authy-and-other-apps/" data-keep-utm>Authy and other apps</a>.</li>
+  </ul>
+
+  <nav class="guide-nav" aria-label="More guides"><a href="../" data-keep-utm>← All guides</a><a href="../open-and-organize/" data-keep-utm>Popup, separate window, and side panel →</a></nav>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <ul>
+      <li><a href="https://github.com/elitekid/popout-authenticator">GitHub</a></li>
+      <li><a href="https://github.com/elitekid/popout-authenticator/blob/main/PRIVACY.md">Privacy</a></li>
+      <li><a href="https://github.com/elitekid/popout-authenticator/issues">Issues</a></li>
+      <li>MIT License</li>
+    </ul>
+  </div>
+</footer>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; media-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>Moving from Authy Desktop and other apps — Popout Authenticator</title>
 <meta name="description" content="How to bring your accounts from Authy Desktop, Google Authenticator and other authenticator apps into Popout Authenticator.">
@@ -30,14 +30,15 @@
     <a class="brand" href="../../" data-keep-utm><img src="../../img/logo.png" width="36" height="36" alt="">Popout Authenticator</a>
     <nav class="main" aria-label="Main">
       <a href="../../" data-keep-utm>Home</a>
-      <a href="../../#guides" data-keep-utm>Guides</a>
+      <a href="../" data-keep-utm>Guides</a>
       <a href="https://github.com/elitekid/popout-authenticator">GitHub</a>
       <a class="lang" href="../../ko/guides/from-authy-and-other-apps/" data-keep-utm hreflang="ko" lang="ko">한국어</a>
     </nav>
   </div>
 </header>
 
-<main id="main" class="wrap">
+<main id="main" class="wrap guide">
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="../../" data-keep-utm>Home</a> › <a href="../" data-keep-utm>Guides</a></nav>
   <h1>Moving from Authy Desktop and other apps</h1>
   <p>Pick your app below. For the original Authenticator extension, see <a href="../from-authenticator-extension/" data-keep-utm>its own guide</a>.</p>
 
@@ -68,21 +69,21 @@
   </div>
 
   <h2 id="others">Other apps</h2>
-  <p>Use an unencrypted export unless the table says otherwise. For encrypted Aegis, 2FAS, and Bitwarden files, Popout says "Export an unencrypted file from the {app} app and use that."</p>
+  <p>Use an unencrypted export unless the table says otherwise. For encrypted Aegis, 2FAS, and Bitwarden files, Popout tells you to export an unencrypted file from that app instead (for example, "Export an unencrypted file from the Aegis app and use that.").</p>
   <div class="table-wrap">
-    <table>
+    <table class="stack">
       <thead>
         <tr><th scope="col">App</th><th scope="col">What to export</th><th scope="col">Notes</th></tr>
       </thead>
       <tbody>
-        <tr><th scope="row">Aegis</th><td>Unencrypted vault export (JSON)</td><td>Encrypted export is not supported.</td></tr>
-        <tr><th scope="row">2FAS</th><td>2FAS Backup → Export, without setting a password (<a href="https://2fas.com/support/2fas-auth-mobile-app/i-want-to-move-copy-transfer-tokens-codes-between-ios-and-android/">2FAS support</a>, checked 2026-10-15)</td><td>The file ends in .2fas. If the file picker doesn't let you select it, rename the file to end in .json.</td></tr>
-        <tr><th scope="row">Bitwarden Authenticator</th><td>Settings → Export → file format .json → Export items (<a href="https://bitwarden.com/help/authenticator-import-export/">Bitwarden help</a>, checked 2026-10-15)</td><td>CSV is not supported. An unencrypted Bitwarden password-manager JSON export also works (TOTP fields are read).</td></tr>
-        <tr><th scope="row">FreeOTP+</th><td>Its JSON export, or a text file of otpauth:// links</td><td></td></tr>
-        <tr><th scope="row">andOTP</th><td>Plain (unencrypted) JSON backup</td><td>Encrypted backups are not supported.</td></tr>
-        <tr><th scope="row">Raivo</th><td>Settings → Export OTPs to ZIP archive (per <a href="https://bitwarden.com/help/authenticator-import-export/">Bitwarden help</a>, checked 2026-10-15)</td><td>Unzip it with the password you chose, then import raivo-otp-export.json. Popout cannot open the ZIP itself.</td></tr>
-        <tr><th scope="row">2FA Authenticator (authenticator.sh)</th><td>Its backup file, plain or encrypted</td><td>For an encrypted file, Popout asks for the password.</td></tr>
-        <tr><th scope="row">Any app</th><td>A .txt file with one otpauth:// or otpauth-migration:// link per line</td><td>You can also paste links in the "Links" tab.</td></tr>
+        <tr><th scope="row">Aegis</th><td data-label="What to export">Unencrypted vault export (JSON)</td><td data-label="Notes">Encrypted export is not supported.</td></tr>
+        <tr><th scope="row">2FAS</th><td data-label="What to export">2FAS Backup → Export, without setting a password (<a href="https://2fas.com/support/2fas-auth-mobile-app/i-want-to-move-copy-transfer-tokens-codes-between-ios-and-android/">2FAS support</a>, checked 2026-10-15)</td><td data-label="Notes">The file ends in .2fas. If the file picker doesn't let you select it, rename the file to end in .json. From version 1.0.1 the picker also offers .2fas files.</td></tr>
+        <tr><th scope="row">Bitwarden Authenticator</th><td data-label="What to export">Settings → Export → file format .json → Export items (<a href="https://bitwarden.com/help/authenticator-import-export/">Bitwarden help</a>, checked 2026-10-15)</td><td data-label="Notes">CSV is not supported. An unencrypted Bitwarden password-manager JSON export also works (TOTP fields are read).</td></tr>
+        <tr><th scope="row">FreeOTP+</th><td data-label="What to export">Its JSON export, or a text file of otpauth:// links</td><td data-label="Notes"></td></tr>
+        <tr><th scope="row">andOTP</th><td data-label="What to export">Plain (unencrypted) JSON backup</td><td data-label="Notes">Encrypted backups are not supported.</td></tr>
+        <tr><th scope="row">Raivo</th><td data-label="What to export">Settings → Export OTPs to ZIP archive (per <a href="https://bitwarden.com/help/authenticator-import-export/">Bitwarden help</a>, checked 2026-10-15)</td><td data-label="Notes">Unzip it with the password you chose, then import raivo-otp-export.json. Popout cannot open the ZIP itself.</td></tr>
+        <tr><th scope="row">2FA Authenticator (authenticator.sh)</th><td data-label="What to export">Its backup file, plain or encrypted</td><td data-label="Notes">For an encrypted file, Popout asks for the password.</td></tr>
+        <tr><th scope="row">Any app</th><td data-label="What to export">A .txt file with one otpauth:// or otpauth-migration:// link per line</td><td data-label="Notes">You can also paste links in the "Links" tab.</td></tr>
       </tbody>
     </table>
   </div>
@@ -101,7 +102,7 @@
     <li>Delete unencrypted export files. They contain your secret keys.</li>
   </ul>
 
-  <p><a href="../../" data-keep-utm>← Back to home</a></p>
+  <nav class="guide-nav" aria-label="More guides"><a href="../" data-keep-utm>← All guides</a><a href="../from-authenticator-extension/" data-keep-utm>Moving from the original Authenticator extension →</a></nav>
 </main>
 
 <footer class="site">

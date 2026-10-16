@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; media-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Lock and protect your accounts — Popout Authenticator</title>
+<meta name="description" content="Set a password lock, keep the recovery code, unlock with a passkey, choose auto-lock, and hide codes while sharing your screen.">
+<link rel="canonical" href="https://elitekid.github.io/popout-authenticator/guides/lock-and-protect/">
+<link rel="alternate" hreflang="en" href="https://elitekid.github.io/popout-authenticator/guides/lock-and-protect/">
+<link rel="alternate" hreflang="ko" href="https://elitekid.github.io/popout-authenticator/ko/guides/lock-and-protect/">
+<link rel="alternate" hreflang="x-default" href="https://elitekid.github.io/popout-authenticator/guides/lock-and-protect/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Popout Authenticator">
+<meta property="og:title" content="Lock and protect your accounts">
+<meta property="og:description" content="Set a password lock, keep the recovery code, unlock with a passkey, choose auto-lock, and hide codes while sharing your screen.">
+<meta property="og:url" content="https://elitekid.github.io/popout-authenticator/guides/lock-and-protect/">
+<meta property="og:image" content="https://elitekid.github.io/popout-authenticator/img/en/03-window.png">
+<meta property="og:locale" content="en">
+<meta property="og:locale:alternate" content="ko">
+<link rel="icon" href="../../img/logo.png">
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/site.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="../../" data-keep-utm><img src="../../img/logo.png" width="36" height="36" alt="">Popout Authenticator</a>
+    <nav class="main" aria-label="Main">
+      <a href="../../" data-keep-utm>Home</a>
+      <a href="../" data-keep-utm>Guides</a>
+      <a href="https://github.com/elitekid/popout-authenticator">GitHub</a>
+      <a class="lang" href="../../ko/guides/lock-and-protect/" data-keep-utm hreflang="ko" lang="ko">한국어</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="wrap guide">
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="../../" data-keep-utm>Home</a> › <a href="../" data-keep-utm>Guides</a></nav>
+  <h1>Lock and protect your accounts</h1>
+  <p class="lead">Set a password lock, keep the recovery code, unlock with a passkey, choose auto-lock, and hide codes while sharing your screen.</p>
+
+  <figure>
+    <video src="../../media/en/protect.mp4" poster="../../media/en/protect.jpg" width="960" height="540" muted loop playsinline controls preload="none" data-autoplay aria-label="Short clip: turning on the lock, the trash, and hiding codes"></video>
+    <figcaption>Demo accounts only.</figcaption>
+  </figure>
+
+  <nav class="toc card" aria-label="On this page">
+    <ol>
+      <li><a href="#how">How the lock works</a></li>
+      <li><a href="#turn-on">Turn on the password lock</a></li>
+      <li><a href="#recovery">Keep the recovery code</a></li>
+      <li><a href="#unlock">Unlock</a></li>
+      <li><a href="#passkey">Unlock with a passkey</a></li>
+      <li><a href="#auto-lock">Auto-lock and "Lock now"</a></li>
+      <li><a href="#code-protection">Extra verification before filling</a></li>
+      <li><a href="#hide-codes">Hide codes on screen</a></li>
+      <li><a href="#change-remove">Change or turn off the password</a></li>
+      <li><a href="#forgot">If you forget the password</a></li>
+      <li><a href="#trash">Deleted accounts and the trash</a></li>
+    </ol>
+  </nav>
+
+  <h2 id="how">How the lock works</h2>
+  <p>The lock is optional. You can add accounts and <a href="../fill-codes/" data-keep-utm>fill codes</a> without it. When you turn it on, your accounts are stored in an encrypted vault (AES-256-GCM). A random vault key opens the vault. Your password, your recovery code, and each passkey can each unlock that key.</p>
+  <p>Your password is stretched with Argon2id before it is used. This is deliberately slow, so guessing passwords is hard. A long password that mixes kinds of characters is harder to guess.</p>
+  <p>Open the lock settings from the toolbar popup: the lock button shows "Lock settings" while the lock is off. You can also open the full page and choose "Lock".</p>
+  <div class="card note">
+    <p>Without the lock, "Turning off the vault lock stores your secret keys on this device without encryption." Turn it on if other people can use your computer or browser profile.</p>
+  </div>
+
+  <h2 id="turn-on">Turn on the password lock</h2>
+  <ol>
+    <li>Open "Lock". Under "Vault lock (optional)", type a password in "Password (8+ characters)".</li>
+    <li>Type it again in "Repeat password".</li>
+    <li>Watch the strength meter: "Weak", "Fair", or "Strong". It counts length and kinds of characters (lowercase, uppercase, digits, symbols). "Strong" needs 12 or more characters and at least three kinds.</li>
+    <li>Select "Turn on lock".</li>
+    <li>Save the recovery code that appears (next section).</li>
+  </ol>
+  <p>Fewer than 8 characters shows "The password must be at least 8 characters." Different passwords show "The passwords do not match." The meter is a guide. The rule you must meet is the 8-character minimum. If your administrator sets password rules, you may also see "The password does not meet your administrator's rules."</p>
+  <p>In version 1.0.0, snapshots saved while the lock was off stay unprotected after you turn it on. Someone with access to your browser profile could still read the secret keys in those earlier snapshots.</p>
+  <p class="ver"><strong>1.0.1</strong> From version 1.0.1, turning on the lock also re-encrypts those earlier snapshots.</p>
+  <p>If browser sync is on, turning on the lock lets your accounts sync encrypted to other devices. You can change this in Settings → Sync. See <a href="../backup-and-sync/" data-keep-utm>Backup, export, and sync</a>.</p>
+
+  <h2 id="recovery">Keep the recovery code</h2>
+  <p>The recovery code unlocks your vault if you forget the password. It appears once, right after you turn on the lock.</p>
+  <ol>
+    <li>Select "Copy", or select "Save as text file" and keep the file somewhere safe. Writing it down also works.</li>
+    <li>Type the code again in the box ("Type the recovery code again.") and select "Confirm". Spaces, hyphens, and capital letters are ignored.</li>
+  </ol>
+  <p>If the codes differ, you see "The code does not match. Check it and try again."</p>
+  <p class="ver"><strong>1.0.1</strong> From version 1.0.1, the toolbar popup hides "Save as text file", because the save dialog closed the popup. Use "Copy" there, or open the full page to save a file.</p>
+  <p>To replace the code, open "Lock" and use "Create new recovery code". Enter your current password, then confirm the new code. "Creating a new recovery code invalidates the previous one."</p>
+
+  <h2 id="unlock">Unlock</h2>
+  <p>When the vault is locked, the popup shows "Locked".</p>
+  <ul>
+    <li><strong>Password:</strong> type it and select "Unlock". A wrong one shows "The password is incorrect."</li>
+    <li><strong>Recovery code:</strong> select "Unlock with a recovery code", enter the code, and unlock. A wrong one shows "The recovery code is incorrect." Select "Unlock with password" to go back.</li>
+    <li><strong>Passkey:</strong> select "Unlock with passkey" (see below).</li>
+  </ul>
+  <p>After you unlock with a recovery code, Popout shows a new one: "The recovery code you used no longer works. Save your new recovery code." Select "Copy", store it, then select "I saved it".</p>
+  <p class="ver"><strong>1.0.1</strong> From version 1.0.1, the code you just used keeps working until you confirm the new one with "I saved it".</p>
+
+  <h2 id="passkey">Unlock with a passkey</h2>
+  <p>A passkey lets you unlock with your device (fingerprint, face, PIN, or security key, depending on the device and browser) instead of typing the password.</p>
+  <ol>
+    <li>Unlock the vault with your password first. Otherwise you see "Unlock with your password first."</li>
+    <li>Open "Lock" → "Passkeys" and select "Add passkey".</li>
+    <li>Confirm in the browser prompt ("Confirm in the passkey prompt.").</li>
+  </ol>
+  <p>To remove one, enter your current password and select "Remove" next to it.</p>
+  <ul>
+    <li><strong>Firefox:</strong> not supported. You see "Firefox does not support passkey unlock or code-fill verification for this extension. You can unlock your vault with a password or recovery code."</li>
+    <li><strong>Other browsers:</strong> Popout asks the browser whether it supports the needed WebAuthn PRF feature. If not, the "Add passkey" option does not appear, or you see "Passkeys are not available on this device or browser." or "This passkey does not support the PRF feature needed to unlock."</li>
+  </ul>
+  <p>Passkeys do not replace the password or the recovery code. Keep both.</p>
+
+  <h2 id="auto-lock">Auto-lock and "Lock now"</h2>
+  <p>Select "Lock now" in the lock settings, or the lock button in the popup toolbar, to lock right away. Under "Automatic lock", choose when it locks by itself. The default is 15 minutes.</p>
+  <ul>
+    <li>"When all authenticator views close"</li>
+    <li>"After 5 minutes of inactivity", "After 15 minutes of inactivity", or "After 60 minutes of inactivity"</li>
+    <li>"Custom": enter "Minutes (1–1440)"</li>
+    <li>"No automatic lock": "Stay unlocked until you lock manually. Fully quitting the browser locks the vault."</li>
+  </ul>
+  <p>If your administrator set a time, the page says it was set by your administrator, and you cannot change it.</p>
+  <p class="ver"><strong>1.0.1</strong> From version 1.0.1, auto-lock also runs on time while a separate window or the side panel stays open, and the QR capture page counts as an open screen for "When all authenticator views close".</p>
+
+  <h2 id="code-protection">Extra verification before filling</h2>
+  <p>This is optional. When it is on, you verify with your registered device each time before a code is filled into a page. Viewing and copying codes stay available. "Extra verification is off. While the vault is unlocked, codes are filled without a password or passkey check."</p>
+  <ol>
+    <li>Turn on the password lock and save the recovery code.</li>
+    <li>Add a passkey. Or open "Lock" → "Extra verification for code filling (optional)" → "Set up extra verification" and follow the steps. You tick "I saved my recovery code somewhere safe." and select "Continue to device registration".</li>
+    <li>Switch on "Verify with your device before filling codes". You see "Code-fill verification is on."</li>
+  </ol>
+  <p>To turn it off, use the same switch and verify with your device. If your device is lost, open "Cannot use device verification?", enter your password, and select "Turn off code-fill verification with password". Your vault lock stays on. You must turn this off before you can turn off the lock or remove your last passkey. It is not available in Firefox.</p>
+
+  <h2 id="hide-codes">Hide codes on screen</h2>
+  <p>"Hide or show codes" masks every code in the popup as dots. Use it before you share your screen. The popup shows "Codes are hidden." An open share window closes when you hide codes.</p>
+  <p>It has no default key. To set one, open your browser's extension keyboard shortcuts page and assign a key to "Hide or show codes". The page is in the extensions menu of your browser. The shortcut for filling codes is <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Y</kbd> (<kbd>Command</kbd>+<kbd>Shift</kbd>+<kbd>Y</kbd> on a Mac). While the popup is open, <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>H</kbd> hides or shows codes too. The hidden state lasts for the browser session.</p>
+
+  <h2 id="change-remove">Change or turn off the password</h2>
+  <ul>
+    <li><strong>Change:</strong> "Lock" → "Change password". Enter your current password, type the new one twice, and select "Change password". You see "Password changed." The recovery code stays the same.</li>
+    <li><strong>Turn off:</strong> "Lock" → "Turn off lock". Read the warning, tick "I understand the risk", enter your password, and select "Turn off lock". If your administrator requires a password, this option is not shown.</li>
+  </ul>
+
+  <h2 id="forgot">If you forget the password</h2>
+  <ol>
+    <li>Unlock with your recovery code or a registered passkey. You can keep using your accounts this way; each recovery-code unlock gives you a new code to save.</li>
+    <li>In version 1.0.0, "Change password", "Turn off lock", and exports ask for the current password, so a forgotten password cannot be reset.</li>
+    <li>If you have no password, no recovery code, and no passkey you can use, the vault cannot be opened, and Popout cannot reset the password for you.</li>
+    <li>In that case, restore from a backup file if you have one, or set the accounts up again at each service. Resetting deletes everything stored in this browser, so save a raw copy first (see <a href="../backup-and-sync/" data-keep-utm>Backup, export, and sync</a>).</li>
+  </ol>
+  <div class="card note">
+    <p>Save the recovery code and a backup file before you need them.</p>
+  </div>
+
+  <h2 id="trash">Deleted accounts and the trash</h2>
+  <p>When you delete an account, you see "Move this account to trash? It will be permanently deleted after 30 days." Choose "Move to trash". Open "Trash" to see how many days are left for each item. Select "Restore" to get one back, "Delete permanently" to remove it, or "Empty trash". More on <a href="../backup-and-sync/" data-keep-utm>backups and recovery</a>. If something is wrong, see <a href="../troubleshooting/" data-keep-utm>Troubleshooting</a>.</p>
+
+
+  <nav class="guide-nav" aria-label="More guides"><a href="../fill-codes/" data-keep-utm>← Fill codes into sign-in pages</a><a href="../backup-and-sync/" data-keep-utm>Backup, export, and sync →</a></nav>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <ul>
+      <li><a href="https://github.com/elitekid/popout-authenticator">GitHub</a></li>
+      <li><a href="https://github.com/elitekid/popout-authenticator/blob/main/PRIVACY.md">Privacy</a></li>
+      <li><a href="https://github.com/elitekid/popout-authenticator/issues">Issues</a></li>
+      <li>MIT License</li>
+    </ul>
+  </div>
+</footer>
+</body>
+</html>

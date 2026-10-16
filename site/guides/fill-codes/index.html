@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; media-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Fill codes into sign-in pages — Popout Authenticator</title>
+<meta name="description" content="Fill a code with one click, the right-click menu, a keyboard shortcut, or a button next to the code field, on the sites you allow.">
+<link rel="canonical" href="https://elitekid.github.io/popout-authenticator/guides/fill-codes/">
+<link rel="alternate" hreflang="en" href="https://elitekid.github.io/popout-authenticator/guides/fill-codes/">
+<link rel="alternate" hreflang="ko" href="https://elitekid.github.io/popout-authenticator/ko/guides/fill-codes/">
+<link rel="alternate" hreflang="x-default" href="https://elitekid.github.io/popout-authenticator/guides/fill-codes/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Popout Authenticator">
+<meta property="og:title" content="Fill codes into sign-in pages">
+<meta property="og:description" content="Fill a code with one click, the right-click menu, a keyboard shortcut, or a button next to the code field, on the sites you allow.">
+<meta property="og:url" content="https://elitekid.github.io/popout-authenticator/guides/fill-codes/">
+<meta property="og:image" content="https://elitekid.github.io/popout-authenticator/img/en/03-window.png">
+<meta property="og:locale" content="en">
+<meta property="og:locale:alternate" content="ko">
+<link rel="icon" href="../../img/logo.png">
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/site.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="../../" data-keep-utm><img src="../../img/logo.png" width="36" height="36" alt="">Popout Authenticator</a>
+    <nav class="main" aria-label="Main">
+      <a href="../../" data-keep-utm>Home</a>
+      <a href="../" data-keep-utm>Guides</a>
+      <a href="https://github.com/elitekid/popout-authenticator">GitHub</a>
+      <a class="lang" href="../../ko/guides/fill-codes/" data-keep-utm hreflang="ko" lang="ko">한국어</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="wrap guide">
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="../../" data-keep-utm>Home</a> › <a href="../" data-keep-utm>Guides</a></nav>
+  <h1>Fill codes into sign-in pages</h1>
+  <p class="lead">Fill a code with one click, the right-click menu, a keyboard shortcut, or a button next to the code field, on the sites you allow.</p>
+
+  <figure>
+    <video src="../../media/en/fill-button.mp4" poster="../../media/en/fill-button.jpg" width="960" height="540" muted loop playsinline controls preload="none" data-autoplay aria-label="Short clip: filling a code with the button next to the code field"></video>
+    <figcaption>Demo accounts only.</figcaption>
+  </figure>
+
+  <nav class="toc card" aria-label="On this page">
+    <ol>
+      <li><a href="#how">How filling works</a></li>
+      <li><a href="#sites">Sites you allow</a></li>
+      <li><a href="#popup">Fill from the popup</a></li>
+      <li><a href="#menu">Fill from the right-click menu</a></li>
+      <li><a href="#shortcut">Fill with a keyboard shortcut</a></li>
+      <li><a href="#button">The button next to the code field</a></li>
+      <li><a href="#copy">Copy a code instead</a></li>
+      <li><a href="#verify">Device verification</a></li>
+      <li><a href="#types">HOTP, Steam and Battle.net</a></li>
+      <li><a href="#limits">Where filling does not work</a></li>
+      <li><a href="#fails">If filling fails</a></li>
+    </ol>
+  </nav>
+
+  <h2 id="how">How filling works</h2>
+  <p>Popout puts the current code into the code field of the page you are on. You start every fill yourself, by one of these ways:</p>
+  <div class="table-wrap">
+    <table class="stack">
+      <thead>
+        <tr><th scope="col">Way</th><th scope="col">Where you start it</th><th scope="col">Picks the account</th></tr>
+      </thead>
+      <tbody>
+        <tr><th scope="row">Popup</th><td data-label="Where you start it">"Fill" next to the suggested account, or "Fill on this page" in an account's menu</td><td data-label="Picks the account">You</td></tr>
+        <tr><th scope="row">Right-click menu</th><td data-label="Where you start it">Right-click a text field → "Fill 2FA code"</td><td data-label="Picks the account">Popout, from the saved sites</td></tr>
+        <tr><th scope="row">Shortcut</th><td data-label="Where you start it"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Y</kbd> (Mac: <kbd>Command</kbd>+<kbd>Shift</kbd>+<kbd>Y</kbd>)</td><td data-label="Picks the account">Popout, from the saved sites</td></tr>
+        <tr><th scope="row">Field button</th><td data-label="Where you start it">"Fill code" button beside the code field</td><td data-label="Picks the account">Popout, from the accounts you turned it on for</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Nothing is filled on its own when a page loads. Filling does not need a vault lock or a passkey. Add an account and you can use it.</p>
+
+  <h2 id="sites">Sites you allow</h2>
+  <p>Two kinds of "allowed" apply, and they are separate.</p>
+  <h3>Saved sites for an account</h3>
+  <p>Each account can have site addresses, for example <code>example.com</code>. A saved address also covers its subdomains. Popout fills and auto-submits only when the page is on a saved site of that account.</p>
+  <ul>
+    <li>To add one by hand: open the account's "⋯" menu → "Edit", type addresses in "Site addresses (separate with commas or new lines)", then select "Save".</li>
+    <li>When you copy a code on a site that is not saved for that account, Popout asks "Remember this account for example.com?" (with the site you are on). Select "Remember" to save it, or "No".</li>
+    <li>If you fill on a site that is not saved, Popout asks first: "Remember and fill", "Fill once" or "Cancel". "Fill once" fills but never auto-submits.</li>
+  </ul>
+  <h3>Site access in the browser</h3>
+  <p>Popout does not keep access to all websites. It gets access in these ways:</p>
+  <ul>
+    <li>Selecting the toolbar icon, using the right-click item, or pressing the shortcut gives access to that one tab for that action.</li>
+    <li>In a separate window or side panel, the browser may need your approval for the site. Popout then shows a button such as "Allow filling on example.com". If you decline, you see "The code was not filled because site access was not allowed."</li>
+    <li>The field button asks for access to the sites you save for it (see below).</li>
+  </ul>
+  <div class="card note">
+    <p>Auto-submit is on by default. Turn it off in Settings → "Copying and privacy" → "Automatically confirm after filling a code". It presses the only confirmation button of a code-only form, and only on saved sites. It never applies to "Fill once" or to filling on copy.</p>
+  </div>
+
+  <h2 id="popup">Fill from the popup</h2>
+  <ol>
+    <li>Open the sign-in page and wait for the code field.</li>
+    <li>Select the Popout icon in the toolbar. The account that matches the site shows a "Fill" button.</li>
+    <li>Select "Fill". On success you see "Code filled." and the popup closes.</li>
+  </ol>
+  <p>If no account shows "Fill", open the "⋯" menu of the account you want and choose "Fill on this page". Suggestions can be turned off in Settings with "Suggest accounts for sites (turning off clears site usage history)".</p>
+  <p>In a separate window or side panel, the row button needs the optional tabs permission. Popout asks "Let suggestions follow the tab you switch to?" with "Allow" and "Dismiss". Without it, use "Fill on this page" in the menu. See <a href="../open-and-organize/" data-keep-utm>Popup, separate window, and side panel</a>.</p>
+  <p class="ver"><strong>1.0.1</strong> From version 1.0.1, a fill still finishes after the browser's site-access prompt closes the popup.</p>
+
+  <h2 id="menu">Fill from the right-click menu</h2>
+  <ol>
+    <li>Right-click the code field on the page.</li>
+    <li>Choose "Fill 2FA code".</li>
+  </ol>
+  <p>Popout picks the account whose saved site matches the page. If several match, it uses the one you filled most often on that site. If it cannot pick one, nothing is filled. Popout opens its popup, or shows "Choose an account." on the page.</p>
+  <p class="ver"><strong>1.0.1</strong> From version 1.0.1, Firefox also shows the menu item on password-type code fields, and filling works from the separate window in Firefox.</p>
+
+  <h2 id="shortcut">Fill with a keyboard shortcut</h2>
+  <p>Press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Y</kbd> (Mac: <kbd>Command</kbd>+<kbd>Shift</kbd>+<kbd>Y</kbd>). This runs "Fill the 2FA code on this page". It works like the right-click menu. Click the code field first.</p>
+  <p>There is also a second command, "Fill the code of the best matching account". It has no default key and does the same thing.</p>
+  <h3>Change a shortcut</h3>
+  <ul>
+    <li>Chrome: open <code>chrome://extensions/shortcuts</code>.</li>
+    <li>Edge: open <code>edge://extensions/shortcuts</code>.</li>
+    <li>Firefox: open the Add-ons page, select the gear icon, and choose "Manage Extension Shortcuts".</li>
+  </ul>
+  <p>Find Popout Authenticator in the list and set the keys you want.</p>
+
+  <h2 id="button">The button next to the code field</h2>
+  <p>On sites you choose, a small "Fill code" button appears beside the code field. Select it to fill. It never fills by itself, and at most three buttons show on a page.</p>
+  <h3>Turn it on for one account</h3>
+  <ol>
+    <li>Open the account's "⋯" menu → "Edit".</li>
+    <li>Enter the site in "Site addresses (separate with commas or new lines)". Use only the site's address, for example <code>github.com</code>.</li>
+    <li>Turn on "Fill codes on manually specified sites".</li>
+    <li>Select "Save" and allow site access in the browser prompt. If you decline, you see "Site access was not allowed, so the button stays off."</li>
+  </ol>
+  <h3>Turn it on for known services</h3>
+  <p>In Settings → "Fill codes on websites", turn on "Recognize known services automatically". This covers GitHub, GitLab, Google, Cloudflare, Dropbox and JetBrains. Popout finds the account by service name. If you use the toolbar popup, Settings opens in a small window for the permission prompt.</p>
+  <h3>Turn it off</h3>
+  <p>Edit the account, turn off "Fill codes on manually specified sites", and select "Save". For known services, turn off "Recognize known services automatically". Site access that no other account needs is released.</p>
+  <p class="ver"><strong>1.0.1</strong> From version 1.0.1, the button sits at the middle of the field and follows it when the page moves it down.</p>
+
+  <h2 id="copy">Copy a code instead</h2>
+  <p>Select an account in the popup to copy its code. "Copy next code" in the menu copies the following code of a timed account.</p>
+  <ul>
+    <li>Settings → "Copying and privacy" → "Clear the clipboard after copying" clears the clipboard 30 seconds later, if you copied nothing else. It asks for the optional clipboard read permission. Safari does not support it.</li>
+    <li>"Also fill the input field when copying" fills the page too. It never auto-submits.</li>
+  </ul>
+  <p>If Popout finds no field to fill, it copies the code and shows "Code copied. Paste it into the input field." on the page.</p>
+  <p class="ver"><strong>1.0.1</strong> From version 1.0.1, a code copied because filling failed is also cleared from the clipboard when that setting is on.</p>
+
+  <h2 id="verify">Device verification</h2>
+  <p>You can ask for a check with your registered device (fingerprint, PIN or similar) each time a code is filled. It is off by default and not available in Firefox. Set it up in the lock settings. See <a href="../lock-and-protect/" data-keep-utm>Lock and protect your accounts</a>.</p>
+
+  <h2 id="types">HOTP, Steam and Battle.net</h2>
+  <ul>
+    <li>HOTP: every fill moves the counter forward by one and uses that code. Fill once per sign-in.</li>
+    <li>Steam and Battle.net accounts fill like timed accounts.</li>
+    <li>If a timed code has about two seconds left, Popout waits for the next code.</li>
+  </ul>
+
+  <h2 id="limits">Where filling does not work</h2>
+  <ul>
+    <li>Pages without https. Popout shows "Codes are not filled on pages without a secure (https) connection." Local test addresses (<code>localhost</code>, <code>127.0.0.1</code>) are allowed.</li>
+    <li>Browser pages such as the extension store. You see "Codes cannot be filled on this page. Try again on the site where you want to sign in."</li>
+    <li>A frame from another site. The frame's own address must be a saved site of the account, and the top page must be https too. Otherwise you are asked as described under "Sites you allow".</li>
+    <li>Fields too short for the whole code. The code is copied instead.</li>
+  </ul>
+  <p class="ver"><strong>1.0.1</strong> From version 1.0.1, Popout no longer picks a phone-number field that shows no sign of being a code field.</p>
+
+  <h2 id="fails">If filling fails</h2>
+  <ol>
+    <li>Click inside the code field, then try again.</li>
+    <li>If you see "The vault is locked. Unlock it and try again.", unlock Popout.</li>
+    <li>If you see "Permission to fill on this site is missing...", allow site access or open Popout from the toolbar on that site.</li>
+    <li>If you see "The target tab or page changed. Try again on the site you want to fill.", start again on the page.</li>
+    <li>If the code is rejected, check the device clock. See <a href="../troubleshooting/" data-keep-utm>Troubleshooting</a>.</li>
+  </ol>
+
+  <nav class="guide-nav" aria-label="More guides"><a href="../open-and-organize/" data-keep-utm>← Popup, separate window, and side panel</a><a href="../lock-and-protect/" data-keep-utm>Lock and protect your accounts →</a></nav>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <ul>
+      <li><a href="https://github.com/elitekid/popout-authenticator">GitHub</a></li>
+      <li><a href="https://github.com/elitekid/popout-authenticator/blob/main/PRIVACY.md">Privacy</a></li>
+      <li><a href="https://github.com/elitekid/popout-authenticator/issues">Issues</a></li>
+      <li>MIT License</li>
+    </ul>
+  </div>
+</footer>
+</body>
+</html>

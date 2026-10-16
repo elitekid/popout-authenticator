@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; media-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>Popout Authenticator — 2FA &amp; OTP Codes</title>
 <meta name="description" content="브라우저에서 쓰는 2단계 인증 앱. 암호화된 코드를 팝업·창·사이드 패널로 보고, 허용한 사이트에 바로 넣습니다.">
@@ -30,7 +30,7 @@
     <a class="brand" href="./" data-keep-utm><img src="../img/logo.png" width="36" height="36" alt="">Popout Authenticator</a>
     <nav class="main" aria-label="주 메뉴">
       <a href="./" data-keep-utm>홈</a>
-      <a href="#guides">가이드</a>
+      <a href="guides/" data-keep-utm>가이드</a>
       <a href="https://github.com/elitekid/popout-authenticator">GitHub</a>
       <a class="lang" href="../" data-keep-utm hreflang="en" lang="en">English</a>
     </nav>
@@ -38,14 +38,25 @@
 </header>
 
 <main id="main" class="wrap">
-  <section aria-labelledby="hero">
-    <h1 id="hero">Popout Authenticator — 2FA &amp; OTP Codes</h1>
-    <p class="lead">브라우저에서 쓰는 2단계 인증 앱. 암호화된 코드를 팝업·창·사이드 패널로 보고, 허용한 사이트에 바로 넣습니다.</p>
-    <div class="stores" data-campaign="pa-home"></div>
-    <noscript><p><a href="https://github.com/elitekid/popout-authenticator">GitHub 저장소에서 받기</a></p></noscript>
-    <p class="facts">오픈소스(MIT) · 계정 수 제한 없음 · 가입 없음 · 분석 도구 없음</p>
+  <section class="hero" aria-labelledby="hero">
+    <div>
+      <h1 id="hero">Popout Authenticator — 2FA &amp; OTP Codes</h1>
+      <p class="lead">브라우저에서 쓰는 2단계 인증 앱. 암호화된 코드를 팝업·창·사이드 패널로 보고, 허용한 사이트에 바로 넣습니다.</p>
+      <div class="stores" data-campaign="pa-home"></div>
+      <noscript><p><a href="https://github.com/elitekid/popout-authenticator">GitHub 저장소에서 받기</a></p></noscript>
+      <p class="facts">오픈소스(MIT) · 계정 수 제한 없음 · 가입 없음 · 분석 도구 없음</p>
+      <p><a href="guides/getting-started/" data-keep-utm>시작하기 가이드 →</a></p>
+    </div>
+    <figure class="short">
+      <video src="../media/ko/short.mp4" poster="../media/ko/short.jpg" width="720" height="1280" muted loop playsinline controls preload="none" data-autoplay aria-label="Popout Authenticator가 로그인 코드를 넣는 17초 영상"></video>
+    </figure>
+  </section>
+
+  <section class="tour" aria-labelledby="tour">
+    <h2 id="tour">1분 만에 둘러보기</h2>
+    <p>창 열기, 코드 넣기, QR 코드로 추가, 백업 가져오기, 코드 공유, 잠금까지 봅니다. 예시 계정만 썼습니다.</p>
     <figure>
-      <img src="../img/ko/03-window.png" width="1280" height="800" alt="웹 페이지 옆 별도 창에 계정과 일회용 코드가 보이는 Popout Authenticator 화면">
+      <video src="../media/ko/overview.mp4" poster="../media/ko/overview.jpg" width="1280" height="720" controls playsinline preload="none" aria-label="소개 영상, 68초, 음악 있음"></video>
     </figure>
   </section>
 
@@ -122,11 +133,21 @@
     <p>앞으로 5~60분 동안의 코드만 보여 주는 링크를 보낼 수 있고, 비밀번호도 걸 수 있습니다. 링크에는 비밀키가 담기지 않습니다.</p>
   </section>
 
-  <section id="guides" aria-labelledby="moving">
-    <h2 id="moving">다른 인증 앱에서 옮기시나요?</h2>
-    <ul>
-      <li><a href="guides/from-authenticator-extension/" data-keep-utm>기존 Authenticator 확장 프로그램에서 옮기기</a></li>
-      <li><a href="guides/from-authy-and-other-apps/" data-keep-utm>Authy 데스크톱과 다른 앱에서 옮기기</a></li>
+  <section id="guides" aria-labelledby="guides-h">
+    <h2 id="guides-h">이용 가이드</h2>
+    <ul class="guide-list">
+      <li><a href="guides/getting-started/" data-keep-utm><strong>시작하기</strong><span>설치하고 첫 계정을 추가합니다.</span></a></li>
+      <li><a href="guides/open-and-organize/" data-keep-utm><strong>팝업·별도 창·사이드 패널</strong><span>코드를 여는 곳과 계정 목록 정리.</span></a></li>
+      <li><a href="guides/fill-codes/" data-keep-utm><strong>로그인 화면에 코드 넣기</strong><span>클릭, 오른쪽 클릭, 단축키, 코드 칸 옆 단추.</span></a></li>
+      <li><a href="guides/lock-and-protect/" data-keep-utm><strong>잠금과 보호</strong><span>비밀번호, 복구 코드, 패스키, 자동 잠금.</span></a></li>
+      <li><a href="guides/backup-and-sync/" data-keep-utm><strong>백업·내보내기·동기화</strong><span>사본을 두고 다른 기기로 옮깁니다.</span></a></li>
+      <li><a href="guides/share-codes/" data-keep-utm><strong>링크로 코드 공유</strong><span>정한 시간 동안 코드만, 비밀키는 보내지 않습니다.</span></a></li>
+      <li><a href="guides/troubleshooting/" data-keep-utm><strong>문제 해결</strong><span>코드가 틀릴 때, 넣기가 안 될 때, 비밀번호를 잊었을 때.</span></a></li>
+    </ul>
+    <h3 id="moving">다른 인증 앱에서 옮기시나요?</h3>
+    <ul class="guide-list">
+      <li><a href="guides/from-authenticator-extension/" data-keep-utm><strong>기존 Authenticator 확장 프로그램에서</strong><span>백업 파일을 그대로 가져옵니다.</span></a></li>
+      <li><a href="guides/from-authy-and-other-apps/" data-keep-utm><strong>Authy 데스크톱과 다른 앱에서</strong><span>Google Authenticator, Aegis, 2FAS, Bitwarden 등.</span></a></li>
     </ul>
   </section>
 

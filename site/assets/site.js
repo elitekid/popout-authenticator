@@ -50,6 +50,35 @@ var STORES = [
     });
   });
 
+  // data-autoplay 영상은 화면에 보일 때만 소리 없이 돌리고(preload="none" 이라 그때 받는다),
+  // 움직임 줄이기를 켠 사람에게는 포스터만 보여 준다.
+  var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var clips = document.querySelectorAll('video[data-autoplay]');
+  if (!still && clips.length && 'IntersectionObserver' in window) {
+    var seen = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        var v = e.target;
+        if (e.isIntersecting) {
+          if (v.dataset.stopped) return;
+          var p = v.play();
+          if (p && p.catch) p.catch(function () {});
+        } else if (!v.paused) {
+          v.dataset.auto = '1';
+          v.pause();
+        }
+      });
+    }, { threshold: 0.5 });
+    clips.forEach(function (v) {
+      // 사람이 직접 멈추면 다시 보일 때 저절로 돌리지 않는다.
+      v.addEventListener('pause', function () {
+        if (v.dataset.auto) delete v.dataset.auto;
+        else if (!v.ended) v.dataset.stopped = '1';
+      });
+      v.addEventListener('play', function () { delete v.dataset.stopped; });
+      seen.observe(v);
+    });
+  }
+
   if (incoming.length) {
     document.querySelectorAll('a[data-keep-utm]').forEach(function (a) {
       var u = new URL(a.getAttribute('href'), window.location.href);

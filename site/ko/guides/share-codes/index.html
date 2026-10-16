@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; media-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>링크로 코드 공유 — Popout Authenticator</title>
+<meta name="description" content="정한 시간 동안 코드만 보여 주는 링크를 보냅니다. 비밀번호를 걸 수 있고, 링크에는 비밀키가 담기지 않습니다.">
+<link rel="canonical" href="https://elitekid.github.io/popout-authenticator/ko/guides/share-codes/">
+<link rel="alternate" hreflang="en" href="https://elitekid.github.io/popout-authenticator/guides/share-codes/">
+<link rel="alternate" hreflang="ko" href="https://elitekid.github.io/popout-authenticator/ko/guides/share-codes/">
+<link rel="alternate" hreflang="x-default" href="https://elitekid.github.io/popout-authenticator/guides/share-codes/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Popout Authenticator">
+<meta property="og:title" content="링크로 코드 공유">
+<meta property="og:description" content="정한 시간 동안 코드만 보여 주는 링크를 보냅니다. 비밀번호를 걸 수 있고, 링크에는 비밀키가 담기지 않습니다.">
+<meta property="og:url" content="https://elitekid.github.io/popout-authenticator/ko/guides/share-codes/">
+<meta property="og:image" content="https://elitekid.github.io/popout-authenticator/img/ko/03-window.png">
+<meta property="og:locale" content="ko">
+<meta property="og:locale:alternate" content="en">
+<link rel="icon" href="../../../img/logo.png">
+<link rel="stylesheet" href="../../../assets/site.css">
+<script src="../../../assets/site.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">본문으로 건너뛰기</a>
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="../../" data-keep-utm><img src="../../../img/logo.png" width="36" height="36" alt="">Popout Authenticator</a>
+    <nav class="main" aria-label="주 메뉴">
+      <a href="../../" data-keep-utm>홈</a>
+      <a href="../" data-keep-utm>가이드</a>
+      <a href="https://github.com/elitekid/popout-authenticator">GitHub</a>
+      <a class="lang" href="../../../guides/share-codes/" data-keep-utm hreflang="en" lang="en">English</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="wrap guide">
+  <nav class="crumbs" aria-label="이동 경로"><a href="../../" data-keep-utm>홈</a> › <a href="../" data-keep-utm>가이드</a></nav>
+  <h1>링크로 코드 공유</h1>
+  <p class="lead">정한 시간 동안 코드만 보여 주는 링크를 보냅니다. 비밀번호를 걸 수 있고, 링크에는 비밀키가 담기지 않습니다.</p>
+
+  <figure>
+    <video src="../../../media/ko/share-link.mp4" poster="../../../media/ko/share-link.jpg" width="960" height="540" muted loop playsinline controls preload="none" data-autoplay aria-label="코드 공유 링크를 만드는 짧은 영상"></video>
+    <figcaption>예시 계정만 썼습니다.</figcaption>
+  </figure>
+
+  <nav class="toc card" aria-label="이 쪽의 내용">
+    <ol>
+      <li><a href="#what">공유 링크란</a></li>
+      <li><a href="#create">링크 만들기</a></li>
+      <li><a href="#options">선택 항목</a></li>
+      <li><a href="#send">링크 복사와 QR 코드</a></li>
+      <li><a href="#receiver">받는 사람이 보는 화면</a></li>
+      <li><a href="#limits">알아 둘 한계</a></li>
+      <li><a href="#related">관련 기능</a></li>
+    </ol>
+  </nav>
+
+  <h2 id="what">공유 링크란</h2>
+  <p>공유 링크는 다른 사람이 정해진 시간 동안 한 계정의 로그인 코드를 볼 수 있게 하는 링크입니다. 예를 들어 팀원이 공용 "Acme Mail" 계정에 한 번 로그인해야 할 때, 비밀키를 보내지 않고 코드만 보여 줄 수 있습니다.</p>
+  <p>링크에는 비밀키가 들어 있지 않습니다. 고른 시간(예: 앞으로 1시간) 동안의 코드를 Popout이 미리 계산해 그 코드만 링크에 담습니다. 코드는 링크 안에서 암호화되어 있습니다. 비밀번호를 걸지 않으면 암호를 푸는 열쇠가 링크 안에 함께 들어 있어서, 링크를 가진 사람은 누구나 열 수 있습니다. 비밀번호를 걸면 열쇠가 그 비밀번호에서 만들어지므로 받는 사람이 비밀번호를 입력해야 합니다.</p>
+  <p>링크는 일반 웹 페이지 <code>elitekid.github.io/popout-authenticator/share/</code>로 열립니다. 주소에서 <code>#</code> 뒤 부분에 데이터가 들어 있습니다. 만든 링크를 보관하는 서버는 Popout에 없습니다.</p>
+  <div class="card note">
+    <p>링크 속 코드는 실제로 쓸 수 있는 코드입니다. 링크를 열 수 있는 사람은 공유 시간 동안 그 코드를 쓸 수 있습니다. 믿을 수 있는 사람에게만 보내세요.</p>
+  </div>
+
+  <h2 id="create">링크 만들기</h2>
+  <ol>
+    <li>Popout을 열고 계정을 찾습니다.</li>
+    <li>계정의 "⋯" 메뉴를 엽니다(계정을 오른쪽 클릭해도 같은 메뉴가 열립니다).</li>
+    <li>"코드 공유"를 고릅니다. 금고 비밀번호를 쓰고 있으면 먼저 "비밀번호를 한 번 더 입력해 주세요."라고 묻습니다. 입력하고 "확인"을 누릅니다.</li>
+    <li>아래 항목을 확인하고 "링크 만들기"를 누릅니다.</li>
+  </ol>
+  <p>시간 기반(TOTP) 계정만 공유할 수 있습니다. HOTP, Steam, Battle.net 계정에는 "코드 공유" 항목이 없습니다. 코드를 가려 둔 동안에도 이 항목이 나타나지 않습니다. 링크를 만들지 못하면 "이 계정은 공유할 수 없습니다."라고 알려 줍니다.</p>
+
+  <h2 id="options">선택 항목</h2>
+  <div class="table-wrap">
+    <table class="stack">
+      <thead>
+        <tr><th scope="col">항목</th><th scope="col">설명</th></tr>
+      </thead>
+      <tbody>
+        <tr><th scope="row">받는 사람에게 표시할 이름</th><td data-label="설명">받는 사람이 보는 이름입니다. 처음에는 서비스 이름과 계정 이름이 들어가며(예: "Acme Mail alex@example.com") 바꿀 수 있습니다. 이름은 64바이트까지만 담습니다.</td></tr>
+        <tr><th scope="row">공유 시간</th><td data-label="설명">"5분", "15분", "30분", "1시간" 중에서 고릅니다. 기본값은 "1시간"입니다.</td></tr>
+        <tr><th scope="row">비밀번호 (선택)</th><td data-label="설명">링크에 비밀번호를 겁니다. 걸지 않으면 링크를 가진 누구나 코드를 볼 수 있습니다.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>필요한 만큼의 가장 짧은 시간을 고르세요. 시간이 지나면 링크에는 더 보여 줄 코드가 남지 않습니다.</p>
+  <p>비밀번호를 걸었다면 링크와 다른 방법으로 알려 주세요. 예를 들어 링크는 메신저로, 비밀번호는 전화로 전합니다. Popout도 "비밀번호는 링크와 다른 방법으로 전달해 주세요."라고 알려 줍니다. 링크를 만들면 비밀번호 입력칸은 비워집니다.</p>
+
+  <h2 id="send">링크 복사와 QR 코드</h2>
+  <p>"링크 만들기"를 누르면 다음이 나타납니다.</p>
+  <ul>
+    <li>QR 코드: 링크가 QR로 그릴 수 있을 만큼 짧을 때만 나타납니다. 받는 사람이 휴대폰으로 읽을 수 있습니다.</li>
+    <li>링크 주소와 "링크 복사" 단추: 복사하면 "복사했습니다."라고 바뀝니다.</li>
+    <li>"…까지 코드를 볼 수 있습니다."라는 안내와 끝나는 시각</li>
+  </ul>
+  <p>"완료"를 누르면 창이 닫힙니다. 만든 링크의 목록은 Popout에 남지 않으니, 링크를 잃어버리면 새로 만드세요.</p>
+
+  <h2 id="receiver">받는 사람이 보는 화면</h2>
+  <p>받는 사람은 Popout이 없어도 됩니다. 링크를 열면 다음이 보입니다.</p>
+  <ol>
+    <li>정해 둔 이름과 그 아래의 현재 코드</li>
+    <li>반으로 나뉜 코드. 코드를 누르면 복사합니다("코드를 누르면 복사합니다.").</li>
+    <li>다음 코드까지 "남은 시간"과 "…까지 사용할 수 있습니다."라는 끝나는 시각</li>
+  </ol>
+  <p>비밀번호를 걸었다면 먼저 "링크를 열려면 비밀번호를 입력해 주세요."라고 나옵니다. 비밀번호를 입력하고 "열기"를 누릅니다. 틀리면 "비밀번호가 일치하지 않습니다."라고 나옵니다. 브라우저 언어가 한국어이면 한국어로, 그 밖에는 영어로 보입니다.</p>
+  <p>그 밖의 안내: 끝난 뒤에는 "공유 링크가 만료되었습니다.", 받는 사람 기기 시계가 늦으면 "아직 사용 가능한 시간이 아닙니다.", 링크가 잘렸거나 손상되면 "공유 링크를 열 수 없습니다.", 주소에 데이터가 없으면 "공유 링크가 없습니다."가 나옵니다.</p>
+
+  <h2 id="limits">알아 둘 한계</h2>
+  <ul>
+    <li><strong>링크를 취소할 수 없습니다.</strong> 코드가 이미 링크 안에 들어 있고, 링크를 꺼 줄 서버가 없습니다. 정한 시간이 끝나야 멈춥니다. Popout이 시간을 앞당겨 끝낼 수 없으니 짧은 시간을 고르세요.</li>
+    <li><strong>링크는 복사되고 전달될 수 있습니다.</strong> 비밀번호가 이를 줄여 주지만, 비밀번호를 아는 사람이 다시 전할 수도 있습니다.</li>
+    <li><strong>링크는 특정 기기나 사람에 묶이지 않습니다.</strong> 정한 시간 안에는 여러 사람이 열 수 있습니다.</li>
+    <li><strong>끝난 뒤</strong>에는 코드가 더 나오지 않습니다. 하지만 링크와 암호화된 데이터는 보낸 곳에 남아 있으니, 링크가 든 메시지는 지우세요.</li>
+    <li><strong>코드는 기기 시계를 따릅니다.</strong> 내 기기나 받는 사람 기기의 시계가 많이 어긋나면 코드가 안 맞을 수 있습니다.</li>
+    <li><strong>페이지는 웹에서 불러옵니다.</strong> 코드는 받는 사람의 기기에서 링크 속 데이터를 읽어 보여 줍니다.</li>
+  </ul>
+
+  <h2 id="related">관련 기능</h2>
+  <ul>
+    <li>화면을 공유할 때 코드를 가리는 기능은 다른 기능입니다. 내 화면의 Popout에서 코드를 가릴 뿐 링크를 만들지 않습니다. <a href="../lock-and-protect/" data-keep-utm>잠금과 보호</a>를 보세요.</li>
+    <li>내 다른 기기로 계정을 옮기려면 공유 대신 백업이나 동기화를 쓰세요. <a href="../backup-and-sync/" data-keep-utm>백업·내보내기·동기화</a>를 보세요.</li>
+    <li>코드가 맞지 않으면 <a href="../troubleshooting/" data-keep-utm>문제 해결</a>을 보세요.</li>
+  </ul>
+
+  <nav class="guide-nav" aria-label="다른 가이드"><a href="../backup-and-sync/" data-keep-utm>← 백업·내보내기·동기화</a><a href="../troubleshooting/" data-keep-utm>문제 해결 →</a></nav>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <ul>
+      <li><a href="https://github.com/elitekid/popout-authenticator">GitHub</a></li>
+      <li><a href="https://github.com/elitekid/popout-authenticator/blob/main/PRIVACY.md">개인정보처리방침</a></li>
+      <li><a href="https://github.com/elitekid/popout-authenticator/issues">이슈</a></li>
+      <li>MIT 라이선스</li>
+    </ul>
+  </div>
+</footer>
+</body>
+</html>

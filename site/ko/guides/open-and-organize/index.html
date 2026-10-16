@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; media-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>팝업·별도 창·사이드 패널 — Popout Authenticator</title>
+<meta name="description" content="툴바 팝업, 별도 창, 사이드 패널에서 코드를 보고, 검색·그룹·고정으로 계정 목록을 정리합니다.">
+<link rel="canonical" href="https://elitekid.github.io/popout-authenticator/ko/guides/open-and-organize/">
+<link rel="alternate" hreflang="en" href="https://elitekid.github.io/popout-authenticator/guides/open-and-organize/">
+<link rel="alternate" hreflang="ko" href="https://elitekid.github.io/popout-authenticator/ko/guides/open-and-organize/">
+<link rel="alternate" hreflang="x-default" href="https://elitekid.github.io/popout-authenticator/guides/open-and-organize/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Popout Authenticator">
+<meta property="og:title" content="팝업·별도 창·사이드 패널">
+<meta property="og:description" content="툴바 팝업, 별도 창, 사이드 패널에서 코드를 보고, 검색·그룹·고정으로 계정 목록을 정리합니다.">
+<meta property="og:url" content="https://elitekid.github.io/popout-authenticator/ko/guides/open-and-organize/">
+<meta property="og:image" content="https://elitekid.github.io/popout-authenticator/img/ko/03-window.png">
+<meta property="og:locale" content="ko">
+<meta property="og:locale:alternate" content="en">
+<link rel="icon" href="../../../img/logo.png">
+<link rel="stylesheet" href="../../../assets/site.css">
+<script src="../../../assets/site.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">본문으로 건너뛰기</a>
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="../../" data-keep-utm><img src="../../../img/logo.png" width="36" height="36" alt="">Popout Authenticator</a>
+    <nav class="main" aria-label="주 메뉴">
+      <a href="../../" data-keep-utm>홈</a>
+      <a href="../" data-keep-utm>가이드</a>
+      <a href="https://github.com/elitekid/popout-authenticator">GitHub</a>
+      <a class="lang" href="../../../guides/open-and-organize/" data-keep-utm hreflang="en" lang="en">English</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="wrap guide">
+  <nav class="crumbs" aria-label="이동 경로"><a href="../../" data-keep-utm>홈</a> › <a href="../" data-keep-utm>가이드</a></nav>
+  <h1>팝업·별도 창·사이드 패널</h1>
+  <p class="lead">툴바 팝업, 별도 창, 사이드 패널에서 코드를 보고, 검색·그룹·고정으로 계정 목록을 정리합니다.</p>
+
+  <figure>
+    <video src="../../../media/ko/open-views.mp4" poster="../../../media/ko/open-views.jpg" width="960" height="540" muted loop playsinline controls preload="none" data-autoplay aria-label="팝업, 별도 창, 사이드 패널을 보여 주는 짧은 영상"></video>
+    <figcaption>예시 계정만 썼습니다.</figcaption>
+  </figure>
+
+  <nav class="toc card" aria-label="이 쪽의 내용">
+    <ol>
+      <li><a href="#views">팝업·별도 창·사이드 패널</a></li>
+      <li><a href="#open">각각 여는 방법</a></li>
+      <li><a href="#window">별도 창</a></li>
+      <li><a href="#panel">사이드 패널과 브라우저별 지원</a></li>
+      <li><a href="#search">검색과 키보드</a></li>
+      <li><a href="#groups">그룹</a></li>
+      <li><a href="#order">순서와 중요 계정</a></li>
+      <li><a href="#compact">간격 좁게 보기와 코드 가리기</a></li>
+      <li><a href="#menu">계정 메뉴</a></li>
+      <li><a href="#site">지금 사이트에 맞는 계정</a></li>
+      <li><a href="#trash">휴지통</a></li>
+    </ol>
+  </nav>
+
+  <h2 id="views">팝업·별도 창·사이드 패널</h2>
+  <p>같은 화면을 세 가지 방식으로 열 수 있습니다. 어느 쪽이든 계정과 코드는 같습니다.</p>
+  <div class="table-wrap">
+    <table class="stack">
+      <thead>
+        <tr><th scope="col">방식</th><th scope="col">동작</th><th scope="col">이럴 때</th></tr>
+      </thead>
+      <tbody>
+        <tr><th scope="row">팝업</th><td data-label="동작">툴바 아이콘 아래에 열립니다. 다른 곳을 누르면 닫힙니다.</td><td data-label="이럴 때">코드 하나를 빠르게 복사할 때. 기본값입니다.</td></tr>
+        <tr><th scope="row">별도 창</th><td data-label="동작">계속 떠 있는 작은 창입니다. 크기와 위치를 기억합니다.</td><td data-label="이럴 때">다른 앱이나 브라우저 옆에 코드를 띄워 둘 때</td></tr>
+        <tr><th scope="row">사이드 패널</th><td data-label="동작">페이지 옆에 붙어 열려 있습니다.</td><td data-label="이럴 때">로그인하는 사이트 옆에 코드를 계속 보고 싶을 때</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="open">각각 여는 방법</h2>
+  <h3>툴바 아이콘이 여는 방식 고르기</h3>
+  <ol>
+    <li>팝업 위쪽의 "설정"(톱니바퀴)을 누릅니다.</li>
+    <li>"화면 · 동기화"를 누릅니다.</li>
+    <li>"여는 방식"에서 "팝업", "별도 창", "사이드 패널" 중 하나를 고릅니다.</li>
+  </ol>
+  <p>"팝업"을 고르면 "팝업 크기"가 나타나며 "작게", "보통", "크게" 중에서 고를 수 있습니다.</p>
+  <h3>팝업에서 별도 창 열기</h3>
+  <ul>
+    <li>위쪽의 "별도 창으로 열기" 단추를 누릅니다. 팝업이 닫히고 창이 열립니다.</li>
+    <li>툴바 아이콘을 오른쪽 클릭해 "별도 창으로 열기"를 눌러도 됩니다.</li>
+    <li>브라우저의 확장 프로그램 단축키 설정에서 "별도 창으로 열기" 명령에 키를 지정할 수도 있습니다. 기본 키는 없습니다.</li>
+  </ul>
+  <p>"별도 창으로 열기" 단추는 사이드 패널에도 있습니다. 별도 창 안에서는 보이지 않습니다.</p>
+
+  <h2 id="window">별도 창</h2>
+  <ul>
+    <li>처음에는 400 × 640 크기로 열립니다. 크기를 바꾸거나 옮기면 다음에 그 자리에 엽니다.</li>
+    <li>창은 하나만 열립니다. 이미 열려 있으면 다시 열 때 앞으로 가져옵니다.</li>
+    <li>저장된 위치가 화면 밖이면(예: 모니터를 뺀 경우) 위치 없이 엽니다.</li>
+  </ul>
+  <h3>목록만 보기</h3>
+  <p>별도 창에서 오른쪽 위의 작은 "목록만 보기" 단추를 누르면 머리글, 검색, 안내가 숨겨지고 이름과 코드만 남습니다. "전체 보기"를 누르면 돌아옵니다. "화면 · 동기화"의 "별도 창 · 목록만 보기"로도 켤 수 있습니다. 팝업과 사이드 패널에는 적용되지 않습니다.</p>
+  <p class="ver"><strong>1.0.1</strong> 1.0.1부터 Firefox에서 별도 창을 옮기면 위치도 기억합니다.</p>
+
+  <h2 id="panel">사이드 패널과 브라우저별 지원</h2>
+  <p>"여는 방식"에서 "사이드 패널"을 고른 뒤 툴바 아이콘을 누르면 열립니다.</p>
+  <ul>
+    <li><strong>Chrome·Edge:</strong> 아이콘이 브라우저의 사이드 패널을 엽니다.</li>
+    <li><strong>Firefox:</strong> 아이콘이 사이드바를 엽니다.</li>
+    <li><strong>macOS Safari:</strong> 사이드 패널이 없습니다. 팝업이나 별도 창을 쓰세요.</li>
+  </ul>
+  <p>"여는 방식"에 "사이드 패널"이 보이지 않으면 그 브라우저가 지원하지 않는 것이며, 팝업으로 열립니다.</p>
+
+  <h2 id="search">검색과 키보드</h2>
+  <ol>
+    <li>목록을 엽니다. 커서가 이미 "검색" 칸에 있습니다.</li>
+    <li>서비스 이름, 계정 이름, 그룹, 메모의 일부를 입력합니다. "검색 결과" 제목 옆에 일치하는 계정 수가 보입니다.</li>
+    <li><kbd>↑</kbd>·<kbd>↓</kbd>로 고르고, <kbd>Enter</kbd>로 코드를 복사하고, <kbd>Esc</kbd>로 검색을 지웁니다.</li>
+  </ol>
+  <p>목록에서 아무 글자나 치면 "검색" 칸으로 이동합니다. 줄을 누르면 코드가 복사되고 "복사됨"이라고 나옵니다.</p>
+
+  <h2 id="groups">그룹</h2>
+  <p>그룹은 "업무"처럼 관련 계정을 묶어 줍니다. 그룹 이름은 64자까지 가능하고, 계정마다 그룹은 하나입니다.</p>
+  <ol>
+    <li>계정 줄에서 <code>⋯</code>(또는 오른쪽 클릭) → "편집"을 누릅니다.</li>
+    <li>"그룹"에 이름을 입력하고 "저장"을 누릅니다.</li>
+  </ol>
+  <p>그룹이 있는 계정이 생기면 목록 위에 "전체"와 그룹별 칩이 나타납니다. 칩을 누르면 그 그룹만 보입니다.</p>
+  <p class="ver"><strong>1.0.1</strong> 1.0.1부터 팝업은 칩 대신 그룹 제목 아래에 계정을 보여 줍니다. 제목에는 그룹 이름과 개수가 있고, 누르면 접고 펼칩니다. 그룹이 없는 계정은 "그룹 없음" 아래에 있습니다. 계정 메뉴의 "그룹"에서 기존 그룹을 고르거나, "새 그룹"으로 "그룹 이름"을 입력해 만들거나, "그룹 빼기"를 고를 수 있습니다. 검색 중에는 그룹 없이 한 줄로 보입니다.</p>
+
+  <h2 id="order">순서와 중요 계정</h2>
+  <ul>
+    <li><strong>순서 바꾸기:</strong> 줄을 위아래로 끕니다. 줄에 키보드 초점이 있을 때 <kbd>Alt</kbd>+<kbd>↑</kbd>, <kbd>Alt</kbd>+<kbd>↓</kbd>도 됩니다. 정한 순서는 그대로 유지됩니다. 코드를 복사하거나 사이트를 방문해도 줄이 움직이지 않습니다.</li>
+    <li><strong>중요 표시:</strong> 계정의 "편집" 화면에서 "중요 계정으로 표시"를 켭니다. 줄에 ★("중요 계정")이 붙습니다. 순서는 바뀌지 않습니다.</li>
+  </ul>
+
+  <h2 id="compact">간격 좁게 보기와 코드 가리기</h2>
+  <p>"화면 · 동기화"의 "보기"에는 "기본", "간격 좁게", "코드 가리기"가 있습니다. "간격 좁게"는 줄 간격을 줄입니다. "코드 가리기"는 이름만 보여 주며, 줄을 누르면 코드가 복사됩니다. 목록에서 <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>H</kbd>를 눌러 코드를 가리거나 다시 볼 수도 있습니다. 같은 화면에 "테마", "배율", "언어", "계정 앞에 이니셜 타일 표시" 설정도 있습니다.</p>
+
+  <h2 id="menu">계정 메뉴</h2>
+  <p>줄의 <code>⋯</code>을 누르거나, 줄을 오른쪽 클릭하거나, <kbd>Shift</kbd>+<kbd>F10</kbd>을 누릅니다. 메뉴 항목은 다음과 같습니다.</p>
+  <ul>
+    <li>"이 페이지에 넣기" — <a href="../fill-codes/" data-keep-utm>로그인 화면에 코드 넣기</a>를 보세요.</li>
+    <li>"다음 코드 복사" — 시간제 계정에만 있습니다.</li>
+    <li>"QR 코드 보기" — 다른 기기에 같은 계정을 추가할 때 씁니다. 비밀번호를 설정했다면 먼저 다시 입력합니다.</li>
+    <li>"코드 공유" — <a href="../share-codes/" data-keep-utm>코드 공유하기</a>를 보세요.</li>
+    <li>"편집", "계정 변경 기록"</li>
+    <li>"삭제" — 확인한 뒤 계정을 휴지통으로 옮깁니다.</li>
+  </ul>
+
+  <h2 id="site">지금 사이트에 맞는 계정</h2>
+  <p>지금 보는 페이지에 맞는 계정이 있으면 그 줄에 "넣기" 단추가 생깁니다. 계정에 저장한 사이트 주소나 이전에 쓴 기록으로 맞춥니다.</p>
+  <ul>
+    <li>팝업은 팝업을 연 탭을 기준으로 합니다.</li>
+    <li>별도 창과 사이드 패널은 "현재 탭에 맞춰 추천 계정도 바뀌도록 허용할까요?"라고 묻습니다. 탭을 따라가려면 "허용", 아니면 "닫기"를 누르세요.</li>
+    <li>계정에 저장되지 않은 사이트에서 코드를 복사하면 "example.com에서 사용할 계정으로 기억할까요?"라고 물을 수 있습니다. "기억" 또는 "아니요"를 누르세요.</li>
+  </ul>
+  <p>추천을 끄려면 설정의 "복사 및 개인정보"에서 "사이트에 맞는 계정 추천"을 끕니다. 끄면 사이트 사용 기록도 지워집니다.</p>
+
+  <h2 id="trash">휴지통</h2>
+  <p>"삭제"를 누르면 "이 계정을 휴지통으로 옮길까요? 30일 뒤 영구 삭제됩니다."라고 묻습니다. "휴지통으로 이동"을 누르세요.</p>
+  <ol>
+    <li>"설정" → "휴지통"을 엽니다.</li>
+    <li>계정마다 "29일 남음"처럼 남은 날이 보입니다. "복원"으로 되돌리거나 "영구 삭제"를 누릅니다.</li>
+    <li>"휴지통 비우기"는 안에 있는 모든 계정을 완전히 지웁니다.</li>
+  </ol>
+  <p>계정 내보내기와 이전 버전 복원은 <a href="../backup-and-sync/" data-keep-utm>백업과 동기화</a>를 보세요.</p>
+
+  <nav class="guide-nav" aria-label="다른 가이드"><a href="../getting-started/" data-keep-utm>← 시작하기: 설치와 첫 계정 추가</a><a href="../fill-codes/" data-keep-utm>로그인 화면에 코드 넣기 →</a></nav>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <ul>
+      <li><a href="https://github.com/elitekid/popout-authenticator">GitHub</a></li>
+      <li><a href="https://github.com/elitekid/popout-authenticator/blob/main/PRIVACY.md">개인정보처리방침</a></li>
+      <li><a href="https://github.com/elitekid/popout-authenticator/issues">이슈</a></li>
+      <li>MIT 라이선스</li>
+    </ul>
+  </div>
+</footer>
+</body>
+</html>

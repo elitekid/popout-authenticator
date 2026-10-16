@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; media-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Share a code with a link — Popout Authenticator</title>
+<meta name="description" content="Send a link that shows an account&#x27;s codes for a limited time, with an optional password. The link never contains the secret.">
+<link rel="canonical" href="https://elitekid.github.io/popout-authenticator/guides/share-codes/">
+<link rel="alternate" hreflang="en" href="https://elitekid.github.io/popout-authenticator/guides/share-codes/">
+<link rel="alternate" hreflang="ko" href="https://elitekid.github.io/popout-authenticator/ko/guides/share-codes/">
+<link rel="alternate" hreflang="x-default" href="https://elitekid.github.io/popout-authenticator/guides/share-codes/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Popout Authenticator">
+<meta property="og:title" content="Share a code with a link">
+<meta property="og:description" content="Send a link that shows an account&#x27;s codes for a limited time, with an optional password. The link never contains the secret.">
+<meta property="og:url" content="https://elitekid.github.io/popout-authenticator/guides/share-codes/">
+<meta property="og:image" content="https://elitekid.github.io/popout-authenticator/img/en/03-window.png">
+<meta property="og:locale" content="en">
+<meta property="og:locale:alternate" content="ko">
+<link rel="icon" href="../../img/logo.png">
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/site.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="../../" data-keep-utm><img src="../../img/logo.png" width="36" height="36" alt="">Popout Authenticator</a>
+    <nav class="main" aria-label="Main">
+      <a href="../../" data-keep-utm>Home</a>
+      <a href="../" data-keep-utm>Guides</a>
+      <a href="https://github.com/elitekid/popout-authenticator">GitHub</a>
+      <a class="lang" href="../../ko/guides/share-codes/" data-keep-utm hreflang="ko" lang="ko">한국어</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="wrap guide">
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="../../" data-keep-utm>Home</a> › <a href="../" data-keep-utm>Guides</a></nav>
+  <h1>Share a code with a link</h1>
+  <p class="lead">Send a link that shows an account&#x27;s codes for a limited time, with an optional password. The link never contains the secret.</p>
+
+  <figure>
+    <video src="../../media/en/share-link.mp4" poster="../../media/en/share-link.jpg" width="960" height="540" muted loop playsinline controls preload="none" data-autoplay aria-label="Short clip: creating a code share link"></video>
+    <figcaption>Demo accounts only.</figcaption>
+  </figure>
+
+  <nav class="toc card" aria-label="On this page">
+    <ol>
+      <li><a href="#what">What a share link is</a></li>
+      <li><a href="#create">Create a link</a></li>
+      <li><a href="#options">The options</a></li>
+      <li><a href="#send">Copy the link or show the QR code</a></li>
+      <li><a href="#receiver">What the other person sees</a></li>
+      <li><a href="#limits">Limits you should know</a></li>
+      <li><a href="#related">Related features</a></li>
+    </ol>
+  </nav>
+
+  <h2 id="what">What a share link is</h2>
+  <p>A share link lets another person see the sign-in codes of one account for a limited time. For example, you can let a teammate sign in to a shared "Acme Mail" account once, without sending them the secret key.</p>
+  <p>The link does not contain the secret key. Instead, Popout calculates the codes for the time you choose, such as the next hour, and puts only those codes into the link. The codes are scrambled (encrypted) inside the link. Without a password, the key for that scrambling is stored in the link itself, so anyone who has the link can open it. With a password, the key comes from the password, and the other person must type it.</p>
+  <p>The link opens a plain web page, <code>elitekid.github.io/popout-authenticator/share/</code>. The part of the address after <code>#</code> holds the data. Popout itself has no server that stores your links.</p>
+  <div class="card note">
+    <p>The codes in a link are real codes. Anyone who can open the link can use them during the sharing time. Share only with people you trust.</p>
+  </div>
+
+  <h2 id="create">Create a link</h2>
+  <ol>
+    <li>Open Popout and find the account.</li>
+    <li>Open the account's "⋯" menu (right-clicking the account opens the same menu).</li>
+    <li>Choose "Share codes". If you use a vault password, Popout first says "Enter your password once more." Type it and select "OK".</li>
+    <li>Check the options below, then select "Create link".</li>
+  </ol>
+  <p>Only accounts of the time-based (TOTP) type can be shared. HOTP, Steam and Battle.net accounts have no "Share codes" item. The item is also missing while codes are hidden. If a link cannot be made, you see "This account cannot be shared."</p>
+
+  <h2 id="options">The options</h2>
+  <div class="table-wrap">
+    <table class="stack">
+      <thead>
+        <tr><th scope="col">Option</th><th scope="col">What it does</th></tr>
+      </thead>
+      <tbody>
+        <tr><th scope="row">Name shown above the code</th><td data-label="What it does">The name the other person sees. It starts as the service and account name, for example "Acme Mail alex@example.com". You can change it. Names are cut at 64 bytes.</td></tr>
+        <tr><th scope="row">Valid for</th><td data-label="What it does">"5 min", "15 min", "30 min" or "1 hour". The default is "1 hour".</td></tr>
+        <tr><th scope="row">Password (optional)</th><td data-label="What it does">Locks the link with a password. Without it, anyone with the link can view the codes.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Pick the shortest time that works for you. When the time is over, the link has no codes left.</p>
+  <p>If you set a password, send it by a different route than the link, for example by phone while the link goes by chat. Popout reminds you with "Send the password separately." Popout clears the password field once the link is made.</p>
+
+  <h2 id="send">Copy the link or show the QR code</h2>
+  <p>After you select "Create link", Popout shows:</p>
+  <ul>
+    <li>A QR code, when the link is short enough to draw one. The other person can scan it with a phone.</li>
+    <li>The link itself, and a "Copy link" button. After copying, the button reads "Link copied".</li>
+    <li>"Codes are available until" and the end time.</li>
+  </ul>
+  <p>Select "Done" to close the window. Popout does not keep a list of the links you made. If you lose a link, create a new one.</p>
+
+  <h2 id="receiver">What the other person sees</h2>
+  <p>They do not need Popout. Opening the link shows a page with:</p>
+  <ol>
+    <li>The name you set, above the current code.</li>
+    <li>The code, split in two halves. They select the code to copy it ("Select the code to copy it.").</li>
+    <li>"Time left" until the next code, and "Valid until" with the end time.</li>
+  </ol>
+  <p>If you set a password, the page first says "Enter the password to open this link." They type it and select "Open". A wrong password shows "Incorrect password." The page uses Korean for browsers set to Korean, and English otherwise.</p>
+  <p>Other messages: "This share link has expired." after the end time, "Not available yet." if their device clock is behind, "Unable to open this share link." for a damaged or cut-off link, and "No share link found." when the address has no data.</p>
+
+  <h2 id="limits">Limits you should know</h2>
+  <ul>
+    <li><strong>You cannot cancel a link.</strong> The codes are already inside it, and there is no server where you could switch it off. It stops only when the time ends. Choose a short time, because Popout cannot end it sooner.</li>
+    <li><strong>The link can be copied and forwarded.</strong> A password limits this, but a person who knows the password can pass it on too.</li>
+    <li><strong>The link is not tied to one device or person.</strong> Several people can open it during the time.</li>
+    <li><strong>After the end time</strong> the page shows no more codes. The link and the encrypted data still exist wherever it was sent, so delete the messages that contain it.</li>
+    <li><strong>The codes follow device clocks.</strong> If the clock of your device or theirs is far off, codes can seem wrong.</li>
+    <li><strong>The page is loaded from the web.</strong> The codes are read on their device from the data in the link.</li>
+  </ul>
+
+  <h2 id="related">Related features</h2>
+  <ul>
+    <li>Hiding codes while you share your screen is a different feature. It masks codes in Popout on your own screen and does not create a link. See <a href="../lock-and-protect/" data-keep-utm>Lock and protect your accounts</a>.</li>
+    <li>To move accounts to another device of your own, use a backup or sync instead. See <a href="../backup-and-sync/" data-keep-utm>Backup, export, and sync</a>.</li>
+    <li>If codes do not work, see <a href="../troubleshooting/" data-keep-utm>Troubleshooting</a>.</li>
+  </ul>
+
+  <nav class="guide-nav" aria-label="More guides"><a href="../backup-and-sync/" data-keep-utm>← Backup, export, and sync</a><a href="../troubleshooting/" data-keep-utm>Troubleshooting →</a></nav>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <ul>
+      <li><a href="https://github.com/elitekid/popout-authenticator">GitHub</a></li>
+      <li><a href="https://github.com/elitekid/popout-authenticator/blob/main/PRIVACY.md">Privacy</a></li>
+      <li><a href="https://github.com/elitekid/popout-authenticator/issues">Issues</a></li>
+      <li>MIT License</li>
+    </ul>
+  </div>
+</footer>
+</body>
+</html>
