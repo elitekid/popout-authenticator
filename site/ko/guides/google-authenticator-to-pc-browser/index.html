@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; media-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>구글 OTP(Google Authenticator) 코드를 PC 브라우저로 옮기기 — Popout Authenticator</title>
+<meta name="description" content="휴대폰 구글 OTP 앱에서 계정을 QR 코드로 내보내 PC의 크롬·엣지·파이어폭스·웨일에 설치한 Popout Authenticator로 읽어 오는 방법과 확인할 점, 옮긴 뒤 할 일을 정리했습니다.">
+<link rel="canonical" href="https://elitekid.github.io/popout-authenticator/ko/guides/google-authenticator-to-pc-browser/">
+<link rel="alternate" hreflang="en" href="https://elitekid.github.io/popout-authenticator/guides/google-authenticator-to-pc-browser/">
+<link rel="alternate" hreflang="ko" href="https://elitekid.github.io/popout-authenticator/ko/guides/google-authenticator-to-pc-browser/">
+<link rel="alternate" hreflang="x-default" href="https://elitekid.github.io/popout-authenticator/guides/google-authenticator-to-pc-browser/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Popout Authenticator">
+<meta property="og:title" content="구글 OTP(Google Authenticator) 코드를 PC 브라우저로 옮기기">
+<meta property="og:description" content="휴대폰 구글 OTP 앱에서 계정을 QR 코드로 내보내 PC의 크롬·엣지·파이어폭스·웨일에 설치한 Popout Authenticator로 읽어 오는 방법과 확인할 점, 옮긴 뒤 할 일을 정리했습니다.">
+<meta property="og:url" content="https://elitekid.github.io/popout-authenticator/ko/guides/google-authenticator-to-pc-browser/">
+<meta property="og:image" content="https://elitekid.github.io/popout-authenticator/img/ko/03-window.png">
+<meta property="og:locale" content="ko">
+<meta property="og:locale:alternate" content="en">
+<link rel="icon" href="../../../img/logo.png">
+<link rel="stylesheet" href="../../../assets/site.css">
+<script src="../../../assets/site.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">본문으로 건너뛰기</a>
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="../../" data-keep-utm><img src="../../../img/logo.png" width="36" height="36" alt="">Popout Authenticator</a>
+    <nav class="main" aria-label="주 메뉴">
+      <a href="../../" data-keep-utm>홈</a>
+      <a href="../" data-keep-utm>가이드</a>
+      <a href="https://github.com/elitekid/popout-authenticator">GitHub</a>
+      <a class="lang" href="../../../guides/google-authenticator-to-pc-browser/" data-keep-utm hreflang="en" lang="en">English</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="wrap guide">
+  <nav class="crumbs" aria-label="이동 경로"><a href="../../" data-keep-utm>홈</a> › <a href="../" data-keep-utm>가이드</a></nav>
+  <h1>구글 OTP(Google Authenticator) 코드를 PC 브라우저로 옮기기</h1>
+  <p class="lead">휴대폰의 구글 OTP 앱에서 계정을 QR 코드로 내보내고, PC 브라우저의 Popout Authenticator로 읽어 오는 방법입니다. 옮긴 뒤에도 휴대폰 앱의 코드는 그대로 씁니다.</p>
+
+  <nav class="toc card" aria-label="이 쪽의 내용">
+    <ol>
+      <li><a href="#before">시작하기 전에</a></li>
+      <li><a href="#export">1. 휴대폰에서 QR 코드 만들기</a></li>
+      <li><a href="#import">2. PC 브라우저에서 읽기</a></li>
+      <li><a href="#check">3. 코드가 맞는지 확인하기</a></li>
+      <li><a href="#after">옮긴 뒤 할 일</a></li>
+      <li><a href="#faq">자주 묻는 질문</a></li>
+      <li><a href="#related">관련 가이드</a></li>
+    </ol>
+  </nav>
+
+  <h2 id="before">시작하기 전에</h2>
+  <ul>
+    <li>구글 OTP 앱이 있는 휴대폰과, Popout Authenticator를 설치한 PC 브라우저(크롬·엣지·파이어폭스·웨일)가 필요합니다.</li>
+    <li>휴대폰의 구글 OTP 앱을 최신 버전으로 업데이트해 주세요. 구글 안내가 내보내기 조건으로 적어 둔 내용입니다.</li>
+    <li>옮기는 동안 휴대폰 화면의 QR 코드에는 비밀키가 들어 있습니다. 다른 사람이 보거나 찍지 않게 해 주세요.</li>
+  </ul>
+
+  <h2 id="export">1. 휴대폰에서 QR 코드 만들기</h2>
+  <ol>
+    <li>구글 OTP 앱에서 메뉴 → <strong>계정 전송</strong> → <strong>계정 내보내기</strong>를 누릅니다.</li>
+    <li>휴대폰 잠금을 풀고, 옮길 계정을 고른 뒤 <strong>다음</strong>을 누릅니다.</li>
+    <li>QR 코드가 나타납니다. 계정이 많으면 QR 코드가 여러 개로 나뉩니다.</li>
+  </ol>
+  <p>메뉴 이름은 <a href="https://support.google.com/accounts/answer/1066447?hl=ko">구글 OTP 코드 받기 안내</a>를 따랐습니다(2026년 10월 18일 확인). 앱 버전에 따라 조금 다를 수 있습니다.</p>
+
+  <h2 id="import">2. PC 브라우저에서 읽기</h2>
+  <p>세 가지 방법 중 편한 것을 쓰세요.</p>
+  <ul>
+    <li><strong>웹캠으로 읽기:</strong> 도구 막대의 Popout 아이콘 → + → <strong>카메라로 QR 코드 읽기</strong>를 누르고, 휴대폰 화면의 QR 코드를 PC 카메라에 비춥니다.</li>
+    <li><strong>사진으로 읽기:</strong> 휴대폰으로 QR 코드 화면을 찍어 PC로 옮긴 뒤, + → <strong>계정 추가</strong> → <strong>QR 코드</strong> → <strong>QR 코드 이미지 선택</strong>에서 고릅니다. 이미지를 여러 개 한꺼번에 고를 수 있습니다.</li>
+    <li><strong>화면에서 읽기:</strong> QR 코드 이미지가 PC 화면에 떠 있으면 + → <strong>화면에서 QR 코드 읽기</strong>를 누르고 QR 코드가 있는 영역을 끌어서 고릅니다.</li>
+  </ul>
+  <p>QR 코드가 여러 개이면 하나씩 모두 읽어 주세요. 계정이 목록에 차례로 추가됩니다.</p>
+  <div class="card note">
+    <p>QR 코드를 찍은 사진과 PC로 옮긴 파일은 다 옮긴 뒤 지워 주세요. 메신저나 클라우드에 올렸다면 거기서도 지워 주세요.</p>
+  </div>
+
+  <h2 id="check">3. 코드가 맞는지 확인하기</h2>
+  <p>Popout의 코드와 휴대폰 구글 OTP 앱의 코드가 같은 계정에서 같은 숫자를 보여 주는지 확인하세요. 두 곳 다 같은 비밀키로 30초마다 코드를 만들기 때문에 숫자가 같아야 합니다. 다르면 PC 시계가 틀렸을 수 있습니다. <a href="../troubleshooting/#codes-rejected" data-keep-utm>문제 해결</a>을 보세요.</p>
+
+  <h2 id="after">옮긴 뒤 할 일</h2>
+  <ul>
+    <li><strong>비밀번호를 정하세요.</strong> 비밀번호가 없으면 금고의 키가 데이터와 함께 PC에 저장됩니다. 다른 사람도 쓰는 PC라면 꼭 정하세요. <a href="../lock-and-protect/" data-keep-utm>잠금과 보호</a>를 보세요.</li>
+    <li><strong>휴대폰 앱은 지우지 않아도 됩니다.</strong> 두 곳 모두에서 코드를 쓸 수 있습니다. PC만 쓰기로 했더라도, 백업을 만든 뒤에 지우세요.</li>
+    <li><strong>백업을 만드세요.</strong> Popout은 개발자가 운영하는 클라우드 백업이 없습니다. 암호화 백업 파일을 만들어 따로 보관하세요. <a href="../backup-and-sync/" data-keep-utm>백업·내보내기·동기화</a>를 보세요.</li>
+  </ul>
+
+  <h2 id="faq">자주 묻는 질문</h2>
+  <h3>휴대폰을 잃어버려서 구글 OTP 앱을 열 수 없습니다.</h3>
+  <p>내보내기는 구글 OTP 앱이 있는 기기에서만 할 수 있습니다. 앱에서 구글 계정 동기화를 켜 두었다면 새 휴대폰에서 같은 구글 계정으로 로그인해 코드를 되찾은 뒤 위 방법으로 옮기세요. 그것도 안 되면 각 서비스의 복구 코드나 고객센터로 2단계 인증을 다시 설정해야 합니다.</p>
+  <h3>나중에 다시 구글 OTP 앱으로 옮길 수 있나요?</h3>
+  <p>네. Popout의 내보내기에서 형식을 <strong>Google 묶음 QR</strong>로 고르면 구글 OTP 앱이 읽는 QR 코드를 만들 수 있습니다. 6자리 또는 8자리·30초가 아닌 계정과 Steam·Battle.net 계정은 이 형식에 들어가지 않습니다.</p>
+  <h3>브라우저에 OTP를 두어도 안전한가요?</h3>
+  <p>편한 만큼 대가가 있습니다. 비밀번호와 OTP가 한 PC에 함께 있으면 그 PC가 뚫렸을 때 두 단계가 한꺼번에 위험해집니다. 금융·회사 계정처럼 중요한 계정은 휴대폰 앱이나 보안 키에 두고, Popout에는 자주 쓰는 계정만 두는 방법도 있습니다.</p>
+
+  <h2 id="related">관련 가이드</h2>
+  <ul>
+    <li><a href="../from-authy-and-other-apps/" data-keep-utm>Authy 데스크톱과 다른 앱에서 옮기기</a>: 다른 인증 앱의 내보내기 파일을 읽습니다.</li>
+    <li><a href="../from-authenticator-extension/" data-keep-utm>기존 Authenticator 확장 프로그램에서 옮기기</a>: 크롬 '인증 도구' 확장의 백업을 읽습니다.</li>
+    <li><a href="../compare-browser-authenticators/" data-keep-utm>브라우저 2FA 확장 비교</a>: 다른 브라우저 확장과 사실을 나란히 봅니다.</li>
+  </ul>
+
+  <aside class="review-ask" aria-label="평가 남기기" hidden>
+    <p><strong>평가 남기기</strong> 쓰는 브라우저의 스토어에 남긴 짧은 평가가 다른 사람이 Popout을 찾는 데 도움이 됩니다.</p>
+    <div class="stores reviews" data-campaign="pa-review-guide"></div>
+  </aside>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <ul>
+      <li><a href="https://github.com/elitekid/popout-authenticator">GitHub</a></li>
+      <li><a href="https://github.com/elitekid/popout-authenticator/blob/main/PRIVACY.md">개인정보처리방침</a></li>
+      <li><a href="https://github.com/elitekid/popout-authenticator/issues">이슈</a></li>
+      <li>MIT 라이선스</li>
+    </ul>
+  </div>
+</footer>
+</body>
+</html>

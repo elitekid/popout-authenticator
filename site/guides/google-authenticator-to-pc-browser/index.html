@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; media-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Move Google Authenticator codes to your PC browser — Popout Authenticator</title>
+<meta name="description" content="Export Google Authenticator accounts as QR codes on your phone and read them into Popout Authenticator in Chrome, Edge, Firefox or Whale on your PC. Steps, checks and what to do after.">
+<link rel="canonical" href="https://elitekid.github.io/popout-authenticator/guides/google-authenticator-to-pc-browser/">
+<link rel="alternate" hreflang="en" href="https://elitekid.github.io/popout-authenticator/guides/google-authenticator-to-pc-browser/">
+<link rel="alternate" hreflang="ko" href="https://elitekid.github.io/popout-authenticator/ko/guides/google-authenticator-to-pc-browser/">
+<link rel="alternate" hreflang="x-default" href="https://elitekid.github.io/popout-authenticator/guides/google-authenticator-to-pc-browser/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Popout Authenticator">
+<meta property="og:title" content="Move Google Authenticator codes to your PC browser">
+<meta property="og:description" content="Export Google Authenticator accounts as QR codes on your phone and read them into Popout Authenticator in Chrome, Edge, Firefox or Whale on your PC. Steps, checks and what to do after.">
+<meta property="og:url" content="https://elitekid.github.io/popout-authenticator/guides/google-authenticator-to-pc-browser/">
+<meta property="og:image" content="https://elitekid.github.io/popout-authenticator/img/en/03-window.png">
+<meta property="og:locale" content="en">
+<meta property="og:locale:alternate" content="ko">
+<link rel="icon" href="../../img/logo.png">
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/site.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="../../" data-keep-utm><img src="../../img/logo.png" width="36" height="36" alt="">Popout Authenticator</a>
+    <nav class="main" aria-label="Main">
+      <a href="../../" data-keep-utm>Home</a>
+      <a href="../" data-keep-utm>Guides</a>
+      <a href="https://github.com/elitekid/popout-authenticator">GitHub</a>
+      <a class="lang" href="../../ko/guides/google-authenticator-to-pc-browser/" data-keep-utm hreflang="ko" lang="ko">한국어</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="wrap guide">
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="../../" data-keep-utm>Home</a> › <a href="../" data-keep-utm>Guides</a></nav>
+  <h1>Move Google Authenticator codes to your PC browser</h1>
+  <p class="lead">Export your accounts from the Google Authenticator app on your phone as QR codes, and read them into Popout Authenticator in your PC browser. The codes on your phone keep working.</p>
+
+  <nav class="toc card" aria-label="On this page">
+    <ol>
+      <li><a href="#before">Before you start</a></li>
+      <li><a href="#export">1. Make the QR codes on your phone</a></li>
+      <li><a href="#import">2. Read them in your PC browser</a></li>
+      <li><a href="#check">3. Check that the codes match</a></li>
+      <li><a href="#after">After moving</a></li>
+      <li><a href="#faq">Questions</a></li>
+      <li><a href="#related">Related guides</a></li>
+    </ol>
+  </nav>
+
+  <h2 id="before">Before you start</h2>
+  <ul>
+    <li>You need the phone with Google Authenticator, and a PC browser with Popout Authenticator installed (Chrome, Edge, Firefox or Whale).</li>
+    <li>Update Google Authenticator on the phone to the latest version. Google lists this as a requirement for exporting.</li>
+    <li>The QR codes on the phone screen contain your secret keys. Do not let anyone else see or photograph them.</li>
+  </ul>
+
+  <h2 id="export">1. Make the QR codes on your phone</h2>
+  <ol>
+    <li>In Google Authenticator, open the menu → <strong>Transfer codes</strong> → <strong>Export codes</strong>.</li>
+    <li>Unlock the phone, select the accounts to move, and tap <strong>Next</strong>.</li>
+    <li>QR codes appear. With many accounts, they are split across several QR codes.</li>
+  </ol>
+  <p>Menu names follow <a href="https://support.google.com/accounts/answer/1066447">Google's instructions</a> (checked October 18, 2026) and can differ slightly between app versions.</p>
+
+  <h2 id="import">2. Read them in your PC browser</h2>
+  <p>Use whichever is easiest:</p>
+  <ul>
+    <li><strong>With a webcam:</strong> click the Popout icon in the toolbar → + → <strong>Read QR with camera</strong>, and hold the phone's QR code up to the PC camera.</li>
+    <li><strong>From photos:</strong> take a picture of each QR code with another device, move the pictures to the PC, then use + → <strong>Add account</strong> → <strong>QR code</strong> → <strong>Choose QR code images</strong>. You can choose several images at once.</li>
+    <li><strong>From the screen:</strong> if the QR code image is shown on your PC screen, use + → <strong>Find QR on screen</strong> and drag over the area with the code.</li>
+  </ul>
+  <p>If there are several QR codes, read each one. The accounts are added to the list as you go.</p>
+  <div class="card note">
+    <p>Delete the photos and copied files of the QR codes when you are done, including any copies in chat apps or cloud storage.</p>
+  </div>
+
+  <h2 id="check">3. Check that the codes match</h2>
+  <p>For each account, the code in Popout should match the one in Google Authenticator on the phone: both make a new code every 30 seconds from the same secret key. If they differ, your PC clock may be off; see <a href="../troubleshooting/#codes-rejected" data-keep-utm>Troubleshooting</a>.</p>
+
+  <h2 id="after">After moving</h2>
+  <ul>
+    <li><strong>Set a password.</strong> Without one, the vault key is kept on the PC next to the data. Set one if others use this computer. See <a href="../lock-and-protect/" data-keep-utm>Lock and protect your accounts</a>.</li>
+    <li><strong>You can keep the phone app.</strong> Codes work in both places. If you decide to use only the PC, make a backup before deleting the phone app.</li>
+    <li><strong>Make a backup.</strong> Popout has no cloud backup run by the developer. Create an encrypted backup file and keep it somewhere safe. See <a href="../backup-and-sync/" data-keep-utm>Backup, export, and sync</a>.</li>
+  </ul>
+
+  <h2 id="faq">Questions</h2>
+  <h3>I lost my phone and cannot open Google Authenticator.</h3>
+  <p>Exporting only works on a device that has the Google Authenticator app. If you turned on Google account sync in the app, sign in with the same Google account on a new phone to get the codes back, then follow the steps above. If that is not possible, use each service's recovery codes or support to set up two-factor authentication again.</p>
+  <h3>Can I move the codes back to Google Authenticator later?</h3>
+  <p>Yes. In Popout's export, choose the <strong>Google batch QR</strong> format to make QR codes that Google Authenticator can read. Accounts that are not 6 or 8 digits with a 30-second period, and Steam or Battle.net accounts, are not included in that format.</p>
+  <h3>Is it safe to keep one-time codes in the browser?</h3>
+  <p>It is a trade-off. If your passwords and codes are on the same PC and that PC is compromised, both factors are at risk at once. For important accounts such as banking or work, you can keep codes on the phone or a security key and keep only everyday accounts in Popout.</p>
+
+  <h2 id="related">Related guides</h2>
+  <ul>
+    <li><a href="../from-authy-and-other-apps/" data-keep-utm>Moving from Authy Desktop and other apps</a>: read export files from other authenticator apps.</li>
+    <li><a href="../from-authenticator-extension/" data-keep-utm>Moving from the original Authenticator extension</a>: read its backup file.</li>
+    <li><a href="../compare-browser-authenticators/" data-keep-utm>Browser 2FA extensions compared</a>: facts side by side with other browser extensions.</li>
+  </ul>
+
+  <aside class="review-ask" aria-label="Rate Popout Authenticator" hidden>
+    <p><strong>Rate Popout Authenticator.</strong> A short review in your browser's store helps other people find it.</p>
+    <div class="stores reviews" data-campaign="pa-review-guide"></div>
+  </aside>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <ul>
+      <li><a href="https://github.com/elitekid/popout-authenticator">GitHub</a></li>
+      <li><a href="https://github.com/elitekid/popout-authenticator/blob/main/PRIVACY.md">Privacy</a></li>
+      <li><a href="https://github.com/elitekid/popout-authenticator/issues">Issues</a></li>
+      <li>MIT License</li>
+    </ul>
+  </div>
+</footer>
+</body>
+</html>
