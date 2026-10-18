@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
 import type { Account } from '../../../core/types';
 import { LockedError } from '../../../store/errors';
-import { TRASH_DAYS, emptyTrash, listTrash, restoreFromTrash } from '../../../store/trash';
+import { RestoreDuplicateError, TRASH_DAYS, emptyTrash, listTrash, restoreFromTrash } from '../../../store/trash';
 import { onVaultChanged } from '../../../store/vault';
 import { UnlockForm } from '../../shared/UnlockForm';
 import { useT } from '../../shared/use-t';
@@ -17,7 +17,7 @@ export function TrashSection() {
   const t = useT();
   const [list, setList] = useState<Account[] | null>(null);
   const [locked, setLocked] = useState(false);
-  const [failed, setFailed] = useState<'load' | 'action' | null>(null);
+  const [failed, setFailed] = useState<'load' | 'action' | 'duplicate' | null>(null);
   // 확인 중인 것: 줄 id, 'all', 없으면 null
   const [confirm, setConfirm] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -63,7 +63,7 @@ export function TrashSection() {
       await load();
     } catch (error) {
       if (error instanceof LockedError) setLocked(true);
-      else setFailed('action');
+      else setFailed(error instanceof RestoreDuplicateError ? 'duplicate' : 'action');
     } finally {
       setBusy(false);
     }
@@ -77,7 +77,7 @@ export function TrashSection() {
       {locked && <UnlockForm onUnlocked={() => void load()} />}
       {failed && (
         <p class="error" role="alert">
-          {t(failed === 'load' ? 'common.loadError' : 'common.actionError')}
+          {t(failed === 'load' ? 'common.loadError' : failed === 'duplicate' ? 'accounts.error.duplicate' : 'common.actionError')}
         </p>
       )}
       {!locked && list && list.length === 0 && (

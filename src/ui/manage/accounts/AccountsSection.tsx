@@ -7,6 +7,9 @@ import { knownSiteHosts } from '../../../core/known-sites';
 import type { Account, Algorithm } from '../../../core/types';
 import { LockedError } from '../../../store/errors';
 import {
+  addPendingFieldButton,
+  applyAccountEditPatch,
+  clearPendingFieldButton,
   fieldPatterns,
   readFieldButtons,
   readAutoFieldButtons,
@@ -14,6 +17,7 @@ import {
   removeFieldButton,
   setFieldButton,
   syncFieldScripts,
+  type AccountEditPatch,
 } from '../../../store/field-buttons';
 import { moveToTrash } from '../../../store/trash';
 import { loadAccounts, onVaultChanged, updateAccounts } from '../../../store/vault';
@@ -185,6 +189,10 @@ type Errors = Partial<Record<'group' | 'digits' | 'period' | 'counter' | 'secret
 function AccountEditor({ t, account, all, hideBack, onHistory, onLocked, onDone, onSaved }: EditorProps) {
   const { toolbarPopup, navigate } = useScreenContext();
   const fixed = account.type === 'steam' || account.type === 'battle';
+  // 편집 시작 때의 계정. 다른 곳에서 바뀐 값을 초안과 비교해 되돌리지 않도록 이것을 기준으로 삼는다.
+  const baseRef = useRef(account);
+  if (baseRef.current.id !== account.id) baseRef.current = account;
+  const base = baseRef.current;
   const [issuer, setIssuer] = useState(account.issuer);
   const [label, setLabel] = useState(account.label);
   const [group, setGroup] = useState(account.group ?? '');
@@ -256,11 +264,11 @@ function AccountEditor({ t, account, all, hideBack, onHistory, onLocked, onDone,
     return () => { alive = false; chrome.storage.onChanged.removeListener(onStorage); };
   }, []);
 
-  const hasDraft = issuer !== account.issuer || label !== account.label || group !== (account.group ?? '')
-    || note !== account.note || hosts !== account.matchHosts.join('\n') || pinned !== account.pinned
-    || (!fixed && (algorithm !== account.algorithm || digits !== String(account.digits)
-      || (account.type === 'totp' && period !== String(account.period))))
-    || (account.type === 'hotp' && counter !== String(account.counter ?? 0))
+  const hasDraft = issuer !== base.issuer || label !== base.label || group !== (base.group ?? '')
+    || note !== base.note || hosts !== base.matchHosts.join('\n') || pinned !== base.pinned
+    || (!fixed && (algorithm !== base.algorithm || digits !== String(base.digits)
+      || (account.type === 'totp' && period !== String(base.period))))
+    || (account.type === 'hotp' && counter !== String(base.counter ?? 0))
     || newSecret !== '' || fieldPending;
 
   // 사이트 주소와 같은 편집 초안이다. 실제 권한 요청·등록은 저장 단추에서 함께 확정한다.
@@ -342,6 +350,22 @@ function AccountEditor({ t, account, all, hideBack, onHistory, onLocked, onDone,
     setErrors(next);
     if (Object.keys(next).length > 0) return;
 
+    // 다른 창의 변경(카운터·고정 등)을 덮지 않게 이 화면에서 바꾼 칸만(편집 시작 때의 계정과 비교) 최신 계정에 적용한다.
+    const patch: AccountEditPatch = {};
+    if (issuer.trim() !== base.issuer) patch.issuer = issuer.trim();
+    if (label.trim() !== base.label) patch.label = label.trim();
+    if (note !== base.note) patch.note = note;
+    const nextHosts = parseHosts(hosts);
+    if (nextHosts.join('\n') !== base.matchHosts.join('\n')) patch.matchHosts = nextHosts;
+    if (pinned !== base.pinned) patch.pinned = pinned;
+    if (groupText !== (base.group ?? '')) patch.group = groupText !== '' ? groupText : null;
+    if (!fixed) {
+      if (algorithm !== base.algorithm) patch.algorithm = algorithm;
+      if (Number(digits) !== base.digits) patch.digits = Number(digits);
+      if (account.type === 'totp' && Number(period) !== base.period) patch.period = Number(period);
+    }
+    if (account.type === 'hotp' && Number(counter) !== (base.counter ?? 0)) patch.counter = Number(counter);
+
     // 단추를 켠 채 사이트 주소가 바뀌었으면 새 주소의 권한을 먼저 요청한다(아직 await 전이라 사용자 동작이 살아 있다).
     // 거절되거나 실패하면 화면의 주소와 허용 범위가 어긋나지 않게 항목을 지우고 스위치를 끈다.
     // 쓸 수 있는 호스트가 하나도 없어도 항목을 지운다.
@@ -349,8 +373,15 @@ function AccountEditor({ t, account, all, hideBack, onHistory, onLocked, onDone,
     const fieldClear = !fieldOn ? fieldHosts.length > 0 : fieldNext.hosts.length === 0;
     // 툴바 팝업에서도 저장을 누른 이 문서가 직접 요청한다.
     // 별도 편집 창으로 넘기면 저장·허용을 다시 눌러야 하고, 다른 모니터에 뜰 수 있다.
+    // 툴바 팝업은 권한 창이 뜨면 닫혀 아래 단계가 실행되지 않으므로, 요청 직전에 대기 항목을 적어
+    // 서비스 워커가 허용 뒤 단추 설정을 마치게 한다. 이 문서가 살아 있으면 직접 처리하고 지운다.
+    // 대기 항목에는 계정 수정(비밀키 제외)도 담아, 팝업이 닫혀도 워커가 계정을 저장한 뒤 단추를 켠다.
+    // 비밀키를 바꾸는 저장은 대기 항목에 비밀키를 둘 수 없으므로, 툴바 팝업에서는 계정만 저장하고 단추는 끈 채 둔다.
+    const deferField = secret !== undefined && toolbarPopup;
     let fieldRequest: Promise<boolean | 'error'> | null = null;
-    if (fieldOn && fieldNext.hosts.length > 0 && fieldNext.hosts.join('\n') !== fieldHosts.join('\n')) {
+    if (!deferField && fieldOn && fieldNext.hosts.length > 0 && fieldNext.hosts.join('\n') !== fieldHosts.join('\n')) {
+      void addPendingFieldButton(account.id, fieldNext.hosts, fieldNext.patterns, Date.now(), patch)
+        .catch((error: unknown) => console.warn('field pending', error));
       try {
         fieldRequest = chrome.permissions.request({ origins: fieldNext.patterns }).catch((error: unknown) => {
           console.warn('field permission request', error);
@@ -375,14 +406,21 @@ function AccountEditor({ t, account, all, hideBack, onHistory, onLocked, onDone,
           await clearField();
           return undefined;
         }
+        if (deferField && fieldOn && fieldNext.hosts.join('\n') !== fieldHosts.join('\n')) {
+          await clearField();
+          setFieldMsg('accounts.fieldButton.denied');
+          return 'denied';
+        }
         if (!fieldRequest) return undefined;
         const permission = await fieldRequest;
         if (permission !== true) {
+          await clearPendingFieldButton(account.id).catch(() => undefined);
           await clearField();
           setFieldMsg(permission === 'error' ? 'accounts.fieldButton.requestError' : 'accounts.fieldButton.denied');
           return 'denied';
         }
         await setFieldButton(account.id, fieldNext.hosts);
+        await clearPendingFieldButton(account.id).catch(() => undefined);
         await syncFieldScripts();
         await releaseUnusedOrigins();
         setFieldHosts(fieldNext.hosts);
@@ -391,6 +429,7 @@ function AccountEditor({ t, account, all, hideBack, onHistory, onLocked, onDone,
         if (accountSaved) onSaved();
         if (fieldRequest) {
           await fieldRequest;
+          await clearPendingFieldButton(account.id).catch(() => undefined);
           await releaseUnusedOrigins().catch(() => undefined);
         }
         throw error;
@@ -398,22 +437,7 @@ function AccountEditor({ t, account, all, hideBack, onHistory, onLocked, onDone,
       return undefined;
     };
 
-    // 다른 창의 변경(카운터·고정 등)을 덮지 않게 이 화면에서 바꾼 칸만 최신 계정에 적용한다.
-    const patch: Partial<Account> = {};
-    if (issuer.trim() !== account.issuer) patch.issuer = issuer.trim();
-    if (label.trim() !== account.label) patch.label = label.trim();
-    if (note !== account.note) patch.note = note;
-    const nextHosts = parseHosts(hosts);
-    if (nextHosts.join('\n') !== account.matchHosts.join('\n')) patch.matchHosts = nextHosts;
-    if (pinned !== account.pinned) patch.pinned = pinned;
-    const groupChanged = groupText !== (account.group ?? '');
-    if (!fixed) {
-      if (algorithm !== account.algorithm) patch.algorithm = algorithm;
-      if (Number(digits) !== account.digits) patch.digits = Number(digits);
-      if (account.type === 'totp' && Number(period) !== account.period) patch.period = Number(period);
-    }
-    if (account.type === 'hotp' && Number(counter) !== (account.counter ?? 0)) patch.counter = Number(counter);
-    if (!groupChanged && Object.keys(patch).length === 0 && !secret) {
+    if (Object.keys(patch).length === 0 && !secret) {
       void run(applyField);
       return;
     }
@@ -425,7 +449,7 @@ function AccountEditor({ t, account, all, hideBack, onHistory, onLocked, onDone,
           const latest = list.find((a) => a.id === account.id);
           if (secret && latest) {
             // 다른 창에서 이미 키를 고쳤으면 다시 바꾸지 않는다. 겹침은 최신 목록으로 본다.
-            if (!sameBytes(latest.secret, account.secret)) throw new SecretConflict('accounts.error.changed');
+            if (!sameBytes(latest.secret, base.secret)) throw new SecretConflict('accounts.error.changed');
             const key = duplicateKey({ type: latest.type, secret });
             if (list.some((a) => a.id !== account.id && a.deletedAt === undefined && duplicateKey(a) === key)) {
               throw new SecretConflict('accounts.error.duplicate');
@@ -433,17 +457,19 @@ function AccountEditor({ t, account, all, hideBack, onHistory, onLocked, onDone,
           }
           return list.map((a) => {
             if (a.id !== account.id) return a;
-            const base: Account = { ...a, ...patch, ...(secret ? { secret } : {}), updatedAt: now };
-            if (!groupChanged) return base;
-            const { group: _group, ...rest } = base;
-            return groupText !== '' ? { ...rest, group: groupText } : rest;
+            const edited = applyAccountEditPatch(a, patch, now);
+            return secret ? { ...edited, secret, updatedAt: now } : edited;
           });
         });
+        // 저장한 수정을 비교 기준에 반영해, 편집 화면이 남아도 같은 수정을 다시 보내지 않는다.
+        const edited = applyAccountEditPatch(base, patch, now);
+        baseRef.current = secret ? { ...edited, secret } : edited;
         accountSaved = true;
       } catch (error) {
         // 저장이 실패했으면 이번에 새로 받은 권한을 반납한다.
         if (fieldRequest) {
           await fieldRequest;
+          await clearPendingFieldButton(account.id).catch(() => undefined);
           await releaseUnusedOrigins().catch(() => undefined);
         }
         throw error;

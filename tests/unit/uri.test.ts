@@ -111,6 +111,20 @@ describe('buildOtpauth', () => {
     expect(parseOtpauth(uri)).toEqual(src);
   });
 
+  it('round-trips colons in issuer and account name', () => {
+    const src = draft({ issuer: 'Corp: Prod', label: 'a:b@example.com' });
+    expect(buildOtpauth(src)).toContain('Corp%3A%20Prod:a%3Ab%40example.com');
+    expect(parseOtpauth(buildOtpauth(src)!)).toEqual(src);
+  });
+
+  it('strips an encoded issuer prefix from other apps', () => {
+    for (const query of ['&issuer=Example', '']) {
+      const d = parseOtpauth(`otpauth://totp/Example%3Aalice?secret=${FAKE}${query}`);
+      expect(d.issuer).toBe('Example');
+      expect(d.label).toBe('alice');
+    }
+  });
+
   it('round-trips hotp with counter 7', () => {
     const src = draft({ type: 'hotp', counter: 7 });
     const back = parseOtpauth(buildOtpauth(src)!);

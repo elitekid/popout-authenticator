@@ -1,4 +1,5 @@
 // 휴지통: deletedAt 이 있는 계정. 30일이 지나면 실제로 지운다.
+import { duplicateKey } from '../core/account';
 import { decryptVault, encryptVault } from '../core/crypto/vault';
 import type { Account } from '../core/types';
 import { NoVaultError } from './errors';
@@ -15,15 +16,29 @@ export async function moveToTrash(ids: string[], now: number = Date.now()): Prom
   );
 }
 
+// 같은 종류·비밀키의 활성 계정이 이미 있어 되살릴 수 없을 때.
+export class RestoreDuplicateError extends Error {
+  constructor() {
+    super('duplicate account');
+    this.name = 'RestoreDuplicateError';
+  }
+}
+
 export async function restoreFromTrash(ids: string[], now: number = Date.now()): Promise<Account[]> {
   const set = new Set(ids);
-  return updateAccounts((accounts) =>
-    accounts.map((a) => {
+  return updateAccounts((accounts) => {
+    // 쓰기 잠금 안에서 확인한다. 충돌이 있으면 아무것도 저장하지 않고 던진다.
+    const seen = new Set<string>();
+    for (const a of accounts) if (a.deletedAt === undefined) seen.add(duplicateKey(a));
+    return accounts.map((a) => {
       if (!set.has(a.id) || a.deletedAt === undefined) return a;
+      const key = duplicateKey(a);
+      if (seen.has(key)) throw new RestoreDuplicateError();
+      seen.add(key);
       const { deletedAt: _deletedAt, ...rest } = a;
       return { ...rest, updatedAt: now };
-    }),
-  );
+    });
+  });
 }
 
 export async function emptyTrash(ids?: string[]): Promise<Account[]> {

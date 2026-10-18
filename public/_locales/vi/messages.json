@@ -1,6 +1,7 @@
 {
   "appName": { "message": "Popout Authenticator" },
-  "appDesc": { "message": "Ứng dụng xác thực 2FA miễn phí cho trình duyệt của bạn. Tạo mã dùng một lần, mở trong cửa sổ bật lên hoặc cửa sổ riêng." },
+  "appShortName": { "message": "Popout Authenticator" },
+  "appDesc": { "message": "Ứng dụng xác thực 2FA cho trình duyệt của bạn. Tạo mã dùng một lần, mở trong cửa sổ bật lên hoặc cửa sổ riêng." },
   "cmdExecuteAction": { "message": "Mở cửa sổ bật lên" },
   "cmdQuickFill": { "message": "Điền mã 2FA vào trang này" },
   "cmdScanQr": { "message": "Quét mã QR trên màn hình" },

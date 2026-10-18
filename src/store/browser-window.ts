@@ -8,8 +8,11 @@ function isNormal(win: chrome.windows.Window | undefined): win is chrome.windows
   return win?.type === 'normal' && win.id !== undefined;
 }
 
+// Safari와 Firefox는 windowTypes를 무시하거나 거절해 별도 창이 돌아올 수 있다.
+const needsFallback = BROWSER_TARGET === 'safari' || BROWSER_TARGET === 'firefox';
+
 async function findNormalWindow(): Promise<chrome.windows.Window | undefined> {
-  if (BROWSER_TARGET !== 'safari') {
+  if (!needsFallback) {
     const win = await chrome.windows.getLastFocused({ windowTypes: ['normal'] }).catch(() => undefined);
     return isNormal(win) ? win : undefined;
   }
@@ -38,7 +41,7 @@ export async function lastNormalWindow(): Promise<chrome.windows.Window | undefi
 
 // 백그라운드에서 한 번만 등록한다. URL이나 탭은 저장하지 않고 사용할 때 다시 읽는다.
 export function registerNormalWindowTracking(): void {
-  if (BROWSER_TARGET !== 'safari' || registered) return;
+  if (!needsFallback || registered) return;
   registered = true;
   const enqueue = (work: () => Promise<void>) => {
     pending = pending.then(work).catch(() => undefined);

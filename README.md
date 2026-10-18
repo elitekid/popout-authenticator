@@ -1,6 +1,6 @@
 # Popout Authenticator
 
-An open-source 2FA / OTP authenticator browser extension. Codes live in an encrypted vault on your device and open in the toolbar popup, a separate window, or the side panel. No account, no server, no analytics, no account limits.
+An open-source 2FA / OTP authenticator browser extension. Accounts live in an AES-256-GCM vault on your device, protected by an optional password lock, and open in the toolbar popup, a separate window, or the side panel. No account, no server, no analytics, no account limits.
 
 Website: [elitekid.github.io/popout-authenticator](https://elitekid.github.io/popout-authenticator/?utm_source=github&utm_medium=readme&utm_campaign=pa-readme)
 
@@ -10,11 +10,13 @@ Website: [elitekid.github.io/popout-authenticator](https://elitekid.github.io/po
 | --- | --- |
 | Chrome | [Chrome Web Store](https://chromewebstore.google.com/detail/nakgmloofpboegibcjhainbpjjokmbgj?utm_source=github&utm_medium=readme&utm_campaign=pa-readme) |
 | Edge | [Microsoft Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/edipphpgdmfabonchodjfnejlbjoknhh?utm_source=github&utm_medium=readme&utm_campaign=pa-readme) |
-| Firefox | Firefox Add-ons (in review) |
-| Whale | Naver Whale Store (in review) |
+| Firefox | [Firefox Add-ons](https://addons.mozilla.org/firefox/addon/popout-authenticator/?utm_source=github&utm_medium=readme&utm_campaign=pa-readme) |
+| Whale | [Naver Whale Store](https://store.whale.naver.com/detail/bcfobdldplagmohdgaiocjddlokiolgc) |
 | Safari (macOS) | Mac App Store (in review) |
 
 Moving from another authenticator: [from the Authenticator extension](https://elitekid.github.io/popout-authenticator/guides/from-authenticator-extension/?utm_source=github&utm_medium=readme&utm_campaign=pa-readme) · [from Authy and other apps](https://elitekid.github.io/popout-authenticator/guides/from-authy-and-other-apps/?utm_source=github&utm_medium=readme&utm_campaign=pa-readme)
+
+Ratings and reviews in your browser's store help other people find the extension.
 
 Privacy policy: [PRIVACY.md](PRIVACY.md) · Changes: [CHANGELOG.md](CHANGELOG.md)
 
@@ -39,7 +41,7 @@ These are build targets, not claims that every operating system or hardware auth
 
 | Permission | Why it is needed |
 | --- | --- |
-| `storage` | Keeps the encrypted vault and settings on the device; `storage.sync` for encrypted browser sync, which runs only after a password lock is set and can be turned off; managed policies for organizations. |
+| `storage` | Keeps the encrypted vault and settings on the device; `storage.sync` for browser sync, which runs only after a password lock is set (accounts are then encrypted) unless you choose "Allow syncing without a lock", and can be turned off; managed policies for organizations. |
 | `unlimitedStorage` | Keeps recovery snapshots of earlier vault versions without hitting the default storage quota. |
 | `activeTab` | Fills a code into the current tab and captures it for QR scanning, only after the user clicks, right-clicks, or presses a shortcut. |
 | `scripting` | Inserts the code into the page's code field, and shows field buttons on sites the user allowed. |

@@ -1,11 +1,28 @@
 // '칸 옆 넣기 단추'의 서비스 워커 쪽: 단추를 누르면 기존 넣기 경로로 코드를 넣는다.
 import { hostOf, matchesSite } from '../core/suggest';
-import { fieldPatterns, pruneRevokedHosts, readAutoFieldButtons, readFieldButtons, refreshAutoFieldAccounts, syncFieldScripts } from '../store/field-buttons';
+import { applyAccountEditPatch, applyPendingFieldButtons, fieldPatterns, pruneRevokedHosts, readAutoFieldButtons, readFieldButtons, refreshAutoFieldAccounts, syncFieldScripts, type AccountEditPatch } from '../store/field-buttons';
 import { LockedError, NoVaultError } from '../store/errors';
-import { loadAccounts } from '../store/vault';
+import { loadAccounts, updateAccounts } from '../store/vault';
 import { runFill } from './fill';
 
 const LOOPBACK = new Set(['localhost', '127.0.0.1']);
+
+// 팝업이 닫혀 저장하지 못한 계정 수정을 일반 금고 쓰기 경로로 마친다. 계정이 없으면 false.
+// 잠겨 있으면 LockedError 가 그대로 올라가 항목이 남는다.
+async function applyAccountPatch(accountId: string, patch: AccountEditPatch): Promise<boolean> {
+  let found = false;
+  const now = Date.now();
+  await updateAccounts((list) => list.map((a) => {
+    if (a.id !== accountId || a.deletedAt !== undefined) return a;
+    found = true;
+    return applyAccountEditPatch(a, patch, now);
+  }));
+  return found;
+}
+
+function applyPending(): void {
+  void applyPendingFieldButtons(Date.now(), applyAccountPatch).catch((error) => console.warn('field-buttons pending', error));
+}
 
 function allowedUrl(url: string): string | undefined {
   let parsed: URL;
@@ -138,6 +155,8 @@ export function register(): void {
   });
 
   chrome.permissions.onAdded.addListener(() => {
+    // 팝업이 권한 창에 닫혔어도 대기 중이던 단추 설정을 마친다.
+    applyPending();
     void syncFieldScripts();
     queueAutoRefresh();
   });
@@ -154,4 +173,6 @@ export function register(): void {
   });
 
   queueAutoRefresh();
+  // 허용 이벤트를 놓친 경우(서비스 워커가 내려가 있던 사이)도 시작 때 한 번 처리한다.
+  applyPending();
 }

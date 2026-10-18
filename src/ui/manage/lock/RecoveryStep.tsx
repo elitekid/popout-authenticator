@@ -1,4 +1,6 @@
 import { useState } from 'preact/hooks';
+import { loadSettings } from '../../../store/settings';
+import { useScreenContext } from '../../shared/screen-context';
 import type { useT } from '../../shared/use-t';
 import { downloadText, today } from '../backup/download';
 
@@ -22,11 +24,18 @@ export function RecoveryStep({ t, code, onDone, savedConfirmation = false }: {
   const [error, setError] = useState<'mismatch' | 'failed' | null>(null);
   const [busy, setBusy] = useState(false);
   const [copied, setCopied] = useState(false);
+  const { toolbarPopup } = useScreenContext();
 
   const copy = () => {
     void navigator.clipboard
       .writeText(code)
-      .then(() => setCopied(true))
+      .then(async () => {
+        setCopied(true);
+        // 팝업의 OTP 복사와 같이, 설정이 켜져 있으면 일정 시간 뒤 클립보드를 비운다.
+        if ((await loadSettings().catch(() => null))?.clipboardClearAfterCopy) {
+          await chrome.runtime.sendMessage({ type: 'clipboard-copied', code }).catch(() => undefined);
+        }
+      })
       .catch(() => setCopied(false));
   };
 
@@ -61,9 +70,12 @@ export function RecoveryStep({ t, code, onDone, savedConfirmation = false }: {
         <button type="button" data-role="recovery-copy" onClick={copy}>
           {t(copied ? 'lock.recovery.copied' : 'lock.recovery.copy')}
         </button>
-        <button type="button" data-role="recovery-save" onClick={save}>
-          {t('lock.recovery.save')}
-        </button>
+        {/* 툴바 팝업은 저장 창이 뜨면 닫혀 새 코드를 잃을 수 있어, 화면의 코드를 복사해 두게 한다. */}
+        {!toolbarPopup && (
+          <button type="button" data-role="recovery-save" onClick={save}>
+            {t('lock.recovery.save')}
+          </button>
+        )}
       </div>
       {savedConfirmation ? (
         <label class="check">

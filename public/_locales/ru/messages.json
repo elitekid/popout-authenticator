@@ -1,6 +1,7 @@
 {
-  "appName": { "message": "Popout Authenticator" },
-  "appDesc": { "message": "Бесплатный 2FA-аутентификатор для вашего браузера. Создаёт одноразовые коды, открывается во всплывающем или отдельном окне." },
+  "appName": { "message": "Popout Authenticator — аутентификатор 2FA" },
+  "appShortName": { "message": "Popout Authenticator" },
+  "appDesc": { "message": "2FA-аутентификатор с открытым кодом. Одноразовые коды во всплывающем или отдельном окне и боковой панели, блокировка паролем." },
   "cmdExecuteAction": { "message": "Открыть всплывающее окно" },
   "cmdQuickFill": { "message": "Ввести 2FA-код на этой странице" },
   "cmdScanQr": { "message": "Сканировать QR-код на экране" },

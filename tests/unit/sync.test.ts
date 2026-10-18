@@ -10,8 +10,11 @@ import { enableLock, lockNow } from '../../src/store/lock';
 import { getSessionKey, setSessionKey } from '../../src/store/session';
 import { saveSettings } from '../../src/store/settings';
 import { _resetSnapshotsForTest } from '../../src/store/snapshots';
-import { clearSyncArea, joinSync, mergeAccounts, syncNow, syncRecoverySources } from '../../src/store/sync';
-import { mergeTombstones } from '../../src/store/tombstones';
+import { restoreSnapshot } from '../../src/store/recover';
+import { loadSettings } from '../../src/store/settings';
+import { listSnapshots } from '../../src/store/snapshots';
+import { clearSyncArea, deleteSyncData, joinSync, mergeAccounts, syncNow, syncRecoverySources } from '../../src/store/sync';
+import { mergeTombstones, readTombstones } from '../../src/store/tombstones';
 import { emptyTrash, moveToTrash } from '../../src/store/trash';
 import { addDrafts, createVault, loadAccounts, readVaultFile, replaceVaultFile, updateAccounts } from '../../src/store/vault';
 import { createChromeMock } from './chrome-mock';
@@ -329,6 +332,125 @@ describe('mergeAccounts', () => {
     const live = { ...account(1), id: 'a1' };
     const trashed = { ...account(1), id: 'a2', deletedAt: T0 + 1, updatedAt: T0 + 1 };
     expect(mergeAccounts([live], [trashed], {})).toHaveLength(2);
+  });
+});
+
+describe('hotp counter merge', () => {
+  it('never rolls the counter back, whichever side wins the other fields', () => {
+    const base = { ...account(1), type: 'hotp' as const, counter: 10 };
+    const renamedLocal = { ...base, label: 'renamed', updatedAt: base.updatedAt + 5 };
+    const aheadRemote = { ...base, counter: 15 };
+    const merged = mergeAccounts([renamedLocal], [aheadRemote], {})[0];
+    expect(merged.label).toBe('renamed');
+    expect(merged.counter).toBe(15);
+    const renamedRemote = { ...base, label: 'remote', counter: 10, updatedAt: base.updatedAt + 5 };
+    const aheadLocal = { ...base, counter: 15 };
+    const other = mergeAccounts([aheadLocal], [renamedRemote], {})[0];
+    expect(other.label).toBe('remote');
+    expect(other.counter).toBe(15);
+  });
+
+  it('keeps the larger counter on both devices after a sync', async () => {
+    const acct = { ...account(1), type: 'hotp' as const, counter: 15 };
+    await on(b, async () => {
+      await createVault([]);
+      await saveSettings({ syncPlaintextAllowed: true });
+      await updateAccounts(() => [acct]);
+    });
+    await pushFrom(b);
+    await on(a, async () => {
+      await createVault([]);
+      await saveSettings({ syncPlaintextAllowed: true });
+      await updateAccounts(() => [{ ...acct, counter: 10, label: 'renamed', updatedAt: T0 + 1000 }]);
+      expect(await syncNow(T0 + 4 * MIN)).toBe('ok');
+      const got = (await loadAccounts())[0];
+      expect([got.label, got.counter]).toEqual(['renamed', 15]);
+    });
+    await on(b, async () => {
+      expect(await syncNow(T0 + 5 * MIN)).toBe('ok');
+      const got = (await loadAccounts())[0];
+      expect([got.label, got.counter]).toEqual(['renamed', 15]);
+    });
+  });
+});
+
+describe('chunk generations', () => {
+  it('holds when a chunk from an older generation is mixed with a newer meta', async () => {
+    await plainDevice(a, Array.from({ length: 60 }, (_, i) => draft(i)));
+    await pushFrom(a);
+    const oldChunk0 = (await a.storage.sync.get('pa_acc_0')).pa_acc_0;
+    await on(a, () => clearSyncArea());
+    await plainDevice(b, [draft(200), draft(201)]);
+    await pushFrom(b, T0 + 10 * MIN);
+    expect((await a.storage.sync.get('pa_meta')).pa_meta).toMatchObject({ chunks: 1 });
+    await a.storage.sync.set({ pa_acc_0: oldChunk0 });
+    const before = await a.storage.sync.get(null);
+    await on(b, async () => {
+      const spy = vi.spyOn(b.storage.sync, 'set');
+      expect(await syncNow(T0 + 20 * MIN)).toBe('held');
+      expect(spy).not.toHaveBeenCalled();
+      expect(await loadAccounts()).toHaveLength(2);
+    });
+    expect(await a.storage.sync.get(null)).toEqual(before);
+  });
+
+  it('reads the legacy format (no generation) and switches on the next upload', async () => {
+    await plainDevice(a, [draft(1), draft(2)]);
+    await pushFrom(a);
+    const area = await a.storage.sync.get(null);
+    delete (area.pa_meta as { gen?: string }).gen;
+    for (const [, list] of chunksOf(area)) for (const r of list as { g?: string }[]) delete r.g;
+    await a.storage.sync.set(area);
+    await plainDevice(b, [draft(3)]);
+    await on(b, async () => {
+      expect(await syncNow(T0 + 4 * MIN)).toBe('ok');
+      expect(await loadAccounts()).toHaveLength(3);
+    });
+    const next = await a.storage.sync.get(null);
+    const gen = (next.pa_meta as { gen?: string }).gen;
+    expect(typeof gen).toBe('string');
+    const records = chunksOf(next).flatMap(([, list]) => list as { g?: string }[]);
+    expect(records).toHaveLength(3);
+    for (const r of records) expect(r.g).toBe(gen);
+  });
+});
+
+describe('deleting sync data', () => {
+  it('turns sync off for this device so nothing is re-uploaded', async () => {
+    await plainDevice(a, [draft(1), draft(2)]);
+    await pushFrom(a);
+    await on(a, async () => {
+      await deleteSyncData();
+      expect((await loadSettings()).syncEnabled).toBe(false);
+      expect(await a.storage.sync.get(null)).toEqual({});
+      expect(await syncNow(T0 + 10 * MIN)).toBe('off');
+      expect(await syncNow(T0 + 20 * MIN)).toBe('off');
+      expect(await loadAccounts()).toHaveLength(2);
+    });
+    expect(await a.storage.sync.get(null)).toEqual({});
+  });
+});
+
+describe('snapshot restore', () => {
+  it('records tombstones for accounts removed by replace so sync does not bring them back', async () => {
+    await plainDevice(a, [draft(1)]);
+    await on(a, async () => {
+      await addDrafts([draft(2)], undefined, T0);
+    });
+    await pushFrom(a);
+    await on(a, async () => {
+      const snap = (await listSnapshots()).find((s) => s.count === 1);
+      if (!snap) throw new Error('missing snapshot');
+      const removed = (await loadAccounts()).find((x) => x.label === 'user2@example.com');
+      if (!removed) throw new Error('missing account');
+      await restoreSnapshot(snap.id, 'replace');
+      expect(await loadAccounts()).toHaveLength(1);
+      expect((await readTombstones())[removed.id]).toBeGreaterThan(0);
+      expect(await syncNow(T0 + 6 * MIN)).toBe('ok');
+      const list = await loadAccounts();
+      expect(list).toHaveLength(1);
+      expect(list.some((x) => x.id === removed.id)).toBe(false);
+    });
   });
 });
 

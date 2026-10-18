@@ -1,6 +1,7 @@
 {
-  "appName": { "message": "Popout Authenticator" },
-  "appDesc": { "message": "Kostenloser 2FA-Authenticator für Ihren Browser. Erzeugt Einmalcodes und öffnet sich als Popup oder eigenes Fenster." },
+  "appName": { "message": "Popout Authenticator — 2FA- & OTP-Codes" },
+  "appShortName": { "message": "Popout Authenticator" },
+  "appDesc": { "message": "Open-Source-2FA-Authenticator. Einmalcodes in Popup, Fenster oder Seitenleiste, mit Passwortsperre und Backup-Import." },
   "cmdExecuteAction": { "message": "Popup öffnen" },
   "cmdQuickFill": { "message": "2FA-Code auf dieser Seite einfügen" },
   "cmdScanQr": { "message": "QR-Code auf dem Bildschirm scannen" },

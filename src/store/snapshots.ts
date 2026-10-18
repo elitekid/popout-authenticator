@@ -142,9 +142,53 @@ export async function getSnapshot(id: number): Promise<VaultFile | null> {
   return record ? record.file : null;
 }
 
+// 금고 파일(암호문)은 읽지 않고 id·takenAt 만 최신순으로 모은다.
+async function allKeys(): Promise<SnapshotCursor[]> {
+  const db = await openDb();
+  return new Promise((resolve, reject) => {
+    const keys: SnapshotCursor[] = [];
+    const request = db.transaction(STORE, 'readonly').objectStore(STORE).index('takenAt')
+      .openKeyCursor(null, 'prev');
+    request.onerror = () => reject(request.error ?? new Error('snapshot keys failed'));
+    request.onsuccess = () => {
+      const cursor = request.result;
+      if (!cursor) return resolve(keys.sort((a, b) => b.takenAt - a.takenAt || b.id - a.id));
+      keys.push({ id: cursor.primaryKey as number, takenAt: cursor.key as number });
+      cursor.continue();
+    };
+  });
+}
+
+// 평문 키(none)를 품은 스냅샷을 rewrite 로 다시 쓴다. null 이거나 던지면 그 스냅샷은 지운다.
+// id·takenAt 은 그대로 둔다.
+export async function rewriteNoneSnapshots(
+  rewrite: (file: VaultFile) => Promise<VaultFile | null>,
+): Promise<void> {
+  const db = await openDb();
+  for (const { id } of await allKeys()) {
+    const record = (await done(db.transaction(STORE, 'readonly').objectStore(STORE).get(id))) as
+      | SnapshotRecord
+      | undefined;
+    if (!record) continue;
+    const wrapped = Array.isArray(record.file.wrappedKeys) ? record.file.wrappedKeys : [];
+    if (record.lock !== 'none' && !wrapped.some((k) => k.kind === 'none')) continue;
+    let file: VaultFile | null = null;
+    try {
+      file = await rewrite(record.file);
+    } catch {
+      file = null;
+    }
+    const tx = db.transaction(STORE, 'readwrite');
+    const store = tx.objectStore(STORE);
+    if (file) store.put({ ...record, count: file.count, lock: file.lock, file });
+    else store.delete(id);
+    await txDone(tx);
+  }
+}
+
 // 최신 30개 + 최근 30일 안의 UTC 날짜별 가장 최근 1개를 남긴다.
 export async function pruneSnapshots(now: number = Date.now()): Promise<number> {
-  const records = await allRecords(); // 최신순
+  const records = await allKeys(); // 최신순
   const keep = new Set<number>();
   records.slice(0, KEEP_LATEST).forEach((r) => keep.add(r.id));
   const cutoff = now - KEEP_DAYS * DAY_MS;

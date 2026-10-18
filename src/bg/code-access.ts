@@ -12,7 +12,7 @@ import type { FillRequest } from './fill';
 const KEY = 'codeAccessRequests';
 const TTL = 120_000;
 type Action = CodeAction | 'fill';
-type FillTarget = FillRequest & { documentId: string; documentUrl: string; topUrl: string };
+type FillTarget = FillRequest & { documentId: string; documentUrl: string; topUrl: string; pinId?: string };
 type Pending = {
   action: Action;
   accountId?: string;
@@ -82,7 +82,9 @@ export async function pinFill(req: FillRequest): Promise<FillTarget> {
   const target: chrome.scripting.InjectionTarget = req.documentId
     ? { tabId: req.tabId, documentIds: [req.documentId] }
     : req.frameId !== undefined ? { tabId: req.tabId, frameIds: [req.frameId] } : { tabId: req.tabId, allFrames: true };
-  const results = await chrome.scripting.executeScript({ target, func: () => {
+  // 요청마다 id 를 붙여 고정한 칸을 기억한다. 대기 중 다른 넣기가 고정해도 서로 덮지 않는다.
+  const pinId = crypto.randomUUID();
+  const results = await chrome.scripting.executeScript({ target, args: [pinId], func: (pinId: string) => {
     let holder: Element | null = document.activeElement;
     while (holder?.shadowRoot?.activeElement) holder = holder.shadowRoot.activeElement;
     let inputActive = holder instanceof HTMLInputElement || holder instanceof HTMLTextAreaElement;
@@ -98,6 +100,13 @@ export async function pinFill(req: FillRequest): Promise<FillTarget> {
         frame = frame.parent;
       }
     } catch { inputActive = false; }
+    // 대기 뒤 넣기가 그 사이 옮겨 간 포커스를 따라가지 않게, 지금 입력칸을 이 문서(격리 세계)에 기억해 둔다.
+    const editable = holder instanceof HTMLElement && holder.isContentEditable;
+    const pins = ((globalThis as { __popoutPinnedFields?: Map<string, WeakRef<Element> | null> })
+      .__popoutPinnedFields ??= new Map());
+    pins.set(pinId, holder && (inputActive || editable) ? new WeakRef(holder) : null);
+    // 쓰이지 않은 고정(다른 프레임·취소된 요청)이 쌓이지 않게 오래된 것부터 버린다.
+    for (const old of pins.keys()) { if (pins.size <= 20) break; pins.delete(old); }
     return { url: location.href,
       focused: document.hasFocus() && holder?.tagName !== 'IFRAME' && holder?.tagName !== 'FRAME',
       // 분리 창을 누르면 문서 포커스는 빠져도 마지막 입력칸은 남는다.
@@ -113,7 +122,7 @@ export async function pinFill(req: FillRequest): Promise<FillTarget> {
       (!req.documentId && req.frameId === undefined && req.pageUrl && req.pageUrl !== tab.url)) {
     throw new Error('codeProtection.targetChanged');
   }
-  return { ...req, windowId: tab.windowId, documentId: result.documentId, documentUrl: result.result.url, topUrl: tab.url };
+  return { ...req, windowId: tab.windowId, documentId: result.documentId, documentUrl: result.result.url, topUrl: tab.url, pinId };
 }
 export async function validateFillTarget(req: FillTarget): Promise<void> {
   const tab = await chrome.tabs.get(req.tabId);

@@ -11,6 +11,7 @@ import { disableCodeProtectionWithPassword, enableCodeProtection, readCodeProtec
 import {
   addPrfKey,
   changePassword,
+  confirmRecoveryCode,
   disableLock,
   enableLock,
   isLocked,
@@ -26,7 +27,7 @@ import {
 import { newRecoveryCode } from '../../src/core/crypto/recovery';
 import { clearSessionKey, getSessionKey, setSessionKey } from '../../src/store/session';
 import { saveSettings } from '../../src/store/settings';
-import { _resetSnapshotsForTest } from '../../src/store/snapshots';
+import { _resetSnapshotsForTest, getSnapshot, listSnapshots } from '../../src/store/snapshots';
 import { addDrafts, createVault, keyFromFile, loadAccounts, readVaultFile } from '../../src/store/vault';
 
 const FAST = { iterations: 1, memoryKiB: 1024, parallelism: 1 };
@@ -157,9 +158,51 @@ describe('비밀번호·복구 코드', () => {
     expect(next.recoveryCode).not.toBe(code);
     expect(await loadAccounts()).toEqual(accounts);
 
+    // 새 코드를 확인하기 전에는 옛 코드도 통하고, 확인하면 새 코드만 남는다.
+    await lockNow();
+    await unlockWithRecoveryCode(code);
+    await confirmRecoveryCode(next.recoveryCode);
     await lockNow();
     await expect(unlockWithRecoveryCode(code)).rejects.toBeInstanceOf(WrongSecretError);
     await unlockWithRecoveryCode(next.recoveryCode);
+  });
+
+  it('복구 코드로 풀고 새 코드를 못 받아도 옛 코드로 다시 풀린다', async () => {
+    const { accounts, code } = await lockedVault();
+    await lockNow();
+    const first = await unlockWithRecoveryCode(code);
+    await lockNow();
+    await unlockWithRecoveryCode(code);
+    expect(await loadAccounts()).toEqual(accounts);
+    await expect(confirmRecoveryCode(newRecoveryCode())).rejects.toBeInstanceOf(WrongSecretError);
+    await confirmRecoveryCode(first.recoveryCode);
+    expect((await readVaultFile())!.wrappedKeys.filter((k) => k.kind === 'recovery')).toHaveLength(1);
+  });
+
+  it('잠금을 켜면 옛 스냅샷도 새 키로 다시 암호화되어 비밀번호로만 열린다', async () => {
+    const accounts = [account(1)];
+    await createVault(accounts);
+    await addDrafts([draft(2)]);
+    const before = await listSnapshots();
+    expect(before.length).toBeGreaterThan(0);
+    const oldFile = (await getSnapshot(before[0]!.id))!;
+    const oldKey = await keyFromFile(oldFile);
+    await enableLock('fake-pass-5678', FAST);
+
+    const after = await listSnapshots();
+    // 기존 스냅샷은 id 를 지키고, 잠금 직전 판이 하나 더 생긴다.
+    expect(after).toHaveLength(before.length + 1);
+    expect(before.every((s) => after.some((a) => a.id === s.id && a.takenAt === s.takenAt))).toBe(true);
+    expect(after.every((s) => s.lock === 'password')).toBe(true);
+    const vault = (await readVaultFile())!;
+    for (const { id } of after) {
+      const snap = (await getSnapshot(id))!;
+      expect(snap.wrappedKeys.some((k) => k.kind === 'none')).toBe(false);
+      expect(snap.wrappedKeys).toEqual(vault.wrappedKeys);
+      await expect(decryptVault(snap, oldKey)).rejects.toThrow();
+      const key = await keyFromFile(snap, { password: 'fake-pass-5678' });
+      expect((await decryptVault(snap, key)).length).toBe(snap.count);
+    }
   });
 
   it('복구 코드를 새로 만들면 옛 코드는 안 통하고 새 코드는 통한다', async () => {
@@ -314,13 +357,15 @@ describe('1회용 키', () => {
 });
 
 describe('감사 반영', () => {
-  it('같은 복구 코드를 동시에 두 번 쓰면 하나만 통한다', async () => {
+  it('같은 복구 코드를 동시에 두 번 써도 쓰기 잠금으로 차례로 처리되고 확인한 새 코드가 통한다', async () => {
     const { code } = await lockedVault();
     await lockNow();
     const results = await Promise.allSettled([unlockWithRecoveryCode(code), unlockWithRecoveryCode(code)]);
-    expect(results.filter((r) => r.status === 'fulfilled')).toHaveLength(1);
-    const ok = results.find((r) => r.status === 'fulfilled') as PromiseFulfilledResult<{ recoveryCode: string }>;
+    expect(results.every((r) => r.status === 'fulfilled')).toBe(true);
+    const ok = results[0] as PromiseFulfilledResult<{ recoveryCode: string }>;
+    await confirmRecoveryCode(ok.value.recoveryCode);
     await lockNow();
+    await expect(unlockWithRecoveryCode(code)).rejects.toBeInstanceOf(WrongSecretError);
     await unlockWithRecoveryCode(ok.value.recoveryCode);
   });
 

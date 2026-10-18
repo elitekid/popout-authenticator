@@ -41,16 +41,45 @@ async function clearInBackgroundDocument(hash: string): Promise<void> {
   }
 }
 
-async function clearIfSame(): Promise<void> {
-  const got = await chrome.storage.session.get('clipboardPending');
-  const pending = got.clipboardPending as { hash?: unknown; due?: unknown } | undefined;
-  if (typeof pending?.hash !== 'string') return;
-  // 앞 복사의 알람이 뒤 복사의 기록을 읽은 경우: 아직 때가 아니면 남은 시간 뒤로 다시 예약한다.
-  if (typeof pending.due === 'number' && Date.now() < pending.due - 500) {
-    await chrome.alarms.create(ALARM, { when: pending.due });
-    return;
+// 기록 저장과 꺼내기를 한 줄로 세운다. 읽은 뒤 지우는 사이에 새 복사의 기록이 끼어들지 못하게.
+function withPendingLock<T>(task: () => Promise<T>): Promise<T> {
+  return navigator.locks ? (navigator.locks.request('clipboard-pending', task) as Promise<T>) : task();
+}
+
+// 복사한 코드를 잠시 뒤 지우도록 예약한다(팝업 복사와 넣기 대체 복사 공용).
+export async function scheduleClipboardClear(code: string): Promise<void> {
+  if (code === '') return;
+  // 시험용: 지연(ms)이 있으면 알람 대신 그 시간 뒤에 지운다.
+  const test = (await chrome.storage.session.get('clipboardClearDelayMs')).clipboardClearDelayMs;
+  const delayMs = typeof test === 'number' ? test : DELAY_MINUTES * 60_000;
+  const hash = await sha256Hex(code);
+  await withPendingLock(async () => {
+    await chrome.storage.session.set({ clipboardPending: { hash, due: Date.now() + delayMs } });
+    if (typeof test !== 'number') await chrome.alarms.create(ALARM, { delayInMinutes: DELAY_MINUTES });
+  });
+  if (typeof test === 'number') {
+    setTimeout(() => void clearIfSame().catch((e) => console.warn('clipboard-clear', e)), test);
   }
-  await chrome.storage.session.remove('clipboardPending');
+}
+
+async function takePending(): Promise<{ hash: string } | undefined> {
+  return withPendingLock(async () => {
+    const got = await chrome.storage.session.get('clipboardPending');
+    const pending = got.clipboardPending as { hash?: unknown; due?: unknown } | undefined;
+    if (typeof pending?.hash !== 'string') return undefined;
+    // 앞 복사의 알람이 뒤 복사의 기록을 읽은 경우: 아직 때가 아니면 남은 시간 뒤로 다시 예약한다.
+    if (typeof pending.due === 'number' && Date.now() < pending.due - 500) {
+      await chrome.alarms.create(ALARM, { when: pending.due });
+      return undefined;
+    }
+    await chrome.storage.session.remove('clipboardPending');
+    return { hash: pending.hash };
+  });
+}
+
+async function clearIfSame(): Promise<void> {
+  const pending = await takePending();
+  if (!pending) return;
   // 읽기 권한이 없으면 아무것도 하지 않는다(권한 요청은 설정 화면 몫).
   if (!(await chrome.permissions.contains({ permissions: ['clipboardRead'] }))) return;
   if (!chrome.offscreen && typeof document !== 'undefined') {
@@ -92,20 +121,7 @@ export function register(): void {
       return false;
     }
     const code = typeof message.code === 'string' ? message.code : '';
-    void (async () => {
-      if (code === '') return;
-      // 시험용: 지연(ms)이 있으면 알람 대신 그 시간 뒤에 지운다.
-      const test = (await chrome.storage.session.get('clipboardClearDelayMs')).clipboardClearDelayMs;
-      const delayMs = typeof test === 'number' ? test : DELAY_MINUTES * 60_000;
-      await chrome.storage.session.set({
-        clipboardPending: { hash: await sha256Hex(code), due: Date.now() + delayMs },
-      });
-      if (typeof test === 'number') {
-        setTimeout(() => void clearIfSame().catch((e) => console.warn('clipboard-clear', e)), test);
-      } else {
-        await chrome.alarms.create(ALARM, { delayInMinutes: DELAY_MINUTES });
-      }
-    })().then(
+    void scheduleClipboardClear(code).then(
       () => sendResponse({ ok: true }),
       (error) => {
         console.warn('clipboard-copied', error);

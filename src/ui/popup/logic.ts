@@ -1,4 +1,5 @@
 // 팝업 목록의 순수 함수. 브라우저 API 를 쓰지 않는다(node 시험에서 import 된다).
+import { BROWSER_TARGET, type BrowserTarget } from '../../core/browser';
 import type { Account } from '../../core/types';
 
 const DAY = 24 * 60 * 60 * 1000;
@@ -68,6 +69,65 @@ export function groupCounts(accounts: Pick<Account, 'group' | 'deletedAt'>[]): G
   return [...counts].map(([name, count]) => ({ name, count }));
 }
 
+// 관리 편집기(AccountsSection)의 그룹 글자 수 한도와 같은 값.
+export const GROUP_MAX = 64;
+
+// 그룹 이름 입력을 다듬는다. 앞뒤 공백을 떼고 1..64 글자(코드 포인트)가 아니면 null.
+export function normalizeGroupName(input: string): string | null {
+  const name = input.trim();
+  const length = [...name].length;
+  return length >= 1 && length <= GROUP_MAX ? name : null;
+}
+
+export type GroupSection<T> = {
+  // 그룹 이름. 그룹 없는 계정 묶음은 null.
+  name: string | null;
+  items: T[];
+  folded: boolean;
+};
+
+// 접힘 기록에서 그룹 없는 묶음을 가리키는 이름(실제 그룹은 빈 이름이 될 수 없다).
+export const UNGROUPED_KEY = '';
+
+// 휴지통이 아닌 계정을 그룹별 묶음으로 나눈다. 묶음 순서는 각 그룹 첫 계정이 목록에서 나온 순서,
+// 묶음 안은 목록 순서 그대로, 그룹 없는 계정은 맨 끝. folded 는 접힌 그룹 이름(그룹 없음은 UNGROUPED_KEY).
+export function groupSections<T extends Pick<Account, 'group' | 'deletedAt'>>(
+  accounts: T[],
+  folded: ReadonlySet<string> | readonly string[] = [],
+): GroupSection<T>[] {
+  const foldedSet = folded instanceof Set ? folded : new Set(folded);
+  const named = new Map<string, T[]>();
+  const rest: T[] = [];
+  for (const a of accounts) {
+    if (a.deletedAt !== undefined) continue;
+    if (!a.group) {
+      rest.push(a);
+      continue;
+    }
+    const list = named.get(a.group);
+    if (list) list.push(a);
+    else named.set(a.group, [a]);
+  }
+  const out: GroupSection<T>[] = [...named].map(([name, items]) => ({
+    name,
+    items,
+    folded: foldedSet.has(name),
+  }));
+  if (rest.length > 0) out.push({ name: null, items: rest, folded: foldedSet.has(UNGROUPED_KEY) });
+  return out;
+}
+
+// 화면에 그려지는(접히지 않은) 줄을 위에서부터 이어 붙인다. 키보드 이동·선택 자리의 기준.
+export function visibleRows<T>(sections: GroupSection<T>[]): T[] {
+  return sections.flatMap((s) => (s.folded ? [] : s.items));
+}
+
+// 접힘 기록에서 지금 없는 묶음 이름을 지운다.
+export function pruneFolded(folded: readonly string[], sections: GroupSection<unknown>[]): string[] {
+  const names = new Set(sections.map((s) => s.name ?? UNGROUPED_KEY));
+  return folded.filter((name) => names.has(name));
+}
+
 // 서비스 이름 해시로 아바타 색(HSL)을 정한다.
 export function avatarColor(issuer: string): string {
   let h = 0;
@@ -110,8 +170,18 @@ export function shouldShowBackupReminder(input: {
 
 const REVIEW_MIN_OPENS = 15;
 export const REVIEW_LATER_OPENS = 50;
-// 스토어 등록이 끝나고 실제 공개 평가 주소가 정해질 때만 넣는다.
-export const STORE_REVIEW_URL: string = '';
+// 빌드 대상별 스토어 평가 주소. 웨일은 chrome 빌드를 쓰므로 userAgent 로 가른다.
+// 서비스 워커 등 navigator 가 없는 곳에서도 import 가 깨지지 않게 확인한다.
+const STORE_REVIEW_URLS: Record<BrowserTarget | 'whale', string> = {
+  chrome: 'https://chromewebstore.google.com/detail/nakgmloofpboegibcjhainbpjjokmbgj/reviews',
+  edge: 'https://microsoftedge.microsoft.com/addons/detail/edipphpgdmfabonchodjfnejlbjoknhh',
+  firefox: 'https://addons.mozilla.org/firefox/addon/popout-authenticator/reviews/',
+  whale: 'https://store.whale.naver.com/detail/bcfobdldplagmohdgaiocjddlokiolgc',
+  safari: 'https://apps.apple.com/app/id6823010294?action=write-review',
+};
+const IS_WHALE =
+  BROWSER_TARGET === 'chrome' && typeof navigator !== 'undefined' && /Whale/.test(navigator.userAgent ?? '');
+export const STORE_REVIEW_URL: string = STORE_REVIEW_URLS[IS_WHALE ? 'whale' : BROWSER_TARGET];
 
 // 평가 요청: 팝업을 15번 이상 열었고 계정이 있으며, 닫지 않았고 미룬 횟수가 지났을 때.
 export function shouldShowReview(s: {
@@ -126,6 +196,18 @@ export function shouldShowReview(s: {
     !s.dismissed &&
     s.openCount >= s.snoozedUntilOpen
   );
+}
+
+// "나중에" 는 한 번만 미룬다. 이미 미뤘으면(값이 0보다 크면) "다시 묻지 않기"만 남긴다.
+export function canSnoozeReview(snoozedUntilOpen: number): boolean {
+  return snoozedUntilOpen === 0;
+}
+
+const SITE_URL = 'https://elitekid.github.io/popout-authenticator/';
+const SITE_UTM = '?utm_source=extension&utm_medium=product&utm_campaign=pa-help';
+// 사이트는 영어·한국어만 있다. 한국어 화면이면 /ko/ 쪽을 연다.
+export function siteUrl(lang: string, page: 'home' | 'guides'): string {
+  return SITE_URL + (lang === 'ko' ? 'ko/' : '') + (page === 'guides' ? 'guides/' : '') + SITE_UTM;
 }
 
 // 새 기능 소개: 버전 → 문구 키 배열. 다음 버전부터 항목을 더한다.

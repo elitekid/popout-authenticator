@@ -41,6 +41,7 @@ export const settings = {
   'settings.sync.plainWarn': "Without a vault lock, secret keys are sent to other devices on the same browser account without encryption.",
   'settings.sync.now': 'Sync now',
   "settings.sync.consent": "Firefox needs your permission to send encrypted accounts through Firefox Sync.",
+  "settings.sync.consentPlain": "Firefox needs your permission to send accounts through Firefox Sync. Turn on a lock to send them encrypted.",
   'settings.sync.failed': 'Could not sync. Try again in a moment.',
   'settings.sync.status.unknown': 'Not synced yet.',
   'settings.sync.status.off': 'Sync is off.',
@@ -62,6 +63,8 @@ export const settings = {
   'settings.suggestions': 'Suggest accounts for sites (turning off clears site usage history)',
 
   'settings.about.version': 'Version {version}',
+  'settings.about.help': 'Help',
+  'settings.about.site': 'Website',
   'settings.about.feedback': 'Send feedback',
   'settings.about.review': 'Rate this extension',
 

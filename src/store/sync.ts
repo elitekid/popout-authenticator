@@ -1,7 +1,7 @@
 // 크롬 동기화: local 이 주 저장, sync 는 계정별로 마스터 키로 암호화한 보조 사본.
 import { duplicateKey } from '../core/account';
 import { aesGcmDecrypt, aesGcmEncrypt } from '../core/crypto/aes';
-import { concat, fromBase64, toBase64, toHex, utf8Decode, utf8Encode } from '../core/crypto/bytes';
+import { concat, fromBase64, randomBytes, toBase64, toHex, utf8Decode, utf8Encode } from '../core/crypto/bytes';
 import { WrongSecretError } from '../core/crypto/errors';
 import { decryptVault, encryptVault } from '../core/crypto/vault';
 import type { Account, Settings, VaultFile, WrappedKey } from '../core/types';
@@ -9,7 +9,7 @@ import { syncConsentGranted } from '../core/browser';
 import { LockedError, NoVaultError } from './errors';
 import type { RecoverySource } from './recover';
 import { setSessionKey, withSessionLock } from './session';
-import { loadSettings } from './settings';
+import { loadSettings, saveSettings } from './settings';
 import { mergeTombstones, readTombstones, saveTombstones, type Tombstones } from './tombstones';
 import {
   commitVaultFile,
@@ -30,9 +30,11 @@ type SyncMeta = {
   lockChangedAt: number;
   chunks: number;
   pushedAt: number;
+  gen?: string; // 올릴 때마다 새로 뽑는 판 id. 없으면 예전 형식
 };
 
-type SyncRecord = { id: string; u: number; iv: string; d: string };
+// g: meta.gen 과 같아야 같은 판의 조각이다. 예전 기기는 모르는 필드라 무시한다.
+type SyncRecord = { id: string; u: number; iv: string; d: string; g?: string };
 type SyncArea = Record<string, unknown>;
 
 const PREFIX = 'pa_';
@@ -75,6 +77,7 @@ function readMeta(area: SyncArea): SyncMeta | null {
     lockChangedAt: typeof m.lockChangedAt === 'number' ? m.lockChangedAt : 0,
     chunks: typeof m.chunks === 'number' ? m.chunks : NaN,
     pushedAt: typeof m.pushedAt === 'number' ? m.pushedAt : 0,
+    ...(typeof m.gen === 'string' ? { gen: m.gen } : {}),
   };
 }
 
@@ -94,7 +97,11 @@ function isRecord(r: unknown): r is SyncRecord {
   if (typeof r !== 'object' || r === null) return false;
   const x = r as Partial<SyncRecord>;
   return (
-    typeof x.id === 'string' && Number.isFinite(x.u) && typeof x.iv === 'string' && typeof x.d === 'string'
+    typeof x.id === 'string' &&
+    Number.isFinite(x.u) &&
+    typeof x.iv === 'string' &&
+    typeof x.d === 'string' &&
+    (x.g === undefined || typeof x.g === 'string')
   );
 }
 
@@ -122,6 +129,11 @@ async function decryptRecord(record: SyncRecord, key: Uint8Array): Promise<Accou
   return { ...raw, secret: fromBase64(raw.secret) } as Account;
 }
 
+// 카운터가 합쳐서 바뀐 계정은 옛 기록을 재사용하지 않게 카운터도 키에 넣는다.
+function reuseKey(a: Pick<Account, 'id' | 'updatedAt' | 'counter'>): string {
+  return `${a.id}:${a.updatedAt}:${a.counter ?? ''}`;
+}
+
 // 못 푸는 기록이 있으면 failed 가 0 보다 크다. 그때는 덮어쓰지 않고 기다린다(옛 키 조각이 섞여 도착한 경우).
 async function decryptRecords(
   records: SyncRecord[],
@@ -134,7 +146,7 @@ async function decryptRecords(
     try {
       const account = await decryptRecord(record, key);
       accounts.push(account);
-      reusable.set(`${account.id}:${account.updatedAt}`, record);
+      reusable.set(reuseKey(account), record);
     } catch (error) {
       failed++;
       console.warn('sync: undecryptable record', error);
@@ -158,6 +170,9 @@ async function readRemote(
     keys.push(name);
   }
   const records = readRecords(area, keys);
+  // 조각마다 다른 판이 섞여 도착할 수 있다. meta 의 판과 다른 기록이 하나라도 있으면 기다린다.
+  // 예전 판 기기는 gen 없는 meta 를 쓰면서 받은 기록(g 포함)을 그대로 다시 올리니, gen 이 있을 때만 맞춰 본다.
+  if (meta.gen !== undefined && records.some((r) => r.g !== meta.gen)) return null;
   const { accounts, reusable, failed } = await decryptRecords(records, key);
   return failed > 0 ? null : { records, accounts, reusable };
 }
@@ -167,13 +182,21 @@ async function hold(): Promise<SyncStatus> {
   return 'held';
 }
 
+// 같은 비밀키의 HOTP 는 어느 쪽이 이기든 카운터를 되돌리지 않는다(코드 재사용·불일치 방지).
+function withMaxCounter(win: Account, other: Account): Account {
+  if (win.type !== 'hotp' || other.type !== 'hotp') return win;
+  if (toBase64(win.secret) !== toBase64(other.secret)) return win;
+  return (other.counter ?? 0) > (win.counter ?? 0) ? { ...win, counter: other.counter } : win;
+}
+
 // local 순서를 유지하고 remote 에만 있던 것은 뒤에 붙인다.
 export function mergeAccounts(local: Account[], remote: Account[], tombs: Tombstones): Account[] {
   const byId = new Map<string, Account>();
   for (const a of local) if (!byId.has(a.id)) byId.set(a.id, a);
   for (const r of remote) {
     const cur = byId.get(r.id);
-    if (!cur || r.updatedAt > cur.updatedAt) byId.set(r.id, r);
+    if (!cur) byId.set(r.id, r);
+    else byId.set(r.id, r.updatedAt > cur.updatedAt ? withMaxCounter(r, cur) : withMaxCounter(cur, r));
   }
   const alive = [...byId.values()].filter((a) => {
     const t = tombs[a.id];
@@ -193,6 +216,15 @@ export function mergeAccounts(local: Account[], remote: Account[], tombs: Tombst
 function accountSig(accounts: { id: string; updatedAt: number }[]): string {
   return accounts
     .map((a) => `${a.id}:${a.updatedAt}`)
+    .sort()
+    .join('|');
+}
+
+// HOTP 카운터만 따로 비교한다(updatedAt 이 같아도 카운터가 합쳐져 달라질 수 있다).
+function counterSig(accounts: Pick<Account, 'id' | 'type' | 'counter'>[]): string {
+  return accounts
+    .filter((a) => a.type === 'hotp')
+    .map((a) => `${a.id}:${a.counter ?? 0}`)
     .sort()
     .join('|');
 }
@@ -252,9 +284,11 @@ type PushInput = {
 };
 
 async function push(input: PushInput): Promise<'ok' | 'overflow' | 'off'> {
+  const gen = toHex(randomBytes(8));
   const records: SyncRecord[] = [];
   for (const a of input.accounts) {
-    records.push(input.reusable?.get(`${a.id}:${a.updatedAt}`) ?? (await encryptRecord(a, input.key)));
+    const rec = input.reusable?.get(reuseKey(a)) ?? (await encryptRecord(a, input.key));
+    records.push({ ...rec, g: gen });
   }
   const chunks = splitChunks(records);
   if (!chunks) {
@@ -269,6 +303,7 @@ async function push(input: PushInput): Promise<'ok' | 'overflow' | 'off'> {
     lockChangedAt: input.file.lockChangedAt ?? 0,
     chunks: chunks.length,
     pushedAt: input.now,
+    gen,
   };
   const items: SyncArea = { [META_KEY]: meta, [TOMB_KEY]: fitTombs(input.tombs) };
   chunks.forEach((c, i) => {
@@ -277,11 +312,15 @@ async function push(input: PushInput): Promise<'ok' | 'overflow' | 'off'> {
   // 암호화·합류 중에도 설정은 바뀔 수 있다. 모든 업로드 경로에서 실제 쓰기 직전에 확인한다.
   if (!isSyncActive(await loadSettings(), input.file) || !(await syncConsentGranted())) return 'off';
   await chrome.storage.sync.set(items);
-  const stale = Object.keys(input.area).filter((k) => {
-    const m = CHUNK_RE.exec(k);
-    return m !== null && Number(m[1]) >= chunks.length;
-  });
-  if (stale.length > 0) await chrome.storage.sync.remove(stale);
+  // 남는 조각은 다시 읽어 meta 가 아직 내 판일 때만 지운다(그사이 다른 기기가 올렸으면 건드리지 않는다).
+  const after: SyncArea = await chrome.storage.sync.get(null);
+  if (readMeta(after)?.gen === gen) {
+    const stale = Object.keys(after).filter((k) => {
+      const m = CHUNK_RE.exec(k);
+      return m !== null && Number(m[1]) >= chunks.length;
+    });
+    if (stale.length > 0) await chrome.storage.sync.remove(stale);
+  }
   await chrome.storage.local.set({ syncOverflow: false, syncPending: false, syncObserved: true });
   return 'ok';
 }
@@ -364,7 +403,7 @@ async function runSync(now: number): Promise<SyncStatus> {
     // 다른 기기에서 잠금 설정을 바꿨다. 마스터 키가 같으니 메타만 받아들이고 세션 키는 건드리지 않는다.
     current = { ...file, lock: meta.lock, wrappedKeys: meta.wrappedKeys, lockChangedAt: meta.lockChangedAt };
   }
-  if (current !== file || accountSig(merged) !== accountSig(local)) {
+  if (current !== file || accountSig(merged) !== accountSig(local) || counterSig(merged) !== counterSig(local)) {
     current = await commitAccounts(current, key, merged);
   }
 
@@ -373,6 +412,7 @@ async function runSync(now: number): Promise<SyncStatus> {
     meta.lock !== current.lock || meta.lockChangedAt !== (current.lockChangedAt ?? 0);
   const needsPush =
     recordSig(remote.records) !== accountSig(merged) ||
+    counterSig(remote.accounts) !== counterSig(merged) ||
     tombSig(remoteTombs) !== tombSig(fitTombs(tombs)) ||
     metaDiffers;
   if (!needsPush) {
@@ -450,7 +490,9 @@ async function joinWithSessionLock(creds: Credentials, now: number): Promise<Syn
 // active 와 무관하게 읽기만 한다. 빈 금고 복구 화면의 후보로 쓴다.
 export async function syncRecoverySources(): Promise<RecoverySource[]> {
   const area: SyncArea = await chrome.storage.sync.get(null);
-  const count = readRecords(area, chunkKeys(area)).length;
+  const gen = readMeta(area)?.gen;
+  // 판이 섞여 있으면 meta 의 판 기록만 센다.
+  const count = readRecords(area, chunkKeys(area)).filter((r) => gen === undefined || r.g === gen).length;
   return count > 0 ? [{ kind: 'sync', count }] : [];
 }
 
@@ -459,4 +501,14 @@ export async function clearSyncArea(): Promise<void> {
   const area: SyncArea = await chrome.storage.sync.get(null);
   const keys = Object.keys(area).filter((k) => k.startsWith(PREFIX));
   if (keys.length > 0) await chrome.storage.sync.remove(keys);
+}
+
+// 동기화 데이터 삭제: 진행 중인 동기화가 끝난 뒤, 이 기기의 동기화를 끄고 지운다(다시 올리지 않게).
+export function deleteSyncData(): Promise<void> {
+  return withVaultWriteLock(async () => {
+    await saveSettings({ syncEnabled: false });
+    await clearSyncArea();
+    await chrome.storage.local.set({ syncPending: false, syncObserved: false });
+    await finish('off', Date.now());
+  });
 }

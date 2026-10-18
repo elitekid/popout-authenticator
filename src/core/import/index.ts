@@ -1,5 +1,5 @@
 // 가져오기 해석 진입점: 텍스트의 모양으로 형식을 판별한다.
-import { isCxf, readCxf } from '../export/cxf';
+import { isCxf, readCxfWithFailures } from '../export/cxf';
 import { isOwnBackup, readOwnBackup } from '../export/own';
 import { parseLinks } from '../uri';
 import { detectApp, parseApp } from './apps';
@@ -42,7 +42,7 @@ export async function importText(text: string, password?: string): Promise<Impor
         format: 'own',
       };
     }
-    if (isCxf(trimmed)) return { drafts: readCxf(trimmed), failed: [], format: 'cxf' };
+    if (isCxf(trimmed)) return { ...readCxfWithFailures(trimmed), format: 'cxf' };
     if (isTwoFaEncrypted(json)) return parseTwoFaEncrypted(json, password);
     if (isTwoFaPlain(json)) return parseTwoFaPlain(json as Record<string, unknown>);
     if (isOriginalBackup(json)) return parseOriginal(json, password);

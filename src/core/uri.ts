@@ -31,22 +31,32 @@ export function parseOtpauth(uri: string): AccountDraft {
   if (typeText !== 'totp' && typeText !== 'hotp' && typeText !== 'steam') {
     throw new Error(`unsupported otpauth type: ${typeText}`);
   }
-  let rawLabel: string;
+  // 퍼센트 디코딩 전에 첫 ':' 로 나눠야 이름 안의 %3A 가 구분자로 오해되지 않는다.
+  const encodedLabel = slash >= 0 ? path.slice(slash + 1) : '';
+  const colon = encodedLabel.indexOf(':');
+  let issuer = '';
+  let label: string;
   try {
-    rawLabel = decodeURIComponent(slash >= 0 ? path.slice(slash + 1) : '');
+    if (colon >= 0) {
+      issuer = decodeURIComponent(encodedLabel.slice(0, colon)).trim();
+      label = decodeURIComponent(encodedLabel.slice(colon + 1)).trim();
+    } else {
+      label = decodeURIComponent(encodedLabel).trim();
+    }
   } catch {
     throw new Error('invalid label encoding');
   }
-
-  let issuer = '';
-  let label = rawLabel.trim();
-  const colon = rawLabel.indexOf(':');
-  if (colon >= 0) {
-    issuer = rawLabel.slice(0, colon).trim();
-    label = rawLabel.slice(colon + 1).trim();
-  }
   const issuerParam = params.get('issuer');
-  if (issuerParam !== null && issuerParam.trim() !== '') issuer = issuerParam.trim();
+  if (issuerParam !== null && issuerParam.trim() !== '') {
+    issuer = issuerParam.trim();
+    // 구분자까지 인코딩한 다른 앱의 링크("Issuer%3Aname")는 발급자 접두를 떼어 낸다.
+    if (colon < 0 && label.startsWith(`${issuer}:`)) label = label.slice(issuer.length + 1).trim();
+  } else if (colon < 0 && label.includes(':')) {
+    // issuer 파라미터 없이 구분자까지 인코딩한 링크는 예전처럼 첫 ':' 로 나눈다.
+    const at = label.indexOf(':');
+    issuer = label.slice(0, at).trim();
+    label = label.slice(at + 1).trim();
+  }
 
   const secretParam = params.get('secret');
   if (secretParam === null) throw new Error('missing secret');

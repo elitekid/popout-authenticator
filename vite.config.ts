@@ -8,15 +8,20 @@ const browserTargets = ['chrome', 'edge', 'firefox', 'safari'] as const;
 type BrowserTarget = typeof browserTargets[number];
 
 const SAFARI_SHORT_DESCRIPTIONS: Record<string, string> = {
-  de: 'Kostenloser 2FA-Authenticator. Erzeugt Einmalcodes und öffnet sich als Popup oder eigenes Fenster.',
-  es: 'Autenticador 2FA gratuito. Genera códigos de un solo uso en ventana emergente o independiente.',
-  fr: 'Authentificateur 2FA gratuit. Génère des codes à usage unique, en fenêtre contextuelle ou séparée.',
-  hi: 'मुफ़्त 2FA ऑथेंटिकेटर। एक बार इस्तेमाल होने वाले कोड बनाता है, पॉपअप या अलग विंडो में।',
-  id: 'Autentikator 2FA gratis. Menghasilkan kode sekali pakai di popup atau jendela terpisah.',
-  ru: 'Бесплатный 2FA-аутентификатор. Создаёт одноразовые коды во всплывающем или отдельном окне.',
-  tr: 'Ücretsiz 2FA kimlik doğrulayıcı. Tek kullanımlık kodlar üretir; açılır veya ayrı pencerede açılır.',
-  uk: 'Безкоштовний 2FA-автентифікатор. Генерує одноразові коди у спливному або окремому вікні.',
-  vi: 'Ứng dụng xác thực 2FA miễn phí. Tạo mã dùng một lần trong cửa sổ bật lên hoặc cửa sổ riêng.',
+  de: 'Open-Source-2FA-Authenticator. Einmalcodes im Popup oder eigenen Fenster, mit Passwortsperre und Backup-Import.',
+  en: 'Open-source 2FA authenticator. One-time codes in a popup or window, with password lock and backup import.',
+  es: 'Autenticador 2FA de código abierto. Códigos de un solo uso en ventana emergente o aparte, con contraseña.',
+  fr: 'Authentificateur 2FA open source. Codes à usage unique en pop-up ou fenêtre, avec verrou par mot de passe.',
+  hi: '2FA ऑथेंटिकेटर। एक बार इस्तेमाल होने वाले कोड बनाता है, पॉपअप या अलग विंडो में।',
+  id: 'Autentikator 2FA. Menghasilkan kode sekali pakai di popup atau jendela terpisah.',
+  ja: 'オープンソースの 2FA 認証アプリ。ワンタイムコードをポップアップや別ウィンドウで表示し、パスワードでロックできます。他のアプリのバックアップも読み込めます。',
+  ko: '오픈소스 2단계 인증(OTP) 도구. 일회용 코드를 팝업·별도 창으로 보고, 비밀번호로 잠글 수 있습니다. 다른 인증 앱 백업도 가져옵니다.',
+  pt_BR: 'Autenticador 2FA de código aberto. Códigos de uso único em pop-up ou janela separada, com bloqueio por senha.',
+  ru: '2FA-аутентификатор с открытым кодом. Одноразовые коды во всплывающем или отдельном окне, блокировка паролем.',
+  tr: '2FA kimlik doğrulayıcı. Tek kullanımlık kodlar üretir; açılır veya ayrı pencerede açılır.',
+  uk: '2FA-автентифікатор. Генерує одноразові коди у спливному або окремому вікні.',
+  vi: 'Ứng dụng xác thực 2FA. Tạo mã dùng một lần trong cửa sổ bật lên hoặc cửa sổ riêng.',
+  zh_CN: '开源 2FA 验证器。在弹出窗口或独立窗口中显示一次性验证码，可用密码锁定，并可导入其他应用的备份。',
 };
 
 // 정본 manifest 하나를 각 브라우저가 실제 제공하는 API에 맞춰 낸다.
@@ -35,7 +40,7 @@ function browserManifest(target: BrowserTarget): Plugin {
       if (target === 'firefox') {
         manifest.sidebar_action = {
           open_at_install: false,
-          default_title: '__MSG_appName__',
+          default_title: '__MSG_appShortName__',
           default_panel: 'sidepanel.html',
           default_icon: 'icons/icon48.png',
         };

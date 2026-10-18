@@ -1,12 +1,19 @@
 import { describe, expect, it } from 'vitest';
 import {
   backupSignature,
+  canSnoozeReview,
   filterAccounts,
   formatCode,
   groupCounts,
+  groupSections,
+  normalizeGroupName,
+  pruneFolded,
   shouldShowBackupReminder,
   shouldShowReview,
+  siteUrl,
   moveActive,
+  UNGROUPED_KEY,
+  visibleRows,
 } from '../../src/ui/popup/logic';
 
 const DAY = 24 * 60 * 60 * 1000;
@@ -109,6 +116,54 @@ describe('groupCounts', () => {
   });
 });
 
+describe('groupSections', () => {
+  const list = [
+    item('a', { group: 'Dev' }),
+    item('b'),
+    item('c', { group: 'Work' }),
+    item('d', { group: 'Dev' }),
+    item('e', { group: 'Work', deletedAt: 1 }),
+    item('f', { group: 'Work' }),
+  ];
+  const ids = (xs: Item[]) => xs.map((x) => x.id);
+
+  it('묶음 순서는 그룹 첫 계정 순서, 안은 목록 순서, 그룹 없음은 맨 끝', () => {
+    const sections = groupSections(list);
+    expect(sections.map((s) => s.name)).toEqual(['Dev', 'Work', null]);
+    expect(sections.map((s) => ids(s.items))).toEqual([['a', 'd'], ['c', 'f'], ['b']]);
+    expect(sections.every((s) => !s.folded)).toBe(true);
+  });
+
+  it('그룹 없는 계정이 없으면 그룹 없음 묶음을 만들지 않는다', () => {
+    expect(groupSections([item('a', { group: 'Work' })]).map((s) => s.name)).toEqual(['Work']);
+    expect(groupSections([item('a', { deletedAt: 1 })])).toEqual([]);
+  });
+
+  it('접힌 묶음의 줄은 보이는 목록에서 빠진다', () => {
+    const sections = groupSections(list, ['Dev']);
+    expect(sections.map((s) => s.folded)).toEqual([true, false, false]);
+    expect(ids(visibleRows(sections))).toEqual(['c', 'f', 'b']);
+    expect(ids(visibleRows(groupSections(list, new Set([UNGROUPED_KEY, 'Work']))))).toEqual(['a', 'd']);
+  });
+
+  it('접힘 기록에서 없어진 이름을 지운다', () => {
+    const sections = groupSections(list);
+    expect(pruneFolded(['Dev', 'Gone', UNGROUPED_KEY], sections)).toEqual(['Dev', UNGROUPED_KEY]);
+    expect(pruneFolded([UNGROUPED_KEY], groupSections([item('a', { group: 'Work' })]))).toEqual([]);
+  });
+});
+
+describe('normalizeGroupName', () => {
+  it('앞뒤 공백을 떼고 1~64 글자만 받는다', () => {
+    expect(normalizeGroupName('  업무 ')).toBe('업무');
+    expect(normalizeGroupName('   ')).toBeNull();
+    expect(normalizeGroupName('가'.repeat(64))).toBe('가'.repeat(64));
+    expect(normalizeGroupName('가'.repeat(65))).toBeNull();
+    // 코드 포인트 기준: 이모지 64개는 통과
+    expect(normalizeGroupName('😀'.repeat(64))).toBe('😀'.repeat(64));
+  });
+});
+
 describe('backupSignature', () => {
   it('휴지통을 빼고 정렬해 잇는다', () => {
     const sig = backupSignature([
@@ -168,5 +223,21 @@ describe('shouldShowReview', () => {
     expect(shouldShowReview({ ...ok, accounts: 0 })).toBe(false);
     expect(shouldShowReview({ ...ok, dismissed: true })).toBe(false);
     expect(shouldShowReview({ ...ok, openCount: 30, snoozedUntilOpen: 65 })).toBe(false);
+  });
+});
+
+describe('canSnoozeReview', () => {
+  it('아직 미루지 않았을 때만 "나중에" 를 보임', () => {
+    expect(canSnoozeReview(0)).toBe(true);
+    expect(canSnoozeReview(65)).toBe(false);
+  });
+});
+
+describe('siteUrl', () => {
+  const utm = '?utm_source=extension&utm_medium=product&utm_campaign=pa-help';
+
+  it('한국어 화면이면 /ko/ 쪽, 그 밖에는 영어 쪽을 연다', () => {
+    expect(siteUrl('ko', 'guides')).toBe(`https://elitekid.github.io/popout-authenticator/ko/guides/${utm}`);
+    expect(siteUrl('en', 'home')).toBe(`https://elitekid.github.io/popout-authenticator/${utm}`);
   });
 });

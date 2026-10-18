@@ -125,8 +125,9 @@ export function ExportPanel({ t, lockOn }: { t: T; lockOn: boolean }) {
       file.text,
       file.ext === 'json' ? 'application/json' : 'text/plain',
     );
-    // 다시 읽어 전부 맞을 때만 백업한 것으로 친다(팝업 알림 띠가 읽는다).
-    if (built.verify.found === built.verify.expected) {
+    // 다시 읽어 전부 맞고 빠진 계정이 없을 때만 백업한 것으로 친다(팝업 알림 띠가 읽는다).
+    // 저장 대화상자 취소는 알 수 없다(다운로드 권한이 없다).
+    if (built.verify.found === built.verify.expected && built.skipped.length === 0) {
       void chrome.storage.local.set({ backupInfo: { at: Date.now(), sig: built.sig } });
     }
   };

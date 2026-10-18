@@ -46,6 +46,16 @@ function coversKnownOrigin(grant: string): boolean {
     (host.startsWith('*.') && (known === host.slice(2) || known.endsWith(`.${host.slice(2)}`))));
 }
 
+// match pattern a 가 b 를 덮거나 같은지. `*.x` 는 x 와 모든 하위 도메인, `*` 스킴은 http·https 를 덮는다.
+export function patternCovers(a: string, b: string): boolean {
+  const pa = /^([^:]+):\/\/([^/]+)\/\*$/.exec(a);
+  const pb = /^([^:]+):\/\/([^/]+)\/\*$/.exec(b);
+  if (!pa || !pb) return a === b;
+  const scheme = pa[1] === pb[1] || (pa[1] === '*' && (pb[1] === 'http' || pb[1] === 'https'));
+  const [ha, hb] = [pa[2]!, pb[2]!];
+  return scheme && (ha === '*' || ha === hb || (ha.startsWith('*.') && (hb === ha.slice(2) || hb.endsWith(ha.slice(1)))));
+}
+
 function asFieldButtons(raw: unknown): FieldButtons {
   const out: FieldButtons = {};
   if (typeof raw !== 'object' || raw === null || Array.isArray(raw)) return out;
@@ -152,6 +162,183 @@ export function setFieldButton(accountId: string, hosts: string[]): Promise<void
   });
 }
 
+// 툴바 팝업은 권한 확인 창이 뜨면 닫혀 요청 뒤의 단계가 실행되지 않는다.
+// 요청 직전에 적어 두면 서비스 워커가 허용 뒤 이어서 단추 설정을 마친다.
+// 편집 화면이 닫혀도 서비스 워커가 대신 저장할 수 있는 계정 수정. 비밀키는 넣지 않는다.
+// group 은 문자열이면 바꾸고 null 이면 지운다.
+export type AccountEditPatch = Partial<Pick<Account,
+  'issuer' | 'label' | 'note' | 'matchHosts' | 'pinned' | 'algorithm' | 'digits' | 'period' | 'counter'>> &
+  { group?: string | null };
+export type PendingFieldButton = { id: string; hosts: string[]; patterns: string[]; at: number; patch?: AccountEditPatch };
+// 계정마다 따로 둔 키라서 읽지 않고 바로 쓸 수 있다. 팝업이 닫히기 전에 쓰기 요청이 나가야 한다.
+const PENDING_PREFIX = 'pendingFieldButton:';
+export const PENDING_FIELD_TTL_MS = 10 * 60 * 1000;
+
+const PATCH_TYPES: Record<string, 'string' | 'boolean' | 'number'> = {
+  issuer: 'string', label: 'string', note: 'string', pinned: 'boolean',
+  digits: 'number', period: 'number', counter: 'number',
+};
+
+function asPatch(raw: unknown): AccountEditPatch | undefined {
+  if (typeof raw !== 'object' || raw === null || Array.isArray(raw)) return undefined;
+  const src = raw as Record<string, unknown>;
+  const out: Record<string, unknown> = {};
+  for (const [key, type] of Object.entries(PATCH_TYPES)) {
+    if (typeof src[key] === type) out[key] = src[key];
+  }
+  if (Array.isArray(src.matchHosts) && src.matchHosts.every((h) => typeof h === 'string')) out.matchHosts = src.matchHosts;
+  if (src.algorithm === 'SHA-1' || src.algorithm === 'SHA-256' || src.algorithm === 'SHA-512') out.algorithm = src.algorithm;
+  if (typeof src.group === 'string' || src.group === null) out.group = src.group;
+  return out as AccountEditPatch;
+}
+
+// 바뀐 칸만 최신 계정에 적용한다. 이미 같은 값이면 계정 객체를 그대로 돌려줘 두 번 적용해도 같다.
+export function applyAccountEditPatch(account: Account, patch: AccountEditPatch, now: number): Account {
+  const { group, ...fields } = patch;
+  const next: Account = { ...account };
+  let changed = false;
+  for (const [key, value] of Object.entries(fields)) {
+    if (value === undefined) continue;
+    const current = account[key as keyof Account];
+    const same = Array.isArray(value)
+      ? Array.isArray(current) && current.join('\n') === value.join('\n')
+      : current === value;
+    if (same) continue;
+    (next as Record<string, unknown>)[key] = value;
+    changed = true;
+  }
+  if (group !== undefined && group !== (account.group ?? null)) {
+    if (group === null) delete next.group;
+    else next.group = group;
+    changed = true;
+  }
+  return changed ? { ...next, updatedAt: now } : account;
+}
+
+async function readPending(): Promise<Record<string, PendingFieldButton>> {
+  const raw = await chrome.storage.local.get(null);
+  const out: Record<string, PendingFieldButton> = {};
+  for (const [key, value] of Object.entries(raw)) {
+    if (!key.startsWith(PENDING_PREFIX) || typeof value !== 'object' || value === null) continue;
+    const { id, hosts, patterns, at, patch } = value as Partial<PendingFieldButton>;
+    if (!Array.isArray(hosts) || !Array.isArray(patterns) || typeof at !== 'number') continue;
+    const parsed = asPatch(patch);
+    out[key.slice(PENDING_PREFIX.length)] = {
+      id: typeof id === 'string' ? id : '',
+      hosts: hosts.filter((h): h is string => typeof h === 'string'),
+      patterns: patterns.filter((p): p is string => typeof p === 'string'),
+      at,
+      ...(parsed ? { patch: parsed } : {}),
+    };
+  }
+  return out;
+}
+
+// 잠금·읽기 없이 곧바로 쓴다. permissions.request 와 같은 동기 구간에서 불러야 한다.
+// 요청마다 새 id 를 붙여, 처리하는 쪽이 자기가 읽은 항목만 지우게 한다.
+export async function addPendingFieldButton(
+  accountId: string,
+  hosts: string[],
+  patterns: string[],
+  now = Date.now(),
+  patch?: AccountEditPatch,
+): Promise<void> {
+  const entry: PendingFieldButton = { id: crypto.randomUUID(), hosts, patterns, at: now, ...(patch ? { patch } : {}) };
+  await chrome.storage.local.set({ [PENDING_PREFIX + accountId]: entry });
+  // 같은 사이트를 다른 계정이 이어 요청하면, 아직 허용되지 않은 앞 계정의 대기는 거절·포기된 것이다.
+  // 그대로 두면 이번 허용으로 앞 계정의 단추까지 켜지므로 그 항목만 지운다.
+  try {
+    const others = await readPending();
+    for (const [id, old] of Object.entries(others)) {
+      if (id === accountId || old.at > now) continue;
+      if (!old.patterns.some((a) => patterns.some((b) => patternCovers(a, b) || patternCovers(b, a)))) continue;
+      if (await grantedAll(old.patterns)) continue;
+      const cur = (await readPending())[id];
+      if (cur && cur.id === old.id) await chrome.storage.local.remove(PENDING_PREFIX + id);
+    }
+  } catch (error) {
+    console.warn('field-buttons pending cleanup', error);
+  }
+}
+
+export function clearPendingFieldButton(accountId: string): Promise<void> {
+  return chrome.storage.local.remove(PENDING_PREFIX + accountId);
+}
+
+// 대기 항목 중 권한이 모두 허용된 것은 단추 설정으로 옮기고, 오래된 것은 버린다.
+// 아직 허용 전인 새 항목은 남긴다. 같은 값을 두 번 처리해도 결과는 같다.
+// 항목에 계정 수정이 있으면 applyPatch 로 먼저 최신 계정에 적용한다. 계정이 없으면 false 를 돌려
+// 항목을 버리고, 던지면(잠김 등) 항목을 남겨 다음에 다시 처리한다.
+export type ApplyAccountPatch = (accountId: string, patch: AccountEditPatch) => Promise<boolean>;
+
+const isExpired = (item: PendingFieldButton, now: number) =>
+  now - item.at > PENDING_FIELD_TTL_MS || item.at > now + PENDING_FIELD_TTL_MS;
+const grantedAll = async (patterns: string[]) => (await Promise.all(
+  patterns.map((p) => chrome.permissions.contains({ origins: [p] })),
+)).every(Boolean);
+const entryKey = (id: string, item: PendingFieldButton) => `${id}:${item.id}:${item.at}`;
+
+export async function applyPendingFieldButtons(now = Date.now(), applyPatch?: ApplyAccountPatch): Promise<void> {
+  // 계정 수정은 단추 잠금을 잡기 전에 적용한다. 금고 쓰기 잠금 안에서 단추를 지우는 곳(변경 기록 복원)과
+  // 잠금 순서가 엇갈려 서로 기다리지 않게 한다. 수정은 두 번 적용해도 같다.
+  const patched = new Map<string, boolean | 'error'>();
+  if (applyPatch) {
+    const before = await readPending();
+    for (const [id, item] of Object.entries(before)) {
+      if (!item.patch || isExpired(item, now) || item.hosts.length === 0 || !(await grantedAll(item.patterns))) continue;
+      try {
+        patched.set(entryKey(id, item), await applyPatch(id, item.patch));
+      } catch (error) {
+        console.warn('field-buttons pending patch', error);
+        patched.set(entryKey(id, item), 'error');
+      }
+    }
+  }
+  return locked(async () => {
+    const pending = await readPending();
+    const ids = Object.keys(pending);
+    if (ids.length === 0) return;
+    const manual = await readFieldButtons();
+    let applied = false;
+    const done: string[] = [];
+    for (const id of ids) {
+      const item = pending[id]!;
+      if (isExpired(item, now)) {
+        done.push(id);
+        continue;
+      }
+      if (item.patterns.length === 0 || item.hosts.length === 0) {
+        done.push(id);
+        continue;
+      }
+      if (!(await grantedAll(item.patterns))) continue;
+      if (item.patch) {
+        // 잠금 밖에서 적용하지 못했으면(수정 함수 없음·잠김·그사이 새 항목) 남겨 다음에 다시 한다.
+        const result = patched.get(entryKey(id, item));
+        if (result === undefined || result === 'error') continue;
+        if (result === false) {
+          done.push(id);
+          continue;
+        }
+      }
+      manual[id] = item.hosts;
+      done.push(id);
+      applied = true;
+    }
+    if (applied) await chrome.storage.local.set({ [KEY]: manual });
+    if (done.length) {
+      // 잠금 밖에서 같은 계정의 새 항목이 쓰였을 수 있으니, 처리한 그 항목일 때만 지운다.
+      const latest = await readPending();
+      const stale = done.filter((id) => {
+        const cur = latest[id];
+        return cur === undefined || (cur.id === pending[id]!.id && cur.at === pending[id]!.at);
+      });
+      if (stale.length) await chrome.storage.local.remove(stale.map((id) => PENDING_PREFIX + id));
+    }
+    if (applied) await syncUnlocked();
+  });
+}
+
 export function removeFieldButton(accountId: string): Promise<void> {
   return locked(async () => {
     const all = await readFieldButtons();
@@ -238,6 +425,8 @@ async function releaseUnlocked(): Promise<void> {
       (o) =>
         !required.has(o) &&
         !inUse.has(o) &&
+        // remove 는 겹치는 패턴을 큰 쪽까지 지우니, 쓰는 패턴을 덮거나 쓰는 패턴에 덮이면 거두지 않는다.
+        ![...inUse].some((u) => patternCovers(u, o) || patternCovers(o, u)) &&
         !(auto.enabled && coversKnownOrigin(o)) &&
         (optional.has(o) || (optional.has('https://*/*') && o.startsWith('https://'))),
     );

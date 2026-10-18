@@ -3,11 +3,13 @@ import { duplicateKey } from '../core/account';
 import { CorruptVaultError } from '../core/crypto/errors';
 import { decryptVault, encryptVault } from '../core/crypto/vault';
 import type { Account, VaultFile } from '../core/types';
+import { clearSessionKey, setSessionKey } from './session';
 import { getSnapshot, listSnapshots } from './snapshots';
-import { readTombstones, type Tombstones } from './tombstones';
+import { readTombstones, recordTombstones, type Tombstones } from './tombstones';
 import {
   commitVaultFile,
   getVaultKey,
+  loadAccounts,
   keyFromFile,
   readVaultFile,
   updateAccounts,
@@ -88,7 +90,15 @@ export async function restoreSnapshot(
   if (mode === 'replace') {
     // 지금 금고가 깨져 못 열어도 통째 되돌리기는 되게, 못 열면 스냅샷 파일을 메타 그대로 쓴다.
     try {
-      await updateAccounts(async (current) => restoredAccounts(old, current, await readTombstones()));
+      let removed: string[] = [];
+      await updateAccounts(async (current) => {
+        const next = restoredAccounts(old, current, await readTombstones());
+        const kept = new Set(next.map((a) => a.id));
+        removed = current.filter((a) => !kept.has(a.id)).map((a) => a.id);
+        return next;
+      });
+      // 스냅샷에 없어 지워진 계정은 삭제 표시를 남겨, 다음 동기화가 되살리지 않게 한다(쓰기가 끝난 뒤에만).
+      await recordTombstones(removed);
     } catch (error) {
       if (!(error instanceof CorruptVaultError)) throw error;
       await withVaultWriteLock(async () => {
@@ -148,12 +158,48 @@ export function isRawCopy(text: string): boolean {
   return parseRaw(text) !== null;
 }
 
-export async function openRawCopy(text: string, creds?: Credentials): Promise<Account[]> {
-  const raw = parseRaw(text);
-  const vault = raw?.local?.vault;
-  if (!raw || typeof vault !== 'object' || vault === null) {
+function rawVaultFile(text: string): VaultFile {
+  const vault = parseRaw(text)?.local?.vault;
+  if (typeof vault !== 'object' || vault === null) {
     throw new CorruptVaultError('not a raw copy with a vault');
   }
-  const file = vault as VaultFile;
+  return vault as VaultFile;
+}
+
+export async function openRawCopy(text: string, creds?: Credentials): Promise<Account[]> {
+  const file = rawVaultFile(text);
   return decryptVault(file, await keyFromFile(file, creds));
+}
+
+// 지금 금고가 손상돼 못 열 때: 현재 금고를 풀지 않고 원시 사본의 금고로 통째 바꾼다.
+// 손상된 이전 판은 commitVaultFile 이 스냅샷에 남긴다. 돌려주는 값은 되살린 계정 수.
+export async function replaceWithRawCopy(text: string, creds?: Credentials): Promise<number> {
+  const file = rawVaultFile(text);
+  const key = await keyFromFile(file, creds);
+  const accounts = await decryptVault(file, key);
+  await withVaultWriteLock(async () => {
+    // 사본을 푸는 사이 다른 창이 이미 복구했으면 그 금고를 덮지 않는다.
+    if (!(await currentVaultCorrupt())) throw new Error('vault no longer damaged');
+    await commitVaultFile(file);
+    // 사본의 잠금으로 바뀌었으니 풀린 상태를 맞춘다(잠금 없는 사본이면 옛 세션 키를 지운다).
+    if (file.lock === 'none') await clearSessionKey();
+    else await setSessionKey(key);
+    // 사본에 패스키 수단이 없으면 코드 보호를 끈다. 켜 두면 넣기가 늘 실패하고 끌 수도 없다.
+    if (file.lock === 'none' || !file.wrappedKeys.some((k) => k.kind === 'prf')) {
+      await chrome.storage.local.set({ codeProtection: false });
+      await chrome.storage.session.remove('codeAccessRequests');
+    }
+  });
+  return accounts.filter((a) => a.deletedAt === undefined).length;
+}
+
+// 금고가 있는데 내용이 손상돼 열리지 않을 때만 true. 잠김 등 판단할 수 없으면 false.
+async function currentVaultCorrupt(): Promise<boolean> {
+  if (!(await readVaultFile())) return false;
+  try {
+    await loadAccounts();
+    return false;
+  } catch (error) {
+    return error instanceof CorruptVaultError;
+  }
 }

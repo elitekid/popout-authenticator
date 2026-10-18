@@ -55,13 +55,26 @@ import type { FieldCheckMessage, FieldCheckReply, FieldFillMessage } from '../st
     return input.form ?? input.parentElement?.parentElement ?? document;
   }
 
-  function place(entry: Entry): void {
+  // 단추가 있어야 할 자리. 지금 실제 위치와의 차이만큼 현재 좌표를 옮긴다. 그래서 html·body 가
+  // position·margin·테두리를 가져도 문서 좌표 계산이 어긋나지 않는다. 읽기만 하고 쓰지 않는다.
+  function target(entry: Entry): { left: number; top: number } {
     const rect = entry.input.getBoundingClientRect();
-    const width = entry.host.offsetWidth;
-    const left = rect.right + window.scrollX - GAP - width;
-    const top = rect.top + window.scrollY + (rect.height - HEIGHT) / 2;
-    entry.host.style.left = `${Math.max(0, left)}px`;
-    entry.host.style.top = `${Math.max(0, top)}px`;
+    const got = entry.host.getBoundingClientRect();
+    const left = parseFloat(entry.host.style.left) || 0;
+    const top = parseFloat(entry.host.style.top) || 0;
+    return {
+      left: Math.max(0, left + rect.right - GAP - got.width - got.left),
+      top: Math.max(0, top + rect.top + (rect.height - HEIGHT) / 2 - got.top),
+    };
+  }
+
+  function move(entry: Entry, at: { left: number; top: number }): void {
+    entry.host.style.left = `${at.left}px`;
+    entry.host.style.top = `${at.top}px`;
+  }
+
+  function place(entry: Entry): void {
+    move(entry, target(entry));
   }
 
   function drop(entry: Entry): void {
@@ -73,7 +86,7 @@ import type { FieldCheckMessage, FieldCheckReply, FieldFillMessage } from '../st
 
   function makeButton(input: HTMLInputElement): Entry {
     const host = document.createElement('popout-otp-button');
-    host.style.cssText = 'all:initial;position:absolute;z-index:2147483647;top:0;left:0;';
+    host.style.cssText = 'all:initial;position:absolute;display:block;margin:0;padding:0;height:24px;z-index:2147483647;top:0;left:0;';
     const root = host.attachShadow({ mode: 'closed' });
     const style = document.createElement('style');
     style.textContent =
@@ -83,7 +96,7 @@ import type { FieldCheckMessage, FieldCheckReply, FieldFillMessage } from '../st
     const button = document.createElement('button');
     button.type = 'button';
     button.textContent = chrome.i18n.getMessage('fieldFillButton');
-    button.title = chrome.i18n.getMessage('appName');
+    button.title = chrome.i18n.getMessage('appShortName');
     // 칸의 포커스를 빼앗지 않는다.
     button.addEventListener('mousedown', (event) => event.preventDefault());
     button.addEventListener('click', (event) => {
@@ -145,8 +158,10 @@ import type { FieldCheckMessage, FieldCheckReply, FieldFillMessage } from '../st
       frame = 0;
       for (const entry of [...entries]) {
         if (!entry.input.isConnected || !visible(entry.input)) drop(entry);
-        else place(entry);
       }
+      // 모두 읽은 뒤 모두 쓴다. 단추마다 읽기·쓰기를 섞으면 레이아웃을 여러 번 다시 계산한다.
+      const spots = entries.map(target);
+      entries.forEach((entry, i) => move(entry, spots[i]));
     });
   }
 
@@ -155,10 +170,14 @@ import type { FieldCheckMessage, FieldCheckReply, FieldFillMessage } from '../st
     timer = window.setTimeout(() => {
       timer = 0;
       scan();
+      // 칸 위에 문구 등이 끼어 칸이 밀렸을 수 있다.
+      schedulePlace();
     }, RESCAN_MS);
   }
 
   const observer = new MutationObserver(scheduleScan);
+  // 문서 높이가 변하면(이미지 로드, 접힘 펼침 등) 칸이 밀린 것이다.
+  const resizeObserver = new ResizeObserver(schedulePlace);
 
   // 꺼졌거나 쓸 수 없는 문서면 단추·관찰·예약·리스너를 모두 거둔다.
   function stop(): void {
@@ -166,6 +185,7 @@ import type { FieldCheckMessage, FieldCheckReply, FieldFillMessage } from '../st
     stopped = true;
     for (const entry of [...entries]) drop(entry);
     observer.disconnect();
+    resizeObserver.disconnect();
     window.removeEventListener('scroll', schedulePlace, { capture: true });
     window.removeEventListener('resize', schedulePlace);
     if (timer !== 0) window.clearTimeout(timer);
@@ -191,6 +211,8 @@ import type { FieldCheckMessage, FieldCheckReply, FieldFillMessage } from '../st
     window.addEventListener('scroll', schedulePlace, { capture: true, passive: true });
     window.addEventListener('resize', schedulePlace, { passive: true });
     observer.observe(document.documentElement, { childList: true, subtree: true });
+    resizeObserver.observe(document.documentElement);
+    if (document.body) resizeObserver.observe(document.body);
     scan();
   }
 

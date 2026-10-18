@@ -14,6 +14,8 @@ import { loadSettings } from '../store/settings';
 import { readSiteUsage, recordSiteUse } from '../store/site-usage';
 import { commitVaultFile, loadAccounts, updateAccounts, withVaultWriteLock } from '../store/vault';
 import { applyOpenMode } from './open-mode';
+import { scheduleClipboardClear } from './clipboard';
+import { clearPendingFill, savePendingFill, takePendingFill } from './pending-fill';
 import { pinFill, validateFillTarget, requestFillApproval, setApprovedFillExecutor } from './code-access';
 
 export type FillRequest = {
@@ -105,7 +107,7 @@ async function inject(
   frameId: number | undefined,
   code: string | null,
   documentId?: string,
-  gate?: { expiresAt?: number; documentUrl: string },
+  gate?: { expiresAt?: number; documentUrl: string; pinId?: string },
   submit = true,
   beforeInject?: () => Promise<void>,
 ): Promise<QuickFillOutcome | undefined> {
@@ -119,7 +121,12 @@ async function inject(
       func: quickFillInPage,
       args: [{ code, requireFocus, ...texts, ...gate, autoSubmit }],
     });
-    return results.map((r) => r.result as QuickFillOutcome | undefined).find((r) => r !== 'skipped' && r !== undefined);
+    const outcome = results.map((r) => r.result as QuickFillOutcome | undefined).find((r) => r !== 'skipped' && r !== undefined);
+    // 넣지 못해 클립보드에 복사된 경우에도 팝업 복사와 같이 지우기를 예약한다.
+    if (outcome === 'copied' && code !== null && (await loadSettings()).clipboardClearAfterCopy) {
+      await scheduleClipboardClear(code).catch((error) => console.warn('clipboard-copied', error));
+    }
+    return outcome;
   };
   if (documentId !== undefined) {
     // 문서를 고정했으면 포커스 조건만 따르고 다른 문서로 폴백하지 않는다.
@@ -214,7 +221,8 @@ export async function runFill(req: FillRequest, requester?: chrome.runtime.Messa
   // 실제로 넣을 문서의 호스트가 계정의 지정 사이트가 아니면 비슷한 주소·광고 iframe 일 수 있다.
   const matched = await siteMatches(req, account, target.documentUrl);
   if (!matched) {
-    if (!requester) {
+    // 권한 승인 뒤 백그라운드가 잇는 넣기는 requester 가 없지만, 사용자가 확인한 호스트면 계속한다.
+    if (!requester && req.allowSiteMismatch === undefined) {
       await handOver(req, requester);
       return 'handed-over';
     }
@@ -252,7 +260,7 @@ export async function runFill(req: FillRequest, requester?: chrome.runtime.Messa
   // 재시도는 허용 뒤 고정한 문서에만 넣는다. 코드 교체를 기다린 뒤에도 활성 탭을
   // 확인하고, 해당 프레임 안에서는 URL을 다시 검사해 탐색 경합을 막는다.
   const outcome = (await inject(req.tabId, req.frameId, code, target.documentId,
-    { documentUrl: target.documentUrl }, submit, beforeInject)) ?? 'shown';
+    { documentUrl: target.documentUrl, pinId: target.pinId }, submit, beforeInject)) ?? 'shown';
   if (outcome === 'expired') throw new FillError('changed');
   if (outcome === 'filled') {
     const host = hostOf(req.pageUrl);
@@ -311,7 +319,7 @@ export function register(): void {
       const code = await generateCode(selected, now + correction);
       await validate(committed);
       const outcome = (await inject(req.tabId, req.frameId, code, req.documentId,
-        { expiresAt: Math.min(expiresAt, codeExpiresAt), documentUrl: req.documentUrl }, req.submit, () => validate(committed))) ?? 'shown';
+        { expiresAt: Math.min(expiresAt, codeExpiresAt), documentUrl: req.documentUrl, pinId: req.pinId }, req.submit, () => validate(committed))) ?? 'shown';
       if (outcome === 'expired') throw new Error('codeProtection.expired');
       if (outcome === 'filled') {
         const host = hostOf(req.pageUrl);
@@ -323,7 +331,32 @@ export function register(): void {
   // 시험용으로 서비스 워커에서 바로 부른다.
   (globalThis as { __popoutRunFill?: typeof runFill }).__popoutRunFill = runFill;
 
+  // 권한 창 때문에 팝업이 닫혀도, 승인된 origin 이면 맡겨 둔 넣기를 한 번 이어 한다.
+  chrome.permissions.onAdded.addListener((added) => {
+    const origins = added.origins ?? [];
+    void takePendingFill((entry) => origins.includes(entry.origin)).then((entry) => {
+      if (!entry) return;
+      return fillFromMessage({ accountId: entry.accountId, submit: entry.submit,
+        allowSiteMismatch: entry.allowSiteMismatch, target: entry.target }, undefined, {});
+    }).catch((error) => console.warn('pending-fill', error));
+  });
+
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (typeof message === 'object' && message !== null && message.type === 'fill-pending') {
+      if (sender.id !== chrome.runtime.id || !sender.url?.startsWith(chrome.runtime.getURL(''))) {
+        sendResponse({ ok: false });
+        return false;
+      }
+      const t = message.target;
+      const valid = typeof message.accountId === 'string' && typeof message.origin === 'string' && t && typeof t === 'object' &&
+        typeof t.tabId === 'number' && typeof t.pageUrl === 'string';
+      void (message.clear === true || !valid ? clearPendingFill() : savePendingFill({
+        accountId: message.accountId, submit: message.submit !== false, origin: message.origin,
+        target: { tabId: t.tabId, pageUrl: t.pageUrl },
+        ...(typeof message.allowSiteMismatch === 'string' ? { allowSiteMismatch: message.allowSiteMismatch } : {}),
+      })).then(() => sendResponse({ ok: true }), () => sendResponse({ ok: false }));
+      return true;
+    }
     if (typeof message !== 'object' || message === null || message.type !== 'fill-code') {
       return false;
     }
@@ -332,42 +365,17 @@ export function register(): void {
       return false;
     }
     const accountId = typeof message.accountId === 'string' ? message.accountId : undefined;
-    let tab: chrome.tabs.Tab | undefined;
+    const seen: { tab?: chrome.tabs.Tab } = {};
     void (async () => {
-      tab = await activeTab();
-      if (tab?.id === undefined) throw new FillError('noTab');
-      let retryTarget: RetryTarget | undefined;
-      // 권한 허용 후 재시도는 처음 누른 탭·주소가 그대로일 때만 진행한다.
-      // 다른 탭으로 이동한 뒤 승인한 요청을 새 페이지에 보내지 않는다.
-      if (message.target !== undefined) {
-        const target = message.target;
-        if (!target || typeof target !== 'object' || target.tabId !== tab.id ||
-            typeof target.pageUrl !== 'string' || target.pageUrl !== tab.url ||
-            (tab.pendingUrl !== undefined && tab.pendingUrl !== target.pageUrl)) {
-          throw new FillError('changed');
-        }
-        retryTarget = { tabId: target.tabId, pageUrl: target.pageUrl };
+      // 권한 허용 뒤 팝업이 살아 있어 이어 가는 경우: 대기 항목을 먼저 꺼낸 쪽만 넣는다.
+      if (message.target !== undefined && accountId !== undefined) {
+        const taken = await takePendingFill((entry) => entry.accountId === accountId);
+        if (!taken) return { ok: true, outcome: 'handed-over' };
       }
-      if (tab.url && /^(?:chrome|edge|about|chrome-extension|moz-extension|safari-web-extension|devtools):/i.test(tab.url)) {
-        throw new FillError('restricted');
-      }
-      const req: FillRequest = {
-        tabId: tab.id,
-        pageUrl: tab.url,
-        windowId: tab.windowId,
-        accountId,
-        submit: message.submit !== false,
-        // 확장 화면에서 보낸 메시지만 여기 온다(위에서 보낸 곳을 확인했다).
-        allowSiteMismatch: typeof message.allowSiteMismatch === 'string' ? message.allowSiteMismatch : undefined,
-      };
-      // 기존 문서 고정만 재사용한다. 추가 인증이 꺼져 있으면 승인을 요구하지 않는다.
-      const pinned = retryTarget ? await pinFill(req) : undefined;
-      // 고정한 문서가 iframe이면 추가 인증에서 다시 확인할 주소도 그 프레임 주소여야 한다.
-      const outcome = await runFill(pinned ? { ...pinned, pageUrl: pinned.documentUrl } : req, sender, retryTarget && pinned
-        ? { ...retryTarget, documentUrl: pinned.documentUrl } : undefined);
-      return { ok: true, outcome };
+      return fillFromMessage(message, sender, seen);
     })().then(sendResponse, (error) => {
       console.warn('fill-code', error);
+      const tab = seen.tab;
       const key = fillErrorKey(error);
       const permission = key === 'popup.fillError.permission' ? permissionFor(tab, accountId) : undefined;
       const mismatch = error instanceof FillError && error.reason === 'siteMismatch' ? { host: error.host ?? '' } : undefined;
@@ -375,4 +383,42 @@ export function register(): void {
     });
     return true;
   });
+}
+
+type FillMessage = { accountId?: unknown; submit?: unknown; allowSiteMismatch?: unknown; target?: unknown };
+
+async function fillFromMessage(message: FillMessage, sender: chrome.runtime.MessageSender | undefined, seen: { tab?: chrome.tabs.Tab }) {
+  const accountId = typeof message.accountId === 'string' ? message.accountId : undefined;
+  const tab = seen.tab = await activeTab();
+  if (tab?.id === undefined) throw new FillError('noTab');
+  let retryTarget: RetryTarget | undefined;
+  // 권한 허용 후 재시도는 처음 누른 탭·주소가 그대로일 때만 진행한다.
+  // 다른 탭으로 이동한 뒤 승인한 요청을 새 페이지에 보내지 않는다.
+  if (message.target !== undefined) {
+    const target = message.target as { tabId?: unknown; pageUrl?: unknown } | null;
+    if (!target || typeof target !== 'object' || target.tabId !== tab.id ||
+        typeof target.pageUrl !== 'string' || target.pageUrl !== tab.url ||
+        (tab.pendingUrl !== undefined && tab.pendingUrl !== target.pageUrl)) {
+      throw new FillError('changed');
+    }
+    retryTarget = { tabId: target.tabId, pageUrl: target.pageUrl };
+  }
+  if (tab.url && /^(?:chrome|edge|about|chrome-extension|moz-extension|safari-web-extension|devtools):/i.test(tab.url)) {
+    throw new FillError('restricted');
+  }
+  const req: FillRequest = {
+    tabId: tab.id,
+    pageUrl: tab.url,
+    windowId: tab.windowId,
+    accountId,
+    submit: message.submit !== false,
+    // 확장 화면(또는 확장 화면이 맡긴 대기 항목)에서 온 값만 여기 온다.
+    allowSiteMismatch: typeof message.allowSiteMismatch === 'string' ? message.allowSiteMismatch : undefined,
+  };
+  // 기존 문서 고정만 재사용한다. 추가 인증이 꺼져 있으면 승인을 요구하지 않는다.
+  const pinned = retryTarget ? await pinFill(req) : undefined;
+  // 고정한 문서가 iframe이면 추가 인증에서 다시 확인할 주소도 그 프레임 주소여야 한다.
+  const outcome = await runFill(pinned ? { ...pinned, pageUrl: pinned.documentUrl } : req, sender, retryTarget && pinned
+    ? { ...retryTarget, documentUrl: pinned.documentUrl } : undefined);
+  return { ok: true, outcome };
 }

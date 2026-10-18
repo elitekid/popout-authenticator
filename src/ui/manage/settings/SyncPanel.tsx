@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'preact/hooks';
 import { isForced } from '../../../store/policy';
-import { clearSyncArea, syncNow, type SyncStatus } from '../../../store/sync';
+import { deleteSyncData, syncNow, type SyncStatus } from '../../../store/sync';
 import { onVaultChanged, readVaultFile } from '../../../store/vault';
 import type { PanelProps } from './panel-props';
 import { BROWSER_TARGET, requestSyncConsent, supportsBrowserSync, syncConsentGranted } from '../../../core/browser';
@@ -97,7 +97,7 @@ export function SyncPanel({ t, settings, policy, save, onReady }: PanelProps & {
     setBusy(true);
     setFailed(false);
     try {
-      await clearSyncArea();
+      await deleteSyncData();
       setAck(false);
       setCleared(true);
     } catch {
@@ -160,7 +160,7 @@ export function SyncPanel({ t, settings, policy, save, onReady }: PanelProps & {
         {failed
           ? t('settings.sync.failed')
           : needsConsent
-            ? t('settings.sync.consent')
+            ? t(lockOff === true ? 'settings.sync.consentPlain' : 'settings.sync.consent')
             : shownStatus === null
             ? t('settings.sync.status.unknown')
             : t(`settings.sync.status.${shownStatus}`)}

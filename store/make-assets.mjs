@@ -184,7 +184,7 @@ const TEXT = {
     dash: 'Project dashboard',
     window: 'Popout Authenticator',
     scenes: [
-      ['01-codes', 'Your 2FA codes, one click away', 'Click a code to copy it. Free, with no limit on accounts.'],
+      ['01-codes', 'Your 2FA codes, one click away', 'Click a code to copy it. No limit on accounts.'],
       ['02-fill', 'Fill codes right into sign-in pages', 'The account for the site you are on is suggested first.'],
       ['03-window', 'Pop it out to a window or the side panel', 'Keep your codes open next to your work.'],
       ['04-add', 'Add accounts in seconds', 'Scan a QR code on screen or with your camera, paste links, or import a backup file.'],
@@ -198,7 +198,7 @@ const TEXT = {
     dash: '프로젝트 대시보드',
     window: '팝업 인증 도구',
     scenes: [
-      ['01-codes', '클릭 한 번으로 2단계 인증 코드', '코드를 누르면 바로 복사됩니다. 계정 수 제한 없이 무료입니다.'],
+      ['01-codes', '클릭 한 번으로 2단계 인증 코드', '코드를 누르면 바로 복사됩니다. 계정 수 제한이 없습니다.'],
       ['02-fill', '로그인 화면에 코드를 바로 넣기', '지금 보고 있는 사이트의 계정을 먼저 알려 드립니다.'],
       ['03-window', '별도 창이나 사이드 패널로 열기', '작업하는 동안 코드를 옆에 띄워 둘 수 있습니다.'],
       ['04-add', '몇 초 만에 계정 추가', '화면이나 카메라로 QR 코드를 읽고, 링크나 백업 파일로 가져올 수 있습니다.'],
@@ -333,11 +333,11 @@ async function makeBrand(browser) {
     ['small-tile-440x280.png', 440, 280, false, `${head}<style>body{flex-direction:column;gap:16px}
       h1{font-size:30px;font-weight:700;letter-spacing:-.3px}p{font-size:16px;opacity:.88}</style>
       <body class="bg" style="width:440px;height:280px">${icon(116, '0 8px 18px rgba(0,0,0,.25)')}
-      <h1>Popout Authenticator</h1><p>Free 2FA codes in your browser</p>`],
+      <h1>Popout Authenticator</h1><p>2FA codes in your browser</p>`],
     ['marquee-1400x560.png', 1400, 560, false, `${head}<style>body{gap:64px}
       h1{font-size:76px;font-weight:700;letter-spacing:-1.5px;line-height:1.05}p{font-size:32px;opacity:.9;margin-top:22px}</style>
       <body class="bg" style="width:1400px;height:560px">${icon(260, '0 16px 36px rgba(0,0,0,.28)')}
-      <div><h1>Popout Authenticator</h1><p>Free 2FA &amp; OTP codes, one click away</p></div>`],
+      <div><h1>Popout Authenticator</h1><p>2FA &amp; OTP codes, one click away</p></div>`],
   ];
   for (const [name, w, h, transparent, html] of items) {
     await renderHtml(browser, html, w, h, path.join(ROOT, 'brand', name), transparent);

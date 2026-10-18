@@ -1,6 +1,7 @@
 {
-  "appName": { "message": "Popout Authenticator" },
-  "appDesc": { "message": "免费的浏览器 2FA 验证器。生成一次性验证码，可在弹出窗口或独立窗口中打开。" },
+  "appName": { "message": "Popout Authenticator — 2FA 身份验证器" },
+  "appShortName": { "message": "Popout Authenticator" },
+  "appDesc": { "message": "开源 2FA 验证器。在弹出窗口、独立窗口或侧边栏中显示一次性验证码，可用密码锁定，并可导入其他应用的备份。" },
   "cmdExecuteAction": { "message": "打开弹出窗口" },
   "cmdQuickFill": { "message": "在此页面填入 2FA 验证码" },
   "cmdScanQr": { "message": "扫描屏幕上的二维码" },

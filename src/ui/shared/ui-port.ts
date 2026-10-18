@@ -1,5 +1,6 @@
 // 서비스 워커에 "UI 가 열려 있음"을 알리는 포트. 끊기면 1초 뒤 다시 연결한다.
 const PORT_NAME = 'popout-ui';
+const PORT_RECONNECT_NAME = 'popout-ui-reconnect';
 const RETRY_MS = 1000;
 const ACTIVITY_MS = 1000;
 
@@ -9,6 +10,7 @@ export function connectUiPort(): UiPort {
   let port: chrome.runtime.Port | null = null;
   let timer: ReturnType<typeof setTimeout> | undefined;
   let closed = false;
+  let reconnecting = false;
   let lastActivity = 0;
   let activityTimer: ReturnType<typeof setTimeout> | undefined;
 
@@ -31,7 +33,9 @@ export function connectUiPort(): UiPort {
   function open(): void {
     if (closed) return;
     try {
-      const next = chrome.runtime.connect({ name: PORT_NAME });
+      // 처음 연결만 활동으로 친다. 다시 연결은 이름을 달리해 기한만 확인하게 한다.
+      const next = chrome.runtime.connect({ name: reconnecting ? PORT_RECONNECT_NAME : PORT_NAME });
+      reconnecting = true;
       next.onDisconnect.addListener(() => {
         void chrome.runtime.lastError;
         retry();

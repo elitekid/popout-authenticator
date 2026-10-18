@@ -22,11 +22,19 @@ if (location.pathname.endsWith('/window.html') && !chrome.windows.onBoundsChange
       void saveBounds().catch((error) => console.warn('windowBounds', error));
     }, 200);
   };
+  const hidden = () => {
+    if (document.visibilityState === 'hidden') resized();
+  };
+  // 옮기기만 한 경우는 resize가 없으니 포커스를 잃을 때도 저장한다.
   window.addEventListener('resize', resized);
+  window.addEventListener('blur', resized);
+  document.addEventListener('visibilitychange', hidden);
   window.addEventListener('pagehide', () => {
     closed = true;
     if (timer !== undefined) clearTimeout(timer);
     window.removeEventListener('resize', resized);
+    window.removeEventListener('blur', resized);
+    document.removeEventListener('visibilitychange', hidden);
   }, { once: true });
 }
 

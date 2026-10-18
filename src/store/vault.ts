@@ -3,6 +3,7 @@ import { duplicateKey, newAccount, type AccountDraft } from '../core/account';
 import { fromBase64, toBase64 } from '../core/crypto/bytes';
 import { newMasterKey, unwrapWithPassword, unwrapWithRecoveryCode } from '../core/crypto/keys';
 import { decryptVault, encryptVault, verifyVaultFile } from '../core/crypto/vault';
+import { WrongSecretError } from '../core/crypto/errors';
 import type { ImportMeta } from '../core/import/types';
 import type { Account, VaultFile } from '../core/types';
 import { LockedError, NoVaultError, VaultWriteError } from './errors';
@@ -42,8 +43,17 @@ export async function keyFromFile(file: VaultFile, creds: Credentials = {}): Pro
     if (wk) return unwrapWithPassword(wk, creds.password);
   }
   if (creds.recoveryCode !== undefined) {
-    const wk = keys.find((k) => k.kind === 'recovery');
-    if (wk) return unwrapWithRecoveryCode(wk, creds.recoveryCode);
+    // 새 복구 코드를 확인하기 전에는 감싸기가 여럿일 수 있다. 차례로 시도한다.
+    let wrong: unknown;
+    for (const wk of keys.filter((k) => k.kind === 'recovery')) {
+      try {
+        return await unwrapWithRecoveryCode(wk, creds.recoveryCode);
+      } catch (error) {
+        if (!(error instanceof WrongSecretError)) throw error;
+        wrong = error;
+      }
+    }
+    if (wrong) throw wrong;
   }
   throw new LockedError();
 }

@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; media-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>팀원에게 2FA 코드를 보내야 할 때: 임시 링크의 사용법과 한계 — Popout Authenticator</title>
+<meta name="description" content="담당자가 자리를 비웠거나 여러 사람이 한 계정에 들어가야 할 때, 개인별 접근·공유 금고·임시 코드 링크 중 무엇을 쓸지 고르고 링크의 한계를 확인합니다.">
+<link rel="canonical" href="https://elitekid.github.io/popout-authenticator/ko/guides/temporary-2fa-sharing-for-teams/">
+<link rel="alternate" hreflang="en" href="https://elitekid.github.io/popout-authenticator/guides/temporary-2fa-sharing-for-teams/">
+<link rel="alternate" hreflang="ko" href="https://elitekid.github.io/popout-authenticator/ko/guides/temporary-2fa-sharing-for-teams/">
+<link rel="alternate" hreflang="x-default" href="https://elitekid.github.io/popout-authenticator/guides/temporary-2fa-sharing-for-teams/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Popout Authenticator">
+<meta property="og:title" content="팀원에게 2FA 코드를 보내야 할 때: 임시 링크의 사용법과 한계">
+<meta property="og:description" content="담당자가 자리를 비웠거나 여러 사람이 한 계정에 들어가야 할 때, 개인별 접근·공유 금고·임시 코드 링크 중 무엇을 쓸지 고르고 링크의 한계를 확인합니다.">
+<meta property="og:url" content="https://elitekid.github.io/popout-authenticator/ko/guides/temporary-2fa-sharing-for-teams/">
+<meta property="og:image" content="https://elitekid.github.io/popout-authenticator/img/ko/03-window.png">
+<meta property="og:locale" content="ko">
+<meta property="og:locale:alternate" content="en">
+<link rel="icon" href="../../../img/logo.png">
+<link rel="stylesheet" href="../../../assets/site.css">
+<script src="../../../assets/site.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">본문으로 건너뛰기</a>
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="../../" data-keep-utm><img src="../../../img/logo.png" width="36" height="36" alt="">Popout Authenticator</a>
+    <nav class="main" aria-label="주 메뉴">
+      <a href="../../" data-keep-utm>홈</a>
+      <a href="../" data-keep-utm>가이드</a>
+      <a href="https://github.com/elitekid/popout-authenticator">GitHub</a>
+      <a class="lang" href="../../../guides/temporary-2fa-sharing-for-teams/" data-keep-utm hreflang="en" lang="en">English</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="wrap guide">
+  <nav class="crumbs" aria-label="이동 경로"><a href="../../" data-keep-utm>홈</a> › <a href="../" data-keep-utm>가이드</a></nav>
+  <h1>팀원에게 2FA 코드를 보내야 할 때: 임시 링크의 사용법과 한계</h1>
+  <p class="lead">담당자가 자리를 비웠거나 여러 사람이 한 계정에 들어가야 할 때, 개인별 접근·공유 금고·임시 코드 링크 중 무엇을 쓸지 고르고 링크의 한계를 확인합니다.</p>
+
+  <nav class="toc card" aria-label="이 쪽의 내용">
+    <ol>
+      <li><a href="#situations">어떤 상황인가</a></li>
+      <li><a href="#personal">먼저 개인별 계정과 위임 권한을 검토한다</a></li>
+      <li><a href="#vault">계속 접근해야 하면 공유 금고를 쓴다</a></li>
+      <li><a href="#link">잠깐 한 번 넘길 때는 Popout 코드 공유 링크</a></li>
+      <li><a href="#limits">꼭 알아야 할 한계</a></li>
+      <li><a href="#related">관련 가이드</a></li>
+    </ol>
+  </nav>
+
+  <h2 id="situations">어떤 상황인가</h2>
+  <p>작은 팀에서 흔히 생기는 상황입니다.</p>
+  <ul>
+    <li>2FA 코드를 가진 담당자가 휴가라서 다른 사람이 로그인하지 못합니다.</li>
+    <li>여러 사람이 같은 계정에 잠깐 로그인해야 합니다.</li>
+    <li>고객 계정의 코드가 한 사람에게만 가서, 누가 코드를 전해 주기 전까지 업무가 멈춥니다.</li>
+  </ul>
+  <p>접근이 필요한 기간과 사람 수에 따라 맞는 방법이 다릅니다. 아래는 먼저 확인할 것부터 순서대로 설명합니다.</p>
+
+  <h2 id="personal">먼저 개인별 계정과 위임 권한을 검토한다</h2>
+  <p>서비스가 사용자 추가나 접근 위임을 지원하면 그 방법을 쓰세요. 그러면 각자 자기 계정과 자기 2단계 인증으로 로그인하고, 서비스에서 누가 무엇을 했는지 볼 수 있습니다.</p>
+  <p>Google은 계정 공유를 권하지 않습니다. <a href="https://knowledge.workspace.google.com/admin/users/avoid-sharing-an-account-among-users">Google의 공유 계정 안내</a>를 보세요. 공용 메일함처럼 공유가 필요한 경우에는 별도 기능을 주는 서비스가 많습니다. 로그인 정보를 나누기 전에 서비스의 관리자 페이지나 도움말을 먼저 확인하세요.</p>
+
+  <h2 id="vault">계속 접근해야 하면 공유 금고를 쓴다</h2>
+  <p>여러 사람이 반복해서 접근해야 하고 퇴사자의 권한을 회수할 수 있어야 한다면, 비밀번호 관리자의 조직 기능처럼 권한 관리가 되는 공유 금고를 쓰세요. Bitwarden의 <a href="https://bitwarden.com/help/onboarding-and-succession/">온보딩과 승계 안내</a>는 이런 구성을 계획하는 예입니다.</p>
+  <p>공유 금고에서 사람을 빼도 그 사람이 이미 복사한 정보는 거둬들일 수 없고, 이미 로그인한 세션도 끝나지 않습니다. Bitwarden 안내도 같은 점을 밝히고, 구성원을 뺄 때 그 사람이 볼 수 있던 자격 증명을 바꾸라고 권합니다. 누군가 떠나면 해당 서비스에서 비밀번호와 2FA 비밀키를 바꾸고 그 사람의 세션을 끝내세요.</p>
+  <p>Popout은 사용자를 관리하지 않습니다. 구성원 목록도 없고, 한 사람의 접근을 거둬들이는 기능도 없습니다.</p>
+
+  <h2 id="link">잠깐 한 번 넘길 때는 Popout 코드 공유 링크</h2>
+  <p>누군가에게 코드가 한 번 또는 잠깐만 필요하다면 Popout 코드 공유 링크를 보낼 수 있습니다. 링크에 담기는 것과 동작은 다음과 같습니다.</p>
+  <ul>
+    <li>링크에는 비밀키가 없습니다. Popout이 미리 계산한 코드 묶음이 링크 안에 암호화되어 들어 있습니다.</li>
+    <li>코드를 보여 줄 시간은 5분, 15분, 30분, 60분 중에서 고릅니다.</li>
+    <li>시간 기반(TOTP) 계정을 공유할 수 있습니다. HOTP 같은 다른 종류는 공유할 수 없습니다.</li>
+    <li>받는 사람은 확장 프로그램을 설치하지 않아도 됩니다. 링크는 일반 웹 페이지로 열립니다.</li>
+    <li>링크에 비밀번호를 걸 수 있습니다. 비밀번호는 링크와 다른 경로로 보내세요. 예를 들어 링크는 메신저로, 비밀번호는 전화로 전합니다.</li>
+  </ul>
+  <p>링크를 만드는 단계는 <a href="../share-codes/" data-keep-utm>링크로 코드 공유</a>를 보세요.</p>
+  <div class="card note">
+    <p>링크 속 코드는 실제로 쓸 수 있는 코드입니다. 링크를 열 수 있는 사람은 시간이 끝날 때까지 그 코드를 쓸 수 있습니다. 필요한 만큼의 가장 짧은 시간을 고르세요.</p>
+  </div>
+
+  <h2 id="limits">꼭 알아야 할 한계</h2>
+  <ul>
+    <li><strong>링크를 취소할 수 없습니다.</strong> 코드가 이미 링크 안에 들어 있고, 링크를 꺼 줄 서버가 없습니다.</li>
+    <li><strong>링크는 복사되고 전달될 수 있습니다.</strong> 비밀번호가 이를 줄여 주지만, 비밀번호를 아는 사람이 다시 전할 수도 있습니다.</li>
+    <li><strong>링크는 특정 사람이나 기기에 묶이지 않습니다.</strong> 링크를 가진 사람은 정한 시간 안에 누구나 열 수 있습니다.</li>
+    <li><strong>Popout에는 만든 링크의 기록이 남지 않습니다.</strong> 나중에 누구에게 보냈는지, 누가 열었는지 확인할 수 없습니다.</li>
+    <li><strong>만료돼도 이미 로그인한 세션은 끊기지 않습니다.</strong> 시간이 끝나면 페이지에 코드가 더 나오지 않지만, 이미 로그인한 사람은 서비스가 그 세션을 끝낼 때까지 로그인된 상태로 남습니다.</li>
+    <li><strong>링크는 피싱을 막아 주지 않습니다.</strong> 누군가 가짜 페이지에 입력한 코드는 공격자가 쓸 수 있습니다. CISA의 <a href="https://www.cisa.gov/sites/default/files/2023-01/fact-sheet-implementing-phishing-resistant-mfa-508c.pdf">피싱에 강한 MFA 안내서</a>(영문)를 보세요.</li>
+  </ul>
+  <p>계정을 공유하는 것이 그 서비스의 이용 약관에 맞는지는 각자 해당 서비스에서 확인하세요.</p>
+
+  <h2 id="related">관련 가이드</h2>
+  <ul>
+    <li><a href="../share-codes/" data-keep-utm>링크로 코드 공유</a>: 링크를 만드는 단계와 선택 항목.</li>
+    <li><a href="../from-authy-and-other-apps/" data-keep-utm>Authy 데스크톱과 다른 앱에서 옮기기</a>: 팀의 코드가 아직 다른 앱에 있다면.</li>
+    <li><a href="../backup-and-sync/" data-keep-utm>백업·내보내기·동기화</a>: 내 계정을 내 여러 기기에서 쓰려면.</li>
+  </ul>
+
+  <aside class="review-ask" aria-label="평가 남기기" hidden>
+    <p><strong>평가 남기기</strong> 쓰는 브라우저의 스토어에 남긴 짧은 평가가 다른 사람이 Popout을 찾는 데 도움이 됩니다.</p>
+    <div class="stores reviews" data-campaign="pa-review-guide"></div>
+  </aside>
+
+  <nav class="guide-nav" aria-label="다른 가이드"><a href="../share-codes/" data-keep-utm>← 링크로 코드 공유</a><a href="../from-authy-and-other-apps/" data-keep-utm>Authy 데스크톱과 다른 앱에서 옮기기 →</a></nav>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <ul>
+      <li><a href="https://github.com/elitekid/popout-authenticator">GitHub</a></li>
+      <li><a href="https://github.com/elitekid/popout-authenticator/blob/main/PRIVACY.md">개인정보처리방침</a></li>
+      <li><a href="https://github.com/elitekid/popout-authenticator/issues">이슈</a></li>
+      <li>MIT 라이선스</li>
+    </ul>
+  </div>
+</footer>
+</body>
+</html>

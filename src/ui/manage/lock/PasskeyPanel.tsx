@@ -28,7 +28,8 @@ export function PasskeyPanel({ t, credIds, onReady, codeProtection }: { t: T; cr
     };
   }, []);
 
-  if (!available && (supportsPasskeys() || credIds.length === 0)) return null;
+  // 쓸 수 없어도 이미 등록된 패스키는 보이고 지울 수 있다. 추가 단추만 숨긴다.
+  if (!available && credIds.length === 0) return null;
 
   const remove = async (credId: string) => {
     if (pending.current || (codeProtection && credIds.length <= 1)) return;

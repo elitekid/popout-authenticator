@@ -8,6 +8,7 @@ import { readVaultFile } from '../store/vault';
 const ALARM = 'autolock';
 const MINUTE = 60_000;
 const PORT_NAME = 'popout-ui';
+const PORT_RECONNECT_NAME = 'popout-ui-reconnect';
 
 export function autolockDeadline(timing: LockTiming, lastActivityAt: number): number | null {
   if (timing === 'every' || timing === 'browser-close') return null;
@@ -47,14 +48,17 @@ export function register(): void {
   const touch = () => void touchActivity().catch(warn);
 
   chrome.runtime.onConnect.addListener((port) => {
-    if (port.name !== PORT_NAME) return;
+    if (port.name !== PORT_NAME && port.name !== PORT_RECONNECT_NAME) return;
     ports++;
-    touch();
+    // 자동 재연결(서비스 워커가 ~30초마다 내려감)은 사용자 활동이 아니다. 기한만 확인한다.
+    if (port.name === PORT_RECONNECT_NAME) void checkAutolock().catch(warn);
+    else touch();
     port.onMessage.addListener(touch);
     port.onDisconnect.addListener(() => {
       ports = Math.max(0, ports - 1);
       void (async () => {
-        await touchActivity();
+        // 마지막 창을 닫는 것만 활동으로 친다.
+        if (ports === 0) await touchActivity();
         if (ports === 0 && (await loadSettings()).lockTiming === 'every') await lockNow();
       })().catch(warn);
     });

@@ -200,11 +200,11 @@ function load(): void {
   void start(fragment);
 }
 
-// 하단 소개 줄: 확장의 기존 번역에서 appName 만 번들에 넣는다(설명의 '무료' 문구는 쓰지 않음).
+// 하단 소개 줄: 확장의 기존 번역에서 짧은 이름(appShortName)만 번들에 넣는다. appName 은 스토어 제목이라 설명 꼬리가 붙는다.
 type Localized = { message: string };
 const appNames = import.meta.glob<Localized>('../public/_locales/*/messages.json', {
   eager: true,
-  import: 'appName',
+  import: 'appShortName',
 });
 
 function aboutLocale(): string {

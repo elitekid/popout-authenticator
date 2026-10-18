@@ -1,6 +1,7 @@
 {
-  "appName": { "message": "Popout Authenticator" },
-  "appDesc": { "message": "Authentificateur 2FA gratuit pour votre navigateur. Génère des codes à usage unique et s’ouvre en fenêtre contextuelle ou en fenêtre séparée." },
+  "appName": { "message": "Popout Authenticator — codes 2FA et OTP" },
+  "appShortName": { "message": "Popout Authenticator" },
+  "appDesc": { "message": "Authentificateur 2FA open source. Codes à usage unique en pop-up, fenêtre ou panneau latéral, avec verrou par mot de passe." },
   "cmdExecuteAction": { "message": "Ouvrir la fenêtre contextuelle" },
   "cmdQuickFill": { "message": "Saisir le code 2FA sur cette page" },
   "cmdScanQr": { "message": "Scanner un code QR à l’écran" },

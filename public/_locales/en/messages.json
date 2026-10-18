@@ -1,9 +1,12 @@
 {
   "appName": {
+    "message": "Popout Authenticator — 2FA & OTP Codes"
+  },
+  "appShortName": {
     "message": "Popout Authenticator"
   },
   "appDesc": {
-    "message": "Free 2FA authenticator for your browser. Generates one-time codes, opens as a popup or separate window."
+    "message": "Open-source 2FA authenticator. One-time codes in a popup, window or side panel, with password lock and backup import."
   },
   "cmdExecuteAction": {
     "message": "Open the popup"

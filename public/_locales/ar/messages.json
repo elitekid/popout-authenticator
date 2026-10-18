@@ -1,6 +1,7 @@
 {
   "appName": { "message": "Popout Authenticator" },
-  "appDesc": { "message": "مصادِق 2FA مجاني لمتصفحك. يولّد رموزًا لمرة واحدة، ويُفتح كنافذة منبثقة أو نافذة منفصلة." },
+  "appShortName": { "message": "Popout Authenticator" },
+  "appDesc": { "message": "مصادِق 2FA لمتصفحك. يولّد رموزًا لمرة واحدة، ويُفتح كنافذة منبثقة أو نافذة منفصلة." },
   "cmdExecuteAction": { "message": "فتح النافذة المنبثقة" },
   "cmdQuickFill": { "message": "إدخال رمز 2FA في هذه الصفحة" },
   "cmdScanQr": { "message": "قراءة رمز QR من الشاشة" },

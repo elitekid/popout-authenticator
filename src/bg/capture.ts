@@ -5,14 +5,15 @@ async function captureTab(windowId?: number, otk?: string): Promise<void> {
     windowId === undefined
       ? await chrome.tabs.captureVisibleTab({ format: 'png' })
       : await chrome.tabs.captureVisibleTab(windowId, { format: 'png' });
-  // 이전 캡처의 1회용 키가 남아 새 그림에 섞이지 않게 한다.
-  await chrome.storage.session.remove('captureOtk');
-  await chrome.storage.session.set({ captureImage: image, ...(otk ? { captureOtk: otk } : {}) });
+  // 요청마다 id 를 두어 동시에 연 두 캡처 화면이 서로의 그림·1회용 키를 가져가지 않게 한다.
+  const id = crypto.randomUUID();
+  const keys = [`captureImage:${id}`, `captureOtk:${id}`];
+  await chrome.storage.session.set({ [keys[0]]: image, ...(otk ? { [keys[1]]: otk } : {}) });
   try {
-    await chrome.tabs.create({ url: chrome.runtime.getURL('capture.html') });
+    await chrome.tabs.create({ url: `${chrome.runtime.getURL('capture.html')}?id=${id}` });
   } catch (error) {
     // 캡처 화면을 못 열면 스크린샷·1회용 키를 남기지 않는다.
-    await chrome.storage.session.remove(['captureImage', 'captureOtk']);
+    await chrome.storage.session.remove(keys);
     throw error;
   }
 }

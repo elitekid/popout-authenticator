@@ -47,6 +47,8 @@ export interface QuickFillPageArgs {
   noticeText: string;
   expiresAt?: number;
   documentUrl?: string;
+  /** The document and field were pinned earlier under this id; use that field, not the current focus. */
+  pinId?: string;
   autoSubmit?: boolean;
 }
 
@@ -134,7 +136,12 @@ export async function quickFillInPage(args: QuickFillPageArgs): Promise<QuickFil
       // autofill keys off — worth more than any amount of naming.
       if ((field.getAttribute('autocomplete') || '').includes('one-time-code')) score += 10;
       if (OTP_HINT.test(haystack)) score += 5;
-      if (/(^|[^a-z])code([^a-z]|$)/i.test(haystack)) score += 3;
+      if (/(^|[^a-z])code([^a-z]|$)/i.test(haystack) || /인증/.test(haystack)) score += 3;
+      // 힌트가 없으면 전화번호 칸 등을 고르지 않는다. 숫자·tel·길이는 힌트 있는 후보끼리만 겨룬다.
+      // 자리마다 한 칸인 입력(maxlength=1이 코드 길이 이상)은 그 자체가 힌트다.
+      // 코드 길이와 같은 숫자 칸(maxlength=6, numeric·tel)도 단서로 친다. 전화번호 칸은 대개 더 길다.
+      const numeric = field.inputMode === 'numeric' || field.type === 'tel';
+      if (score === 0 && !(field.maxLength === 1 && groupFor(field)) && !(numeric && field.maxLength === CODE.length)) continue;
       if (field.maxLength === 1) score += 2;
       if (field.maxLength === CODE.length) score += 2;
       if (field.inputMode === 'numeric' || field.type === 'tel') score += 1;
@@ -411,8 +418,23 @@ export async function quickFillInPage(args: QuickFillPageArgs): Promise<QuickFil
     return 'shown';
   }
 
-  const focused = focusedElement();
-  const target = isFillable(focused) ? (focused as HTMLElement) : guessTarget();
+  // 문서를 먼저 고정한 넣기는 그때 기억한 칸만 쓴다. 기다리는 사이 옮겨 간 포커스는 따르지 않는다.
+  // 고정했던 칸이 사라졌으면 다른 칸을 추측하지 않는다(엉뚱한 폼에 넣고 제출하지 않게).
+  let target: HTMLElement | null;
+  if (args.pinId !== undefined) {
+    const pins = (globalThis as { __popoutPinnedFields?: Map<string, WeakRef<Element> | null> }).__popoutPinnedFields;
+    const pin = pins?.get(args.pinId);
+    pins?.delete(args.pinId);
+    if (pin) {
+      const field = pin.deref();
+      target = field?.isConnected && isFillable(field) ? (field as HTMLElement) : null;
+    } else {
+      target = guessTarget();
+    }
+  } else {
+    const focused = focusedElement();
+    target = isFillable(focused) ? (focused as HTMLElement) : guessTarget();
+  }
 
   if (target) {
     const form = target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement ? target.form : null;

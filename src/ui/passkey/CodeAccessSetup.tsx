@@ -9,6 +9,7 @@ import { UnlockForm } from '../shared/UnlockForm';
 import {
   PasskeyUnsupportedError,
   passkeyAvailable,
+  evaluatePrf,
   passkeyErrorKey,
   registerPasskey,
 } from '../shared/passkey';
@@ -48,11 +49,16 @@ export function CodeAccessSetup({ onDone, onCancel }: { onDone: () => void; onCa
       if (!current(mine)) return;
       if (!file || file.lock === 'none') throw new Error('lock not enabled');
       // 앞선 시도에서 저장했으면 등록을 반복하지 않고 보호를 켜는 단계부터 이어간다.
-      if (!file.wrappedKeys.some((key) => key.kind === 'prf' && key.credId)) {
+      const credIds = file.wrappedKeys.flatMap((key) => (key.kind === 'prf' && key.credId ? [key.credId] : []));
+      if (credIds.length === 0) {
         const result = await registerPasskey({ signal: request.signal });
         output = result.prfOutput;
         if (!current(mine)) return;
         await addPrfKey(output, result.credId);
+      } else {
+        // 이미 지워진 패스키 ID 로 보호를 켜지 않도록, 켜기 직전에 실제로 한 번 인증한다.
+        output = (await evaluatePrf(credIds, { signal: request.signal })).prfOutput;
+        if (!current(mine)) return;
       }
       if (!current(mine)) return;
       await enableCodeProtection();

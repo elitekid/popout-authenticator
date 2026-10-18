@@ -30,12 +30,39 @@ export function useCodes(accounts: Account[], nowMs: number, enabled = true): Ma
   const live = useMemo(() => new Set(accounts.map((account) => account.id)), [accounts]);
   const second = Math.floor(nowMs / 1000);
 
+  // 계산이 진행 중이면 새 계산을 시작하지 않고 입력만 갱신한다. 끝난 뒤 최신 입력으로 한 번 더 돈다.
+  const latest = useRef({ accounts, live, second, enabled });
+  const running = useRef(false);
+  const dirty = useRef(false);
+  const alive = useRef(true);
   useEffect(() => {
+    alive.current = true;
+    return () => {
+      alive.current = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    latest.current = { accounts, live, second, enabled };
     if (!enabled) return;
-    let cancelled = false;
+    dirty.current = true;
+    if (running.current) return;
+    running.current = true;
     void (async () => {
+      try {
+        while (dirty.current && alive.current) {
+          dirty.current = false;
+          await compute();
+        }
+      } finally {
+        running.current = false;
+      }
+    })();
+
+    async function compute(): Promise<void> {
+      const { accounts, live, second } = latest.current;
       const now = second * 1000;
-      // 이번 실행의 결과는 임시 사본에 모으고, 취소되지 않았을 때만 캐시와 화면에 함께 반영한다.
+      // 이번 실행의 결과는 임시 사본에 모으고, 끝까지 돈 뒤에 캐시와 화면에 함께 반영한다.
       const previous = cache.current;
       let draft = previous;
       // 대부분의 초에는 코드가 그대로다. 내용이 바뀔 때만 목록 크기의 사본을 만든다.
@@ -49,14 +76,12 @@ export function useCodes(accounts: Account[], nowMs: number, enabled = true): Ma
           const key = cacheKey(a, now);
           if (draft.get(a.id)?.key === key) continue;
           const code = await generateCode(a, now);
-          if (cancelled) return;
           const next = a.type === 'hotp' ? code : await generateCode(a, now, 0, 1);
           writable().set(a.id, { key, pair: { code, next, at: now } });
           changed = true;
         } catch {
           if (draft.has(a.id)) { writable().delete(a.id); changed = true; }
         }
-        if (cancelled) return;
       }
       for (const id of previous.keys()) {
         if (!live.has(id)) {
@@ -64,14 +89,11 @@ export function useCodes(accounts: Account[], nowMs: number, enabled = true): Ma
           changed = true;
         }
       }
-      if (cancelled) return;
+      if (!alive.current || !latest.current.enabled) return;
       cache.current = draft;
       if (changed) setCodes(new Map([...draft].map(([id, v]) => [id, v.pair] as const)));
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [accounts, live, second, enabled]);
+    }
+  },[accounts, live, second, enabled]);
 
   return codes;
 }

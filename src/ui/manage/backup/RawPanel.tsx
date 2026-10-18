@@ -1,10 +1,10 @@
 import { useState } from 'preact/hooks';
 import type { AccountDraft } from '../../../core/account';
-import { WrongSecretError } from '../../../core/crypto/errors';
+import { CorruptVaultError, WrongSecretError } from '../../../core/crypto/errors';
 import type { ImportMeta } from '../../../core/import/types';
 import { LockedError } from '../../../store/errors';
-import { buildRawCopy, isRawCopy, openRawCopy } from '../../../store/recover';
-import { addDrafts, createVault, readVaultFile } from '../../../store/vault';
+import { buildRawCopy, isRawCopy, openRawCopy, replaceWithRawCopy } from '../../../store/recover';
+import { addDrafts, createVault, loadAccounts, readVaultFile } from '../../../store/vault';
 import type { useT } from '../../shared/use-t';
 import { downloadText, today } from './download';
 
@@ -41,6 +41,19 @@ export function RawSave({ t, big = false }: { t: T; big?: boolean }) {
 
 type Result = { added: number; duplicates: number };
 
+// 금고가 있는데 내용이 손상돼 열리지 않을 때만 true. 잠김 등 다른 실패는 그대로 위로 올린다.
+async function currentVaultCorrupt(): Promise<boolean> {
+  if (!(await readVaultFile())) return false;
+  try {
+    await loadAccounts();
+    return false;
+  } catch (error) {
+    if (error instanceof CorruptVaultError) return true;
+    if (error instanceof LockedError) return false;
+    throw error;
+  }
+}
+
 export function RawImport({ t, showSave }: { t: T; showSave: boolean }) {
   // 비밀번호를 물을 때 사본 글을 들고 있는다.
   const [pending, setPending] = useState<{ text: string; wrong: boolean } | null>(null);
@@ -57,6 +70,13 @@ export function RawImport({ t, showSave }: { t: T; showSave: boolean }) {
       if (!isRawCopy(text)) {
         setPending(null);
         setError('backup.raw.notRaw');
+        return;
+      }
+      // 현재 금고가 손상돼 있으면 그것을 풀려 하지 않고 사본으로 바로 바꾼다.
+      if (await currentVaultCorrupt()) {
+        const restored = await replaceWithRawCopy(text, pw === undefined ? undefined : { password: pw });
+        setPending(null);
+        setResult({ added: restored, duplicates: 0 });
         return;
       }
       const accounts = (await openRawCopy(text, pw === undefined ? undefined : { password: pw })).filter(

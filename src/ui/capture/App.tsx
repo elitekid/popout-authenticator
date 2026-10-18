@@ -6,6 +6,7 @@ import { LockedError } from '../../store/errors';
 import { redeemOneTimeKey } from '../../store/lock';
 import { addDrafts, createVault, readVaultFile } from '../../store/vault';
 import { sourceToRgba } from '../shared/qr-image';
+import { connectUiPort } from '../shared/ui-port';
 import { UnlockForm } from '../shared/UnlockForm';
 import { useT } from '../shared/use-t';
 
@@ -84,13 +85,29 @@ export function App() {
     return { drafts: parsed.drafts, failed };
   };
 
+  // 페이지가 열려 있는 동안 포트를 유지한다('모든 화면을 닫으면 잠금'이 이 페이지도 센다).
+  useEffect(() => {
+    const port = connectUiPort();
+    const activity = () => port.activity();
+    document.addEventListener('keydown', activity);
+    document.addEventListener('pointerdown', activity);
+    return () => {
+      document.removeEventListener('keydown', activity);
+      document.removeEventListener('pointerdown', activity);
+      port.close();
+    };
+  }, []);
+
   useEffect(() => {
     let alive = true;
     void (async () => {
       let got: Record<string, unknown>;
       try {
-        got = await chrome.storage.session.get(['captureImage', 'captureOtk']);
-        await chrome.storage.session.remove(['captureImage', 'captureOtk']);
+        const id = new URLSearchParams(location.search).get('id') ?? '';
+        const keys = [`captureImage:${id}`, `captureOtk:${id}`];
+        got = await chrome.storage.session.get(keys);
+        await chrome.storage.session.remove(keys);
+        got = { captureImage: got[keys[0]], captureOtk: got[keys[1]] };
       } catch {
         if (alive) setPhase('empty');
         return;

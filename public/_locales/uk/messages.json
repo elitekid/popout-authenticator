@@ -1,6 +1,7 @@
 {
   "appName": { "message": "Popout Authenticator" },
-  "appDesc": { "message": "Безкоштовний автентифікатор 2FA для вашого браузера. Генерує одноразові коди, відкривається як спливне або окреме вікно." },
+  "appShortName": { "message": "Popout Authenticator" },
+  "appDesc": { "message": "Автентифікатор 2FA для вашого браузера. Генерує одноразові коди, відкривається як спливне або окреме вікно." },
   "cmdExecuteAction": { "message": "Відкрити спливне вікно" },
   "cmdQuickFill": { "message": "Вставити код 2FA на цій сторінці" },
   "cmdScanQr": { "message": "Сканувати QR-код на екрані" },

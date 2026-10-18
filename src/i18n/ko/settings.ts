@@ -41,6 +41,7 @@ export const settings = {
   'settings.sync.plainWarn': '잠금 없이 동기화하면 계정의 비밀키가 암호화되지 않은 채 같은 브라우저 계정의 다른 기기로 전송됩니다.',
   'settings.sync.now': '지금 동기화',
   "settings.sync.consent": "Firefox 동기화로 암호화된 계정을 보내려면 허용이 필요합니다.",
+  "settings.sync.consentPlain": "Firefox 동기화로 계정을 보내려면 허용이 필요합니다. 잠금을 켜면 암호화해 보냅니다.",
   'settings.sync.failed': '동기화하지 못했습니다. 잠시 뒤 다시 해 보세요.',
   'settings.sync.status.unknown': '아직 동기화한 기록이 없습니다.',
   'settings.sync.status.off': '동기화가 꺼져 있습니다.',
@@ -62,6 +63,8 @@ export const settings = {
   'settings.suggestions': '사이트에 맞는 계정 추천 (끄면 사이트 사용 기록 삭제)',
 
   'settings.about.version': '버전 {version}',
+  'settings.about.help': '도움말',
+  'settings.about.site': '웹사이트',
   'settings.about.feedback': '의견 보내기',
   'settings.about.review': '평가하기',
 

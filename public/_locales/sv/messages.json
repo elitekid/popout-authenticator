@@ -1,6 +1,7 @@
 {
   "appName": { "message": "Popout Authenticator" },
-  "appDesc": { "message": "Gratis 2FA-autentiserare för din webbläsare. Skapar engångskoder och öppnas som popup eller separat fönster." },
+  "appShortName": { "message": "Popout Authenticator" },
+  "appDesc": { "message": "2FA-autentiserare för din webbläsare. Skapar engångskoder och öppnas som popup eller separat fönster." },
   "cmdExecuteAction": { "message": "Öppna popupen" },
   "cmdQuickFill": { "message": "Fyll i 2FA-koden på den här sidan" },
   "cmdScanQr": { "message": "Skanna en QR-kod på skärmen" },

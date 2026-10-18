@@ -1,6 +1,7 @@
 {
   "appName": { "message": "Popout Authenticator" },
-  "appDesc": { "message": "Tarayıcınız için ücretsiz 2FA kimlik doğrulayıcı. Tek kullanımlık kodlar üretir; açılır pencere veya ayrı pencere olarak açılır." },
+  "appShortName": { "message": "Popout Authenticator" },
+  "appDesc": { "message": "Tarayıcınız için 2FA kimlik doğrulayıcı. Tek kullanımlık kodlar üretir; açılır pencere veya ayrı pencere olarak açılır." },
   "cmdExecuteAction": { "message": "Açılır pencereyi aç" },
   "cmdQuickFill": { "message": "2FA kodunu bu sayfaya doldur" },
   "cmdScanQr": { "message": "Ekrandaki bir QR kodunu tara" },

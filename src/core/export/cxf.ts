@@ -1,6 +1,7 @@
 // FIDO Credential Exchange Format(CXF) JSON 쓰기·읽기. totp 자격 증명만 다룬다.
 import { makeDraft, type AccountDraft } from '../account';
 import { encodeBase32, parseSecret } from '../base32';
+import type { ImportFailure } from '../import/types';
 import type { Account, Algorithm } from '../types';
 
 type CxfCredential = {
@@ -125,9 +126,15 @@ export function isCxf(text: string): boolean {
 }
 
 export function readCxf(text: string): AccountDraft[] {
+  return readCxfWithFailures(text).drafts;
+}
+
+// 읽지 못한 totp 항목은 다른 가져오기 형식처럼 failed 로 돌려준다.
+export function readCxfWithFailures(text: string): { drafts: AccountDraft[]; failed: ImportFailure[] } {
   const root = parse(text);
   if (!root || (!Array.isArray(root.accounts) && !Array.isArray(root.items))) throw new Error('not a CXF file');
   const drafts: AccountDraft[] = [];
+  const failed: ImportFailure[] = [];
   for (const items of itemLists(root)) {
     for (const rawItem of items) {
       const item = asObject(rawItem);
@@ -140,7 +147,7 @@ export function readCxf(text: string): AccountDraft[] {
         try {
           const algorithmText = typeof cred.algorithm === 'string' ? cred.algorithm.toLowerCase() : 'sha1';
           const algorithm = READ_ALGORITHM[algorithmText];
-          if (!algorithm) continue;
+          if (!algorithm) throw new Error(`unsupported algorithm: ${algorithmText}`);
           const username = (typeof cred.username === 'string' ? cred.username.trim() : '') || subtitle;
           const issuer =
             (typeof cred.issuer === 'string' ? cred.issuer.trim() : '') || (title !== username ? title : '');
@@ -155,11 +162,11 @@ export function readCxf(text: string): AccountDraft[] {
               ...(typeof cred.period === 'number' ? { period: cred.period } : {}),
             }),
           );
-        } catch {
-          // 이 자격 증명만 건너뛴다.
+        } catch (e) {
+          failed.push({ source: title.slice(0, 60), reason: e instanceof Error ? e.message : String(e) });
         }
       }
     }
   }
-  return drafts;
+  return { drafts, failed };
 }

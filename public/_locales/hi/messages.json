@@ -1,6 +1,7 @@
 {
   "appName": { "message": "Popout Authenticator" },
-  "appDesc": { "message": "आपके ब्राउज़र के लिए मुफ़्त 2FA ऑथेंटिकेटर। एक बार इस्तेमाल होने वाले कोड बनाता है और पॉपअप या अलग विंडो में खुलता है।" },
+  "appShortName": { "message": "Popout Authenticator" },
+  "appDesc": { "message": "आपके ब्राउज़र के लिए 2FA ऑथेंटिकेटर। एक बार इस्तेमाल होने वाले कोड बनाता है और पॉपअप या अलग विंडो में खुलता है।" },
   "cmdExecuteAction": { "message": "पॉपअप खोलें" },
   "cmdQuickFill": { "message": "इस पेज पर 2FA कोड भरें" },
   "cmdScanQr": { "message": "स्क्रीन पर QR कोड स्कैन करें" },

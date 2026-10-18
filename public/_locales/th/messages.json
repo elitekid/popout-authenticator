@@ -1,6 +1,7 @@
 {
   "appName": { "message": "Popout Authenticator" },
-  "appDesc": { "message": "แอปยืนยันตัวตน 2FA ฟรีสำหรับเบราว์เซอร์ของคุณ สร้างรหัสใช้ครั้งเดียว เปิดเป็นป๊อปอัปหรือหน้าต่างแยกได้" },
+  "appShortName": { "message": "Popout Authenticator" },
+  "appDesc": { "message": "แอปยืนยันตัวตน 2FA สำหรับเบราว์เซอร์ของคุณ สร้างรหัสใช้ครั้งเดียว เปิดเป็นป๊อปอัปหรือหน้าต่างแยกได้" },
   "cmdExecuteAction": { "message": "เปิดป๊อปอัป" },
   "cmdQuickFill": { "message": "กรอกรหัส 2FA ในหน้านี้" },
   "cmdScanQr": { "message": "สแกนรหัส QR บนหน้าจอ" },

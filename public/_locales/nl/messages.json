@@ -1,6 +1,7 @@
 {
   "appName": { "message": "Popout Authenticator" },
-  "appDesc": { "message": "Gratis 2FA-authenticator voor je browser. Genereert eenmalige codes en opent als pop-up of apart venster." },
+  "appShortName": { "message": "Popout Authenticator" },
+  "appDesc": { "message": "2FA-authenticator voor je browser. Genereert eenmalige codes en opent als pop-up of apart venster." },
   "cmdExecuteAction": { "message": "De pop-up openen" },
   "cmdQuickFill": { "message": "De 2FA-code op deze pagina invullen" },
   "cmdScanQr": { "message": "Een QR-code op het scherm scannen" },

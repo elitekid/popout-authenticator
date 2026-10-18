@@ -1,4 +1,5 @@
 // 입력칸 우클릭 메뉴. 'open-window' 는 open-mode.ts 가 만드니 removeAll 하지 않는다.
+import { BROWSER_TARGET } from '../core/browser';
 import { runFill } from './fill';
 
 const MENU_ID = 'quick-fill';
@@ -9,7 +10,10 @@ export function register(): void {
       {
         id: MENU_ID,
         title: chrome.i18n.getMessage('menuQuickFill'),
-        contexts: ['editable'],
+        // Firefox의 editable 에는 password 입력칸이 빠져 있다. Chrome은 'password'를 모른다.
+        contexts: BROWSER_TARGET === 'firefox'
+          ? (['editable', 'password'] as chrome.contextMenus.ContextType[])
+          : ['editable'],
         documentUrlPatterns: ['http://*/*', 'https://*/*'],
       },
       () => void chrome.runtime.lastError, // 이미 있으면 무시

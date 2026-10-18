@@ -23,7 +23,7 @@ export const add = {
   'add.rejected.encrypted': 'Export an unencrypted file from the {app} app and use that.',
   'add.rejected.unknown': 'Unknown format',
   'add.result': '{added} added, {duplicates} duplicates, {failed} failed',
-  'add.success': "Added {added} accounts.",
+  'add.success': "Accounts added: {added}.",
   'add.duplicates': "Skipped {n} accounts that already exist.",
   'add.failures': "Could not add {n} items.",
   'add.noAdded': "No new accounts were added.",

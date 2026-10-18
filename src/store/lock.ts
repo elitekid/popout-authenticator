@@ -5,6 +5,7 @@ import type { Argon2Params } from '../core/crypto/kdf';
 import {
   newMasterKey,
   unwrapWithPrf,
+  unwrapWithRecoveryCode,
   wrapWithPassword,
   wrapWithPrf,
   wrapWithRecoveryCode,
@@ -23,6 +24,7 @@ import {
   setSessionKey,
   withSessionLock,
 } from './session';
+import { clearSnapshots, rewriteNoneSnapshots } from './snapshots';
 import { commitVaultFile, keyFromFile, readVaultFile, replaceVaultFile, withVaultWriteLock } from './vault';
 
 const MIN_PASSWORD = 8;
@@ -60,6 +62,21 @@ export async function isLocked(): Promise<boolean> {
   return (await getSessionKey()) === null;
 }
 
+// 잠금 전 스냅샷(방금 남긴 직전 판 포함)은 none 키가 그대로라 새 마스터 키로 다시 암호화한다.
+// 다시 쓰지 못한 스냅샷은 남기지 않고 지운다. 저장소 자체가 막히면 스냅샷을 모두 비운다.
+async function protectSnapshots(locked: VaultFile, next: Uint8Array): Promise<void> {
+  try {
+    await rewriteNoneSnapshots(async (old) => {
+      const accounts = await decryptVault(old, await keyFromFile(old));
+      const file = await encryptVault(accounts, next, locked.lock, locked.wrappedKeys);
+      if (locked.lockChangedAt !== undefined) file.lockChangedAt = locked.lockChangedAt;
+      return file;
+    });
+  } catch {
+    await clearSnapshots().catch((error: unknown) => console.warn('snapshots clear', error));
+  }
+}
+
 export async function enableLock(
   password: string,
   params?: Argon2Params,
@@ -82,6 +99,7 @@ export async function enableLock(
       file.lockChangedAt = Date.now();
       await commitVaultFile(file);
       await setSessionKey(next);
+      await protectSnapshots(file, next);
     } finally { next.fill(0); }
   }));
   // 잠금을 켜면 방문 사이트 기록을 디스크에 남기지 않는다(이후는 session 에만).
@@ -124,26 +142,75 @@ export async function unlockWithPassword(password: string): Promise<void> {
   }));
 }
 
-// 쓴 복구 코드는 버리고 새 코드로 바꾼다. 확인부터 교체까지 쓰기 잠금 하나 안에서 해,
-// 같은 코드를 두 창이 동시에 써도 하나만 통한다.
+// 복구 코드 감싸기는 이어 붙은 채 둘 수 있는 개수의 한도(확정된 것 하나 + 확정 전 새 코드들).
+const MAX_RECOVERY = 4;
+
+// 복구 코드로 풀고 새 코드를 덧붙인다. 새 코드를 사용자가 받았다고 확인하기(confirmRecoveryCode) 전에는
+// 쓴 옛 코드도 그대로 둔다(팝업이 닫혀 새 코드를 잃어도 잠기지 않게).
+// 확인부터 덧붙이기까지 쓰기 잠금 하나 안에서 한다.
 export async function unlockWithRecoveryCode(code: string): Promise<{ recoveryCode: string }> {
   const recoveryCode = newRecoveryCode();
   await withVaultWriteLock(() => withSessionLock(async () => {
     const cur = await readVaultFile();
     if (!cur) throw new NoVaultError();
     if (cur.lock === 'none') throw new Error('lock not enabled');
-    const opened = await keyFromFile(cur, { recoveryCode: code });
+    const recovery = cur.wrappedKeys.filter((k) => k.kind === 'recovery');
+    if (recovery.length === 0) throw new LockedError();
+    const opened = await openWithAnyRecovery(recovery, code);
     try {
       await decryptVault(cur, opened);
       const others = cur.wrappedKeys.filter((k) => k.kind !== 'recovery');
+      // 한도를 넘으면 맨 앞(확정된 것)과 가장 최근 것만 남긴다.
+      const kept = recovery.length >= MAX_RECOVERY
+        ? [...recovery.slice(0, 1), ...recovery.slice(-(MAX_RECOVERY - 2))]
+        : recovery;
       await commitVaultFile(withLockMeta(cur, {
         lock: cur.lock,
-        wrappedKeys: [...others, await wrapWithRecoveryCode(opened, recoveryCode)],
+        wrappedKeys: [...others, ...kept, await wrapWithRecoveryCode(opened, recoveryCode)],
       }));
       await setSessionKey(opened);
     } finally { opened.fill(0); }
   }));
   return { recoveryCode };
+}
+
+async function openWithAnyRecovery(recovery: WrappedKey[], code: string): Promise<Uint8Array> {
+  let wrong: unknown = new WrongSecretError('wrong recovery code');
+  for (const wk of recovery) {
+    try {
+      return await unwrapWithRecoveryCode(wk, code);
+    } catch (error) {
+      if (!(error instanceof WrongSecretError)) throw error;
+      wrong = error;
+    }
+  }
+  throw wrong;
+}
+
+// 사용자가 새 복구 코드를 받았다고 확인하면 그 코드만 남기고 나머지 복구 감싸기를 없앤다.
+// 풀린 상태에서만 하고, 넘긴 코드가 실제로 풀리는 감싸기가 있을 때만 바꾼다.
+export async function confirmRecoveryCode(recoveryCode: string): Promise<void> {
+  await changeLockMeta(async (cur, key) => {
+    if (cur.lock === 'none') throw new Error('lock not enabled');
+    const recovery = cur.wrappedKeys.filter((k) => k.kind === 'recovery');
+    let mine: WrappedKey | undefined;
+    for (const wk of recovery) {
+      let check: Uint8Array | null = null;
+      try {
+        check = await unwrapWithRecoveryCode(wk, recoveryCode);
+      } catch (error) {
+        if (!(error instanceof WrongSecretError)) throw error;
+      }
+      if (check && sameBytes(check, key)) mine = wk;
+      check?.fill(0);
+      if (mine) break;
+    }
+    if (!mine) throw new WrongSecretError('unknown recovery code');
+    return {
+      lock: cur.lock,
+      wrappedKeys: [...cur.wrappedKeys.filter((k) => k.kind !== 'recovery'), mine],
+    };
+  });
 }
 
 // 풀린 상태에서 복구 코드 감싸기만 새 코드로 바꾼다. 옛 코드는 바로 못 쓰게 된다.

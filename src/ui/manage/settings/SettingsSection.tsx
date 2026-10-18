@@ -3,7 +3,8 @@ import type { Settings } from '../../../core/types';
 import { readPolicy, type Policy } from '../../../store/policy';
 import { loadSettings, onSettingsChanged, saveSettings } from '../../../store/settings';
 import { useT } from '../../shared/use-t';
-import { STORE_REVIEW_URL } from '../../popup/logic';
+import { currentLang } from '../../../i18n';
+import { STORE_REVIEW_URL, siteUrl } from '../../popup/logic';
 import { AdvisorPanel } from './AdvisorPanel';
 import { ClockPanel } from './ClockPanel';
 import { DisplayPanel } from './DisplayPanel';
@@ -79,6 +80,7 @@ export function SettingsSection() {
   );
 
   const feedbackUrl = policy.feedbackURL ?? DEFAULT_FEEDBACK_URL;
+  const lang = currentLang(settings.language);
 
   return (
     <div class="settings" aria-busy={readyPanels !== 15}>
@@ -93,6 +95,12 @@ export function SettingsSection() {
         <AdvisorPanel t={t} onReady={advisorReady} />
         <p class="settings-about muted" data-role="settings-about">
           <span data-role="settings-version">{t('settings.about.version', { version: chrome.runtime.getManifest().version })}</span>{' '}
+          <a href={siteUrl(lang, 'guides')} target="_blank" rel="noopener" data-role="settings-help">
+            {t('settings.about.help')}
+          </a>{' '}
+          <a href={siteUrl(lang, 'home')} target="_blank" rel="noopener" data-role="settings-site">
+            {t('settings.about.site')}
+          </a>{' '}
           <a href={feedbackUrl} target="_blank" rel="noopener" data-role="settings-feedback">
             {t('settings.about.feedback')}
           </a>{' '}

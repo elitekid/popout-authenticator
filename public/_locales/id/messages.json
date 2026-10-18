@@ -1,6 +1,7 @@
 {
   "appName": { "message": "Popout Authenticator" },
-  "appDesc": { "message": "Autentikator 2FA gratis untuk browser Anda. Menghasilkan kode sekali pakai dan dibuka sebagai popup atau jendela terpisah." },
+  "appShortName": { "message": "Popout Authenticator" },
+  "appDesc": { "message": "Autentikator 2FA untuk browser Anda. Menghasilkan kode sekali pakai dan dibuka sebagai popup atau jendela terpisah." },
   "cmdExecuteAction": { "message": "Buka popup" },
   "cmdQuickFill": { "message": "Isi kode 2FA di halaman ini" },
   "cmdScanQr": { "message": "Pindai kode QR di layar" },

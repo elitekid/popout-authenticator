@@ -1,4 +1,5 @@
 import type { ComponentChildren } from 'preact';
+import { memo } from 'preact/compat';
 import { useEffect, useLayoutEffect, useRef, useState } from 'preact/hooks';
 import { makeDraft, type AccountDraft } from '../../../core/account';
 import { encodeBase32, parseSecret } from '../../../core/base32';
@@ -141,6 +142,11 @@ export function AddSection({ initialTab, onDone }: { initialTab?: Tab; onDone?: 
         privacyEpoch.current++;
         setVerify([]);
         setVerifyOpen(false);
+        // 입력 중인 비밀키·링크·비밀번호와 대기 중인 가져오기 데이터도 지운다.
+        setForm((f) => ({ ...f, secret: '' }));
+        setLinksText('');
+        setPassword('');
+        setAsk(null);
       }
     };
     chrome.storage.onChanged.addListener(onSession);
@@ -283,6 +289,7 @@ export function AddSection({ initialTab, onDone }: { initialTab?: Tab; onDone?: 
 
   // 파일을 차례로 읽는다. 비밀번호가 필요하면 멈추고 묻는다.
   const processFiles = async (queue: Item[], batch: Batch, pw?: string): Promise<void> => {
+    const epoch = privacyEpoch.current;
     setBusy(true);
     try {
       setAsk(null);
@@ -290,10 +297,13 @@ export function AddSection({ initialTab, onDone }: { initialTab?: Tab; onDone?: 
         const item = queue[i]!;
         try {
           const out = await importText(item.text, i === 0 ? pw : undefined);
+          // 읽는 동안 잠겼으면 결과를 버린다.
+          if (epoch !== privacyEpoch.current) return;
           batch.drafts.push(...out.drafts);
           batch.meta.push(...out.drafts.map((_, n) => out.meta?.[n] ?? {}));
           batch.failed.push(...translateFailures(out.failed, t, 'add.file.unreadable'));
         } catch (error) {
+          if (epoch !== privacyEpoch.current) return;
           if (error instanceof NeedsPasswordError || error instanceof WrongSecretError) {
             setAsk({ queue: queue.slice(i), batch, wrong: error instanceof WrongSecretError });
             return;
@@ -307,6 +317,7 @@ export function AddSection({ initialTab, onDone }: { initialTab?: Tab; onDone?: 
           batch.failed.push({ source: item.name, reason });
         }
       }
+      if (epoch !== privacyEpoch.current) return;
       await commit(batch);
     } finally { setBusy(false); }
   };
@@ -464,7 +475,7 @@ export function AddSection({ initialTab, onDone }: { initialTab?: Tab; onDone?: 
             }}>{t('add.file.label')}</button> : <input
               type="file"
               multiple
-              accept=".json,.txt,application/json,text/plain"
+              accept=".json,.txt,.2fas,application/json,text/plain"
               data-role="file-input"
               disabled={ask !== null || busy}
               onChange={(e) => void onFiles(e.currentTarget)}
@@ -634,10 +645,18 @@ function VerifyList({ t, accounts, onFixed }: {
 
 type VerifyProps = { t: T; account: Account; nowMs: number; onFixed: (next: Account) => void };
 
+const verifyStep = (account: Account, nowMs: number) =>
+  account.type === 'hotp' ? 0 : Math.floor(nowMs / 1000 / (account.type === 'totp' ? account.period : 30));
+
+// 매초 시계가 바뀌어도 주기(step)가 그대로면 줄을 다시 그리지 않는다.
+const VerifyRow = memo(VerifyRowInner, (a, b) =>
+  a.t === b.t && a.account === b.account && a.onFixed === b.onFixed &&
+  verifyStep(a.account, a.nowMs) === verifyStep(b.account, b.nowMs));
+
 // 폰 앱 코드와 맞춰 보는 줄. 저장하지 않는다(알고리즘·자릿수를 고칠 때만 금고에 쓴다).
-function VerifyRow({ t, account, nowMs, onFixed }: VerifyProps) {
+function VerifyRowInner({ t, account, nowMs, onFixed }: VerifyProps) {
   const [code, setCode] = useState('');
-  const step = account.type === 'hotp' ? 0 : Math.floor(nowMs / 1000 / (account.type === 'totp' ? account.period : 30));
+  const step = verifyStep(account, nowMs);
   const [open, setOpen] = useState(false);
   const [failed, setFailed] = useState(false);
   const [options, setOptions] = useState<{ algorithm: Algorithm; digits: number; code: string }[]>(
