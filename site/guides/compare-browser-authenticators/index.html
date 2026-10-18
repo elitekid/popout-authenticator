@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; media-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Browser 2FA extensions compared: Popout Authenticator, Authenticator, 2FAS and 2FA Authenticator — Popout Authenticator</title>
+<meta name="description" content="Where codes are made, browsers, latest versions, license, server use, paid plans, storage, backup, import and filling for four browser 2FA extensions, checked October 18, 2026.">
+<link rel="canonical" href="https://elitekid.github.io/popout-authenticator/guides/compare-browser-authenticators/">
+<link rel="alternate" hreflang="en" href="https://elitekid.github.io/popout-authenticator/guides/compare-browser-authenticators/">
+<link rel="alternate" hreflang="ko" href="https://elitekid.github.io/popout-authenticator/ko/guides/compare-browser-authenticators/">
+<link rel="alternate" hreflang="x-default" href="https://elitekid.github.io/popout-authenticator/guides/compare-browser-authenticators/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Popout Authenticator">
+<meta property="og:title" content="Browser 2FA extensions compared: Popout Authenticator, Authenticator, 2FAS and 2FA Authenticator">
+<meta property="og:description" content="Where codes are made, browsers, latest versions, license, server use, paid plans, storage, backup, import and filling for four browser 2FA extensions, checked October 18, 2026.">
+<meta property="og:url" content="https://elitekid.github.io/popout-authenticator/guides/compare-browser-authenticators/">
+<meta property="og:image" content="https://elitekid.github.io/popout-authenticator/img/en/02-fill.png">
+<meta property="og:locale" content="en">
+<meta property="og:locale:alternate" content="ko">
+<link rel="icon" href="../../img/logo.png">
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/site.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="../../" data-keep-utm><img src="../../img/logo.png" width="36" height="36" alt="">Popout Authenticator</a>
+    <nav class="main" aria-label="Main">
+      <a href="../../" data-keep-utm>Home</a>
+      <a href="../" data-keep-utm>Guides</a>
+      <a href="https://github.com/elitekid/popout-authenticator">GitHub</a>
+      <a class="lang" href="../../ko/guides/compare-browser-authenticators/" data-keep-utm hreflang="ko" lang="ko">한국어</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="wrap guide">
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="../../" data-keep-utm>Home</a> › <a href="../" data-keep-utm>Guides</a></nav>
+  <h1>Browser 2FA extensions compared: Popout Authenticator, Authenticator, 2FAS and 2FA Authenticator</h1>
+  <p class="lead">Facts about four browser extensions for one-time codes, checked on October 18, 2026 against each project's store page, website and source code. There is no ranking here: pick by what you need.</p>
+
+  <nav class="toc card" aria-label="On this page">
+    <ol>
+      <li><a href="#how">How this was checked</a></li>
+      <li><a href="#table">Side by side</a></li>
+      <li><a href="#fit">Which one fits what you need</a></li>
+      <li><a href="#limits">Popout's limits</a></li>
+      <li><a href="#sources">Sources</a></li>
+      <li><a href="#related">Related guides</a></li>
+    </ol>
+  </nav>
+
+  <h2 id="how">How this was checked</h2>
+  <p>This page is written by the developer of Popout Authenticator, so read it with that in mind. Every value for the other extensions comes from their own store page, website, documentation or source code, listed under <a href="#sources">Sources</a>. "Not confirmed" means we did not find it in those sources, not that the feature is missing. We did not install the other extensions to test them. If something here is wrong or out of date, please <a href="https://github.com/elitekid/popout-authenticator/issues">open an issue</a>.</p>
+
+  <h2 id="table">Side by side</h2>
+  <div class="table-wrap">
+    <table class="stack">
+      <thead>
+        <tr><th scope="col"></th><th scope="col">Popout Authenticator</th><th scope="col">Authenticator (authenticator.cc)</th><th scope="col">2FAS Auth extension</th><th scope="col">2FA Authenticator (authenticator.sh)</th></tr>
+      </thead>
+      <tbody>
+        <tr><th scope="row">Where codes are made</th><td data-label="Popout Authenticator">In the browser</td><td data-label="Authenticator">In the browser</td><td data-label="2FAS Auth">On your phone, in the 2FAS Auth app; the extension receives them</td><td data-label="2FA Authenticator">In the browser</td></tr>
+        <tr><th scope="row">Browsers</th><td data-label="Popout Authenticator">Chrome, Edge, Firefox, Whale; Safari (macOS) in review</td><td data-label="Authenticator">Chrome, Edge, Firefox; a Safari version exists but the project says it is not officially supported</td><td data-label="2FAS Auth">Chrome and other Chromium browsers, Edge, Firefox, Opera, Safari</td><td data-label="2FA Authenticator">Chrome (other stores not confirmed)</td></tr>
+        <tr><th scope="row">Latest store version</th><td data-label="Popout Authenticator">1.0.1 on Firefox (October 18, 2026); 1.0.1 in review on Chrome and Edge</td><td data-label="Authenticator">Chrome 8.0.1 (August 27, 2024); Firefox 8.0.2 (September 15, 2024)</td><td data-label="2FAS Auth">1.9.2 on Chrome and Firefox (September 28, 2026)</td><td data-label="2FA Authenticator">1.15.0 on Chrome (October 10, 2026)</td></tr>
+        <tr><th scope="row">License</th><td data-label="Popout Authenticator">MIT</td><td data-label="Authenticator">MIT</td><td data-label="2FAS Auth">GPL-3.0</td><td data-label="2FA Authenticator">MIT</td></tr>
+        <tr><th scope="row">Account and server</th><td data-label="Popout Authenticator">No account. No developer server; the only request is an optional clock check</td><td data-label="Authenticator">No account. Optional cloud backup goes to your own Google Drive, OneDrive or Dropbox</td><td data-label="2FAS Auth">No account. Phone and browser talk through 2FAS servers, end-to-end encrypted</td><td data-label="2FA Authenticator">No account. Checks in with its server once a day for the plan; its FAQ says no secrets, names or codes are sent</td></tr>
+        <tr><th scope="row">Paid plan or account limit</th><td data-label="Popout Authenticator">None</td><td data-label="Authenticator">Not found in its documentation</td><td data-label="2FAS Auth">No charge for 2FAS Auth per its site and terms</td><td data-label="2FA Authenticator">New installs may have an account limit; Pro (subscription or one-time) removes it. Installs before 1.14.0 keep unlimited accounts</td></tr>
+        <tr><th scope="row">How secrets are stored</th><td data-label="Popout Authenticator">AES-256-GCM vault on the device. A password (Argon2id) protects the key; without a password, the key is kept on the device next to the data</td><td data-label="Authenticator">Browser storage; optional password encryption and auto-lock</td><td data-label="2FAS Auth">On the phone; the app can be locked with a PIN or biometrics</td><td data-label="2FA Authenticator">Browser storage, not encrypted by default; optional password (AES-256-GCM, PBKDF2) with auto-lock and recovery codes</td></tr>
+        <tr><th scope="row">Backup and export</th><td data-label="Popout Authenticator">Encrypted backup file, otpauth text, CXF, QR codes; recovery snapshots and a 30-day trash</td><td data-label="Authenticator">Encrypted backup, otpauth text; automatic backup to Google Drive, OneDrive or Dropbox</td><td data-label="2FAS Auth">In the phone app: .2fas file (optional password), Google Drive on Android, iCloud on iOS</td><td data-label="2FA Authenticator">Encrypted file, plain JSON, otpauth text, CXF; keeps the last 7 automatic local backups</td></tr>
+        <tr><th scope="row">Import from other apps</th><td data-label="Popout Authenticator">Authenticator extension backups (including password-protected), Google Authenticator export QR, plain-text backups from Aegis, 2FAS, Bitwarden and others, CXF</td><td data-label="Authenticator">Google Authenticator export QR, standard plain-text backups (for example FreeOTP+)</td><td data-label="2FAS Auth">In the phone app: Google Authenticator, Aegis, Raivo OTP, LastPass, Authenticator Pro, andOTP</td><td data-label="2FA Authenticator">Google Authenticator export QR, otpauth links, CXF</td></tr>
+        <tr><th scope="row">Filling codes into sign-in pages</th><td data-label="Popout Authenticator">Click, right-click, keyboard shortcut, or a button next to the code field, on sites you allow</td><td data-label="Authenticator">Click a code (after turning the option on), or a shortcut when one account matches the site</td><td data-label="2FAS Auth">Request from the extension, approve on the phone, and the code is filled in</td><td data-label="2FA Authenticator">Right-click the field or use a shortcut</td></tr>
+        <tr><th scope="row">Where it opens</th><td data-label="Popout Authenticator">Toolbar popup, separate window, side panel (sidebar in Firefox)</td><td data-label="Authenticator">Toolbar popup, separate window; side panel not confirmed</td><td data-label="2FAS Auth">Not confirmed beyond the toolbar button</td><td data-label="2FA Authenticator">Toolbar popup, separate window, Chrome side panel</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="fit">Which one fits what you need</h2>
+  <ul>
+    <li><strong>You want the secrets to stay on your phone.</strong> 2FAS keeps them in the phone app and asks you to approve each code there. The browser never holds the secret.</li>
+    <li><strong>You want everything in the browser, with no phone.</strong> Authenticator, 2FA Authenticator and Popout all make codes in the browser. Set a password in any of them: an extension that holds both your password manager and your codes on one computer is a trade-off, and for important accounts a phone app or a security key keeps the factors apart.</li>
+    <li><strong>You already use Authenticator.</strong> It keeps working. Its last Chrome store update was August 27, 2024. If you move, its backup file (including a password-protected one) can be read by Popout; see <a href="../from-authenticator-extension/" data-keep-utm>Moving from the original Authenticator extension</a>.</li>
+    <li><strong>You want codes in a side panel or a separate window that stays open.</strong> Popout and 2FA Authenticator both offer this.</li>
+  </ul>
+
+  <h2 id="limits">Popout's limits</h2>
+  <ul>
+    <li>There is no cloud backup run by us. Backups are files you keep, and sync goes through your browser's own sync.</li>
+    <li>Passkey unlock and device verification do not work in Firefox.</li>
+    <li>The Safari version is for macOS only and is still in review.</li>
+    <li>The interface languages other than English and Korean are machine-translated.</li>
+    <li>Popout is new: version 1.0.0 was released in October 2026.</li>
+  </ul>
+
+  <h2 id="sources">Sources</h2>
+  <p>All checked on October 18, 2026.</p>
+  <ul>
+    <li>Authenticator: <a href="https://chromewebstore.google.com/detail/authenticator/bhghoamapcdpbohphigoooaddinpkbai">Chrome Web Store</a>, <a href="https://addons.mozilla.org/en-US/firefox/addon/auth-helper/">Firefox Add-ons</a>, <a href="https://github.com/Authenticator-Extension/Authenticator">GitHub</a>, <a href="https://authenticator.cc/docs/en/export-and-import.html">export and import</a>, <a href="https://authenticator.cc/docs/en/otp-backup.html">standard backup format</a>, <a href="https://authenticator.cc/docs/en/privacy-policy">privacy policy</a></li>
+    <li>2FAS Auth: <a href="https://chromewebstore.google.com/detail/2fas-auth-two-factor-auth/dbfoemgnkgieejfkaddieamagdfepnff">Chrome Web Store</a>, <a href="https://2fas.com/support/2fas-auth-browser-extension/how-does-the-browser-extension-work/">how the extension works</a>, <a href="https://2fas.com/support/2fas-auth-browser-extension/which-browsers-do-you-support/">supported browsers</a>, <a href="https://2fas.com/support/2fas-auth-security-privacy/where-do-you-store-the-tokens/">where tokens are stored</a>, <a href="https://2fas.com/support/2fas-auth-mobile-app/2fas-auth-app-tutorial/">app tutorial</a>, <a href="https://github.com/twofas/2fas-browser-extension">GitHub</a></li>
+    <li>2FA Authenticator: <a href="https://chromewebstore.google.com/detail/2fa-authenticator/ebhcbenbgjmaebpgbldimndmfomjmphd">Chrome Web Store</a>, <a href="https://www.authenticator.sh/how-it-works">how it works</a>, <a href="https://www.authenticator.sh/faq">FAQ</a>, <a href="https://github.com/authenticator-sh/2fa">GitHub</a></li>
+    <li>Popout Authenticator: <a href="https://github.com/elitekid/popout-authenticator">GitHub</a>, <a href="https://github.com/elitekid/popout-authenticator/blob/main/PRIVACY.md">privacy policy</a></li>
+  </ul>
+
+  <h2 id="related">Related guides</h2>
+  <ul>
+    <li><a href="../from-authenticator-extension/" data-keep-utm>Moving from the original Authenticator extension</a>: read its backup file, including a password-protected one.</li>
+    <li><a href="../from-authy-and-other-apps/" data-keep-utm>Moving from Authy Desktop and other apps</a>: which formats Popout can read.</li>
+    <li><a href="../lock-and-protect/" data-keep-utm>Lock and protect your accounts</a>: set a password and auto-lock.</li>
+  </ul>
+
+  <aside class="review-ask" aria-label="Rate Popout Authenticator" hidden>
+    <p><strong>Rate Popout Authenticator.</strong> A short review in your browser's store helps other people find it.</p>
+    <div class="stores reviews" data-campaign="pa-review-guide"></div>
+  </aside>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <ul>
+      <li><a href="https://github.com/elitekid/popout-authenticator">GitHub</a></li>
+      <li><a href="https://github.com/elitekid/popout-authenticator/blob/main/PRIVACY.md">Privacy</a></li>
+      <li><a href="https://github.com/elitekid/popout-authenticator/issues">Issues</a></li>
+      <li>MIT License</li>
+    </ul>
+  </div>
+</footer>
+</body>
+</html>
