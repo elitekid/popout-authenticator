@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; media-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>IT 관리자 배포 안내 — Popout Authenticator</title>
+<meta name="description" content="IT 관리자용: 크롬·엣지·파이어폭스에 Popout Authenticator를 강제 설치하고 관리 정책 키를 설정합니다. 정책 키 이름은 기존 Authenticator 확장 프로그램과 같습니다.">
+<link rel="canonical" href="https://elitekid.github.io/popout-authenticator/ko/guides/managed-deployment/">
+<link rel="alternate" hreflang="en" href="https://elitekid.github.io/popout-authenticator/guides/managed-deployment/">
+<link rel="alternate" hreflang="ko" href="https://elitekid.github.io/popout-authenticator/ko/guides/managed-deployment/">
+<link rel="alternate" hreflang="x-default" href="https://elitekid.github.io/popout-authenticator/guides/managed-deployment/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Popout Authenticator">
+<meta property="og:title" content="IT 관리자 배포 안내">
+<meta property="og:description" content="IT 관리자용: 크롬·엣지·파이어폭스에 Popout Authenticator를 강제 설치하고 관리 정책 키를 설정합니다. 정책 키 이름은 기존 Authenticator 확장 프로그램과 같습니다.">
+<meta property="og:url" content="https://elitekid.github.io/popout-authenticator/ko/guides/managed-deployment/">
+<meta property="og:image" content="https://elitekid.github.io/popout-authenticator/img/ko/03-window.png">
+<meta property="og:locale" content="ko">
+<meta property="og:locale:alternate" content="en">
+<link rel="icon" href="../../../img/logo.png">
+<link rel="stylesheet" href="../../../assets/site.css">
+<script src="../../../assets/site.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">본문으로 건너뛰기</a>
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="../../" data-keep-utm><img src="../../../img/logo.png" width="36" height="36" alt="">Popout Authenticator</a>
+    <nav class="main" aria-label="주 메뉴">
+      <a href="../../" data-keep-utm>홈</a>
+      <a href="../" data-keep-utm>가이드</a>
+      <a href="https://github.com/elitekid/popout-authenticator">GitHub</a>
+      <a class="lang" href="../../../guides/managed-deployment/" data-keep-utm hreflang="en" lang="en">English</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="wrap guide">
+  <nav class="crumbs" aria-label="이동 경로"><a href="../../" data-keep-utm>홈</a> › <a href="../" data-keep-utm>가이드</a></nav>
+  <h1>IT 관리자 배포 안내</h1>
+  <p>회사나 학교에서 기존 Authenticator 확장 프로그램(authenticator.cc)을 관리 정책으로 배포했거나 배포하려는 관리자를 위한 쪽입니다. Popout Authenticator는 같은 이름의 정책 키를 읽습니다. 기존 값을 쓰기 전에 아래 표에서 키마다 동작을 확인해 주세요.</p>
+
+  <h2>정책 키</h2>
+  <p>Popout은 브라우저의 관리 저장소(<code>managed_schema.json</code>에 선언)에서 아래 8개 키를 읽습니다. 키 이름은 기존 확장 프로그램의 스키마와 같습니다. 기존 확장 프로그램의 <code>disableInstallHelp</code> 키는 받지 않습니다.</p>
+  <div class="table-wrap">
+    <table class="stack">
+      <thead><tr><th>키</th><th>형식</th><th>동작</th></tr></thead>
+      <tbody>
+        <tr><td data-label="키"><code>storageArea</code></td><td data-label="형식">문자열: <code>sync</code> 또는 <code>local</code></td><td data-label="동작">브라우저 동기화를 강제로 켜거나(<code>sync</code>) 끕니다(<code>local</code>). 어느 쪽이든 주 저장은 local입니다. 동기화 설정은 사용자가 바꿀 수 없게 잠깁니다. 다른 값은 무시합니다.</td></tr>
+        <tr><td data-label="키"><code>disableBackup</code></td><td data-label="형식">불리언</td><td data-label="동작">값을 읽어 두지만, 현재 코드는 이 값으로 화면을 숨기지 않습니다.</td></tr>
+        <tr><td data-label="키"><code>disableExport</code></td><td data-label="형식">불리언</td><td data-label="동작"><code>true</code>이면 백업 화면에서 내보내기 대신 안내 문구가 나오고, 원시 사본 저장과 팝업의 계정별 내보내기가 숨겨집니다.</td></tr>
+        <tr><td data-label="키"><code>enforcePassword</code></td><td data-label="형식">불리언</td><td data-label="동작"><code>true</code>이면 비밀번호 잠금이 없는 사용자에게 비밀번호 설정을 요구합니다. 잠금을 켜기 전에는 계정 추가와 원시 사본 가져오기가 막히고, 사용자는 잠금을 끌 수 없습니다.</td></tr>
+        <tr><td data-label="키"><code>enforceAutolock</code></td><td data-label="형식">숫자(분)</td><td data-label="동작">자동 잠금 시간을 정하고 사용자가 바꿀 수 없게 잠급니다. 0 이하는 무시하고, 1440(24시간)을 넘으면 1440으로 맞춥니다.</td></tr>
+        <tr><td data-label="키"><code>passwordPolicy</code></td><td data-label="형식">문자열(정규식)</td><td data-label="동작">새 비밀번호가 이 정규식과 맞아야 합니다. 빈 값이나 잘못된 정규식은 무시합니다.</td></tr>
+        <tr><td data-label="키"><code>passwordPolicyHint</code></td><td data-label="형식">문자열</td><td data-label="동작">비밀번호가 <code>passwordPolicy</code>와 맞지 않을 때 보여 주는 문구입니다.</td></tr>
+        <tr><td data-label="키"><code>feedbackURL</code></td><td data-label="형식">문자열(http 또는 https 주소)</td><td data-label="동작">설정의 의견 보내기 링크 주소를 바꿉니다. 다른 방식의 주소나 잘못된 주소는 무시합니다.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>정책은 페이지마다 한 번 읽고, 정책이 바뀌면 다시 읽습니다. 읽는 데 1초를 넘기거나 실패하면 그 읽기에서는 정책이 없는 것으로 봅니다.</p>
+  <p>정책에 비밀키를 넣어 계정을 일괄 배포하는 기능은 없습니다.</p>
+
+  <h2>강제 설치</h2>
+  <p>브라우저마다 확장 ID만 바꾸면 됩니다.</p>
+  <ul>
+    <li>크롬: <code>nakgmloofpboegibcjhainbpjjokmbgj</code></li>
+    <li>엣지: <code>edipphpgdmfabonchodjfnejlbjoknhh</code></li>
+    <li>파이어폭스: <code>popout-authenticator@elitekid</code></li>
+  </ul>
+  <ul>
+    <li>크롬: 구글 관리 콘솔의 Apps &amp; extensions에서 스토어 ID로 확장 프로그램을 추가하고 설치 정책을 Force install로 정합니다. <a href="https://support.google.com/chrome/a/answer/6177447">구글 안내</a>를 참고해 주세요.</li>
+    <li>엣지: <a href="https://learn.microsoft.com/en-us/deployedge/microsoft-edge-management-service-extensions">마이크로소프트의 확장 프로그램 관리 안내</a>를 참고해 주세요.</li>
+  </ul>
+
+  <h2>정책 값 전달</h2>
+  <p>아래 값은 설명용 가짜 예시입니다. <code>&lt;ID&gt;</code>는 쓰는 브라우저의 확장 ID로 바꿔 주세요.</p>
+  <h3>윈도 레지스트리(크롬)</h3>
+  <p>아래 경로 밑에 <code>policy</code> 키를 만들고 정책 키마다 값을 하나씩 추가합니다(문자열은 REG_SZ, 숫자와 불리언은 REG_DWORD).</p>
+  <pre><code>HKLM\Software\Policies\Google\Chrome\3rdparty\extensions\&lt;ID&gt;\policy</code></pre>
+  <h3>맥(크롬)</h3>
+  <p>이름이 <code>com.google.Chrome.extensions.&lt;ID&gt;</code>인 plist를 씁니다.</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;plist version="1.0"&gt;
+&lt;dict&gt;
+  &lt;key&gt;enforcePassword&lt;/key&gt;
+  &lt;true/&gt;
+  &lt;key&gt;enforceAutolock&lt;/key&gt;
+  &lt;integer&gt;15&lt;/integer&gt;
+  &lt;key&gt;passwordPolicy&lt;/key&gt;
+  &lt;string&gt;^.{12,}$&lt;/string&gt;
+&lt;/dict&gt;
+&lt;/plist&gt;</code></pre>
+  <h3>파이어폭스(<code>policies.json</code>)</h3>
+  <p>Popout의 파이어폭스판도 같은 관리 스키마를 선언하고 <code>storage.managed</code>로 읽습니다.</p>
+  <pre><code>{
+  "policies": {
+    "3rdparty": {
+      "Extensions": {
+        "popout-authenticator@elitekid": {
+          "enforcePassword": true,
+          "enforceAutolock": 15,
+          "passwordPolicy": "^.{12,}$",
+          "passwordPolicyHint": "12자 이상으로 정해 주세요."
+        }
+      }
+    }
+  }
+}</code></pre>
+
+  <h2>사용자 계정 옮기기</h2>
+  <p>사용자는 기존 확장 프로그램의 백업 파일로 계정을 옮길 수 있습니다. <a href="../from-authenticator-extension/" data-keep-utm>기존 Authenticator 확장 프로그램에서 옮기기</a>를 참고해 주세요.</p>
+
+  <h2>문의</h2>
+  <p><a href="https://github.com/elitekid/popout-authenticator/issues">GitHub 이슈</a>로 남겨 주세요.</p>
+
+  <nav class="guide-nav" aria-label="다른 가이드"><a href="../" data-keep-utm>← 모든 가이드</a><a href="../from-authenticator-extension/" data-keep-utm>기존 Authenticator 확장 프로그램에서 옮기기 →</a></nav>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <ul>
+      <li><a href="https://github.com/elitekid/popout-authenticator">GitHub</a></li>
+      <li><a href="https://github.com/elitekid/popout-authenticator/blob/main/PRIVACY.md">개인정보처리방침</a></li>
+      <li><a href="https://github.com/elitekid/popout-authenticator/issues">이슈</a></li>
+      <li>MIT 라이선스</li>
+    </ul>
+  </div>
+</footer>
+</body>
+</html>
