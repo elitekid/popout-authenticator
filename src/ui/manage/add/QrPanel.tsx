@@ -121,6 +121,24 @@ export function QrPanel({ t, busy, onBatch, onScanned, onCameraStart, onCameraSt
       >
         {t('add.qr.camera')}
       </button>
+      <button
+        type="button"
+        data-role="qr-display"
+        disabled={busy}
+        onClick={() => {
+          setWindowFailed(false);
+          void chrome.runtime.sendMessage({ type: 'capture-display' }).then(
+            (reply: { ok?: boolean } | undefined) => {
+              if (reply?.ok !== true) { setWindowFailed(true); return; }
+              // 파이어폭스는 탭이 열려도 툴바 팝업이 안 닫혀 직접 닫는다
+              if (toolbarPopup) window.close();
+            },
+            () => setWindowFailed(true),
+          );
+        }}
+      >
+        {t('add.qr.display')}
+      </button>
       {windowFailed && <p class="error" role="alert">{t('add.error.save')}</p>}
       {camera && <CameraScanner onFound={onScanned} onClose={() => { setCamera(false); onCameraStop(); }} />}
     </div>

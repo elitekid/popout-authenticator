@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'preact/hooks';
 import { supportsBrowserSync } from '../../../core/browser';
 import { LockedError } from '../../../store/errors';
+import { onPolicyChanged, readPolicy } from '../../../store/policy';
 import { loadSettings, onSettingsChanged } from '../../../store/settings';
 import { isSyncActive } from '../../../store/sync';
 import { loadAccounts, onVaultChanged, readVaultFile } from '../../../store/vault';
@@ -37,7 +38,8 @@ async function compute(): Promise<View> {
 
   if (file && file.lock === 'none') found.push({ id: 'password', level: 'danger', link: '#lock' });
 
-  if (file) {
+  // 관리자가 백업을 껐으면 백업 권고를 내지 않는다.
+  if (file && !(await readPolicy()).disableBackup) {
     const backupInfo = asBackupInfo(local.backupInfo);
     let needed = false;
     try {
@@ -91,11 +93,13 @@ export function AdvisorPanel({ t, onReady }: Pick<PanelProps, 't'> & { onReady: 
     };
     refresh();
     const offVault = onVaultChanged(refresh);
+    const offPolicy = onPolicyChanged(refresh);
     const offSettings = onSettingsChanged(refresh);
     chrome.storage.onChanged.addListener(onLocal);
     return () => {
       alive = false;
       offVault();
+      offPolicy();
       offSettings();
       chrome.storage.onChanged.removeListener(onLocal);
     };

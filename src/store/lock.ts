@@ -16,6 +16,7 @@ import type { VaultFile, WrappedKey } from '../core/types';
 import { LockedError, NoVaultError } from './errors';
 import { readCodeProtection } from './code-access';
 import {
+  bumpLockEpoch,
   clearLastActivityAt,
   clearSessionKey,
   getOneTimeKeys,
@@ -280,6 +281,7 @@ export async function unlockWithPrf(
 
 export function lockNow(): Promise<void> {
   return withSessionLock(async () => {
+    await bumpLockEpoch();
     await clearSessionKey();
     await chrome.storage.session.remove('codeAccessRequests');
     await clearLastActivityAt();

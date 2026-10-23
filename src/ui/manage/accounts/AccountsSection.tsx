@@ -4,7 +4,7 @@ import { duplicateKey } from '../../../core/account';
 import { encodeBase32, parseSecret } from '../../../core/base32';
 import { generateCode } from '../../../core/otp';
 import { knownSiteHosts } from '../../../core/known-sites';
-import type { Account, Algorithm } from '../../../core/types';
+import { ACCOUNT_ICONS, accountIconSymbol, type Account, type Algorithm } from '../../../core/types';
 import { LockedError } from '../../../store/errors';
 import {
   addPendingFieldButton,
@@ -157,6 +157,7 @@ export function AccountsSection({ initialEditId, onDone, onEdit, onHistory }: { 
                 data-account-id={a.id}
                 onClick={() => onEdit ? onEdit(a.id) : setEditId(a.id)}
               >
+                {accountIconSymbol(a.iconId) && <span class="account-icon" aria-hidden="true">{accountIconSymbol(a.iconId)}</span>}
                 {a.pinned && <span class="pin">★</span>}
                 <span class="account-names">
                   <span class="issuer">{a.issuer}</span>
@@ -203,6 +204,8 @@ function AccountEditor({ t, account, all, hideBack, onHistory, onLocked, onDone,
   const [period, setPeriod] = useState(String(account.period));
   const [counter, setCounter] = useState(String(account.counter ?? 0));
   const [pinned, setPinned] = useState(account.pinned);
+  // '' = 자동(이니셜). 모르는 값은 그대로 들고 있다가 저장해도 지우지 않는다.
+  const [iconId, setIconId] = useState(account.iconId ?? '');
   const [shown, setShown] = useState(false);
   const [broken, setBroken] = useState(account.secret.length === 0);
   const [newSecret, setNewSecret] = useState('');
@@ -266,6 +269,7 @@ function AccountEditor({ t, account, all, hideBack, onHistory, onLocked, onDone,
 
   const hasDraft = issuer !== base.issuer || label !== base.label || group !== (base.group ?? '')
     || note !== base.note || hosts !== base.matchHosts.join('\n') || pinned !== base.pinned
+    || iconId !== (base.iconId ?? '')
     || (!fixed && (algorithm !== base.algorithm || digits !== String(base.digits)
       || (account.type === 'totp' && period !== String(base.period))))
     || (account.type === 'hotp' && counter !== String(base.counter ?? 0))
@@ -359,6 +363,7 @@ function AccountEditor({ t, account, all, hideBack, onHistory, onLocked, onDone,
     if (nextHosts.join('\n') !== base.matchHosts.join('\n')) patch.matchHosts = nextHosts;
     if (pinned !== base.pinned) patch.pinned = pinned;
     if (groupText !== (base.group ?? '')) patch.group = groupText !== '' ? groupText : null;
+    if (iconId !== (base.iconId ?? '')) patch.iconId = iconId !== '' ? iconId : null;
     if (!fixed) {
       if (algorithm !== base.algorithm) patch.algorithm = algorithm;
       if (Number(digits) !== base.digits) patch.digits = Number(digits);
@@ -528,6 +533,21 @@ function AccountEditor({ t, account, all, hideBack, onHistory, onLocked, onDone,
       {text(issuer, setIssuer, t('add.issuer'), 'issuer')}
       {text(label, setLabel, t('add.label'), 'label')}
       {text(group, setGroup, t('accounts.group'), 'group', errors.group)}
+      <label>
+        <span>{t('accounts.icon')}</span>
+        <select
+          class="field"
+          data-role="icon"
+          value={iconId}
+          onChange={(e) => setIconId(e.currentTarget.value)}
+        >
+          <option value="">{t('accounts.icon.auto')}</option>
+          {ACCOUNT_ICONS.map((i) => (
+            <option key={i.id} value={i.id}>{i.symbol} {t(`accounts.icon.${i.id}`)}</option>
+          ))}
+          {iconId !== '' && !accountIconSymbol(iconId) && <option value={iconId}>{iconId}</option>}
+        </select>
+      </label>
       <label>
         <span>{t('accounts.note')}</span>
         <textarea

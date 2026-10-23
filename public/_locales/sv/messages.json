@@ -1,5 +1,5 @@
 {
-  "appName": { "message": "Popout Authenticator" },
+  "appName": { "message": "Popout Authenticator — 2FA-autentiserare" },
   "appShortName": { "message": "Popout Authenticator" },
   "appDesc": { "message": "2FA-autentiserare för din webbläsare. Skapar engångskoder och öppnas som popup eller separat fönster." },
   "cmdExecuteAction": { "message": "Öppna popupen" },
@@ -14,6 +14,27 @@
   "fillManual": {
     "message": "Kod: $CODE$",
     "placeholders": { "code": { "content": "$1" } }
+  },
+  "cmdCopyPinned1": {
+    "message": "Kopiera koden för stjärnmarkerat konto 1"
+  },
+  "cmdCopyPinned2": {
+    "message": "Kopiera koden för stjärnmarkerat konto 2"
+  },
+  "cmdCopyPinned3": {
+    "message": "Kopiera koden för stjärnmarkerat konto 3"
+  },
+  "shortcutCopied": {
+    "message": "Koden har kopierats."
+  },
+  "shortcutLocked": {
+    "message": "Lås först upp Popout Authenticator."
+  },
+  "shortcutMissing": {
+    "message": "Inget stjärnmarkerat konto för det här kortkommandot."
+  },
+  "shortcutFailed": {
+    "message": "Det gick inte att kopiera koden."
   },
   "fillPickAccount": { "message": "Välj ett konto" },
   "fieldFillButton": { "message": "Fyll i kod" }

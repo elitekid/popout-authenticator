@@ -32,6 +32,7 @@ type StoredAccount = {
   note: string;
   pinned: boolean;
   matchHosts: string[];
+  iconId?: string;
   lastUsedAt?: number;
   createdAt: number;
   updatedAt: number;
@@ -62,6 +63,7 @@ function store(a: Account): StoredAccount {
     note: a.note,
     pinned: a.pinned,
     matchHosts: [...a.matchHosts],
+    ...(a.iconId !== undefined ? { iconId: a.iconId } : {}),
     ...(a.lastUsedAt !== undefined ? { lastUsedAt: a.lastUsedAt } : {}),
     createdAt: a.createdAt,
     updatedAt: a.updatedAt,
@@ -167,6 +169,7 @@ function restore(raw: unknown): Account {
     note: str(o.note),
     pinned: o.pinned === true,
     matchHosts: o.matchHosts as string[],
+    ...(typeof o.iconId === 'string' && o.iconId !== '' && o.iconId.length <= 64 ? { iconId: o.iconId } : {}),
     ...(o.lastUsedAt !== undefined ? { lastUsedAt: num(o.lastUsedAt) } : {}),
     createdAt: num(o.createdAt),
     updatedAt: num(o.updatedAt),

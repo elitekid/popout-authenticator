@@ -16,7 +16,19 @@ const params = (text: string) => [...text.matchAll(/\{(\w+)\}/g)].map((m) => m[1
 // en·ko 밖 언어 파일(src/i18n/<언어>/messages.ts)
 const files = import.meta.glob<{ messages: Record<string, string> }>('../../src/i18n/*/messages.ts', { eager: true });
 
+// 브라우저 확장 _locales(public/_locales/<언어>/messages.json)
+const locales = import.meta.glob<Record<string, unknown>>('../../public/_locales/*/messages.json', { import: 'default', eager: true });
+
 describe('다국어', () => {
+  it('_locales 20개 폴더가 en 의 키를 모두 가진다', () => {
+    const entries = Object.entries(locales);
+    expect(entries).toHaveLength(20);
+    const enKeys = Object.keys(locales['../../public/_locales/en/messages.json']!);
+    for (const [path, messages] of entries) {
+      for (const key of enKeys) expect(messages, `${path} ${key}`).toHaveProperty(key);
+    }
+  });
+
   it('모든 언어가 ko 와 같은 키·같은 자리 표시를 가진다', () => {
     const en = makeT('en');
     for (const key of Object.keys(ko)) {

@@ -15,6 +15,27 @@
     "message": "Code : $CODE$",
     "placeholders": { "code": { "content": "$1" } }
   },
+  "cmdCopyPinned1": {
+    "message": "Copier le code du compte étoilé 1"
+  },
+  "cmdCopyPinned2": {
+    "message": "Copier le code du compte étoilé 2"
+  },
+  "cmdCopyPinned3": {
+    "message": "Copier le code du compte étoilé 3"
+  },
+  "shortcutCopied": {
+    "message": "Code copié."
+  },
+  "shortcutLocked": {
+    "message": "Déverrouillez d’abord Popout Authenticator."
+  },
+  "shortcutMissing": {
+    "message": "Aucun compte étoilé pour ce raccourci."
+  },
+  "shortcutFailed": {
+    "message": "Impossible de copier le code."
+  },
   "fillPickAccount": { "message": "Choisissez un compte" },
   "fieldFillButton": { "message": "Saisir le code" }
 }

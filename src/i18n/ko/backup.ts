@@ -50,6 +50,14 @@ export const backup = {
   'backup.raw.notRaw': '원시 사본 파일이 아닙니다.',
   'backup.raw.error': '사본을 열지 못했습니다.',
   'backup.raw.result': '{added}개 추가 · {duplicates}개 중복',
+  'backup.policy.noBackup': '관리자가 백업 기능을 껐습니다.',
+  'backup.savedConfirm': '저장했습니다',
+  'backup.savedConfirm.hint': '파일을 저장한 뒤 아래 단추를 눌러 주세요.',
+  'backup.savedFile.select': '저장 파일 확인',
+  'backup.savedFile.hint': '방금 저장한 백업 파일을 선택해 주세요.',
+  'backup.savedFile.mismatch': '백업과 다른 파일입니다.',
+  'backup.savedFile.verified': '저장한 파일을 확인했습니다.',
+  'backup.iconsOmitted': '아이콘은 Popout 백업에만 저장됩니다.',
   'backup.notice':
     '확장을 삭제하면 계정·스냅샷도 함께 삭제됩니다. 확장을 삭제하거나 다시 설치하기 전에 백업 파일을 안전한 곳에 저장해 주세요.',
 

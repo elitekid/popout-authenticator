@@ -171,6 +171,86 @@ export async function runPopupScenario(session) {
       await waitScreen('settings');
     }
     await backToList();
+
+    // B11: 순서 저장이 실패하면 오류를 보이고 원래 순서를 지킨다.
+    const rowIds = () => page.$$eval('[data-account-id]', (els) => els.map((el) => el.getAttribute('data-account-id')));
+    const orderBefore = await rowIds();
+    await page.evaluate(() => {
+      const local = chrome.storage.local;
+      window.__origSet = local.set;
+      local.set = () => Promise.reject(new Error('시험용 저장 실패'));
+    });
+    try {
+      await page.focus(`[data-account-id="${orderBefore[0]}"]`);
+      await page.keyboard.down('Alt');
+      await page.keyboard.press('ArrowDown');
+      await page.keyboard.up('Alt');
+      await page.waitForSelector('[data-role="code-access-error"]', { visible: true, timeout: 5000 })
+        .catch(() => problems.push('순서 저장 실패 뒤 오류 표시(code-access-error)가 안 나옴'));
+      const orderAfter = await rowIds();
+      if (orderAfter.join() !== orderBefore.join()) problems.push('순서 저장 실패 뒤 원래 순서가 아님');
+    } finally {
+      await page.evaluate(() => {
+        chrome.storage.local.set = window.__origSet;
+        delete window.__origSet;
+      });
+    }
+
+    // N1·N3: 업데이트 대기 버전 1.0.2 → 띠가 목록 아래에 보이고, 확인하면 다시 열어도 안 보인다.
+    // 여기서는 시험이 직접 팝업을 새로 여니 새 탭 감시를 먼저 끝낸다.
+    browser.off('targetcreated', onNewTarget);
+    await page.evaluate(() => chrome.storage.local.set({ pendingWhatsNew: '1.0.2' }));
+    const open2 = async () => {
+      const p = await browser.newPage();
+      pages.push(p);
+      p.on('pageerror', (err) => problems.push(`popup pageerror: ${err.message}`));
+      await p.goto(`${origin}/popup.html`, { waitUntil: session.navigationWait ?? 'load' });
+      await focusPage(p);
+      await p.waitForSelector('[data-account-id]', { timeout: 10000 });
+      return p;
+    };
+    const closeExtra = async (p) => {
+      await p.close();
+      pages.splice(pages.indexOf(p), 1);
+    };
+    const second = await open2();
+    const noteShown = await second
+      .waitForSelector('[data-role="whats-new"]', { visible: true, timeout: 5000 })
+      .then(() => true)
+      .catch(() => false);
+    if (!noteShown) {
+      problems.push('업데이트 안내 띠(whats-new)가 안 보임');
+    } else {
+      const below = await second.evaluate(() => {
+        const note = document.querySelector('[data-role="whats-new"]');
+        const list = document.querySelector('.popup-list');
+        return !!note && !!list && !!(list.compareDocumentPosition(note) & Node.DOCUMENT_POSITION_FOLLOWING);
+      });
+      if (!below) problems.push('업데이트 안내 띠가 계정 목록 아래에 있지 않음');
+      await second.click('[data-role="whats-new-done"]');
+      await second.waitForFunction(() => document.querySelector('[data-role="whats-new"]') === null, { timeout: 5000 })
+        .catch(() => problems.push("'확인' 뒤에도 안내 띠가 남음"));
+    }
+    await closeExtra(second);
+    const third = await open2();
+    await new Promise((r) => setTimeout(r, 500));
+    if ((await third.$('[data-role="whats-new"]')) !== null) problems.push('확인한 뒤 다시 열었는데 안내 띠가 또 보임');
+
+    // N3: 설정의 '변경 내용' 단추가 목록을 그 자리에서 펼친다.
+    await third.click('[data-role="settings-menu"]');
+    await third.waitForSelector('[data-role="screen-display"]', { visible: true, timeout: 10000 });
+    await third.click('[data-role="screen-display"]');
+    const changesBtn = await third
+      .waitForSelector('[data-role="settings-changes"]', { visible: true, timeout: 10000 })
+      .catch(() => null);
+    if (!changesBtn) problems.push("설정에 '변경 내용' 단추가 안 보임");
+    else {
+      await changesBtn.click();
+      await third
+        .waitForSelector('[data-role="settings-changes-list"] li', { visible: true, timeout: 5000 })
+        .catch(() => problems.push("'변경 내용'을 눌러도 목록이 안 펼쳐짐"));
+    }
+    await closeExtra(third);
   } catch (error) {
     problems.push(`시나리오 오류: ${error instanceof Error ? error.stack : String(error)}`);
   } finally {

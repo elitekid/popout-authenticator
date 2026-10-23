@@ -11,6 +11,7 @@ import {
   MAX_SHARE_SECONDS,
   openShareFragment,
   SHARE_PAGE_URL,
+  shareValidUntilMs,
 } from '../../src/core/share';
 
 type Vector = {
@@ -85,6 +86,20 @@ describe('createShareFragment / openShareFragment', () => {
     await expect(createShareFragment(draft(), NOW, MAX_SHARE_SECONDS + 60)).rejects.toThrow();
     await expect(createShareFragment(draft(), NOW, 299)).rejects.toThrow();
     await expect(createShareFragment(draft(), NOW, MAX_SHARE_SECONDS)).resolves.toBeTypeOf('string');
+  });
+
+  it('shows the same expiry as the envelope (mid-period, with clock correction)', async () => {
+    const correction = 7_000;
+    // 30초 주기 한가운데에서 +7초 보정된 시각
+    const at = Math.floor(NOW / 30_000) * 30_000 + 12_000;
+    for (const [period, sec] of [[30, 900], [30, 3600], [60, 1800], [1, 3600]] as const) {
+      const d = draft({ period });
+      const opened = await openShareFragment(await createShareFragment(d, at + correction, sec));
+      const actual = (opened.firstCounter + opened.codes.length) * opened.period * 1000;
+      expect(shareValidUntilMs(at + correction, period, sec)).toBe(actual);
+      // 대화상자가 예전에 쓰던 생성 시각 + N초는 실제와 다르다
+      if (period === 30 && sec === 900) expect(at + sec * 1000).not.toBe(actual - correction);
+    }
   });
 
   it('refuses non-totp accounts', async () => {

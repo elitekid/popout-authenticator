@@ -13,6 +13,7 @@ export const lock = {
   'lock.error.failed': '처리하지 못했습니다. 잠시 뒤 다시 시도해 주세요.',
   'lock.error.policy': '관리자 비밀번호 규칙에 맞지 않습니다.',
   'lock.timing.forced': '관리자가 {minutes}분으로 정했습니다.',
+  'lock.policy.keepEnabled': '관리자 정책에 따라 비밀번호 잠금을 끌 수 없습니다.',
   "lock.enable.title": "금고 잠금 (선택)",
   "lock.enable.desc": "금고 잠금은 계정을 보호하는 선택 기능이며 일반 코드 넣기에 필수는 아닙니다. 잠긴 상태에서는 먼저 잠금을 해제해야 합니다. 비밀번호를 잊었을 때를 대비해 복구 코드를 안전하게 보관해 주세요.",
   "lock.enable.syncNote": "비밀번호를 정하면 브라우저 동기화로 다른 기기와 암호화해서 동기화합니다. 설정 → 동기화에서 바꿀 수 있습니다.",

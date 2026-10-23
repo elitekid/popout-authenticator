@@ -4,7 +4,9 @@ import { readPolicy, type Policy } from '../../../store/policy';
 import { loadSettings, onSettingsChanged, saveSettings } from '../../../store/settings';
 import { useT } from '../../shared/use-t';
 import { currentLang } from '../../../i18n';
-import { STORE_REVIEW_URL, siteUrl } from '../../popup/logic';
+import { BROWSER_TARGET } from '../../../core/browser';
+import { STORE_REVIEW_URL, WHATS_NEW, siteUrl } from '../../popup/logic';
+
 import { AdvisorPanel } from './AdvisorPanel';
 import { ClockPanel } from './ClockPanel';
 import { DisplayPanel } from './DisplayPanel';
@@ -14,6 +16,71 @@ import { SyncPanel } from './SyncPanel';
 
 const DEFAULT_FEEDBACK_URL = 'https://github.com/elitekid/popout-authenticator/issues';
 
+// 점으로 나뉜 숫자 버전 비교(오름차순).
+const compareVersions = (a: string, b: string): number => {
+  const pa = a.split('.').map(Number);
+  const pb = b.split('.').map(Number);
+  for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+    const d = (pa[i] ?? 0) - (pb[i] ?? 0);
+    if (d !== 0) return d;
+  }
+  return 0;
+};
+
+const SHORTCUT_COMMANDS = ['copy-pinned-1', 'copy-pinned-2', 'copy-pinned-3'];
+
+// 전역 단축키 안내: 지금 실제로 붙은 키를 보여 주고 브라우저 단축키 화면을 연다.
+function ShortcutsBlock({ t }: { t: ReturnType<typeof useT> }) {
+  const [rows, setRows] = useState<chrome.commands.Command[]>([]);
+
+  useEffect(() => {
+    let alive = true;
+    // 읽기 실패나 commands API 없음은 줄 목록만 생략
+    const read = () => {
+      try {
+        void chrome.commands.getAll().then((all) => {
+          if (alive) setRows(SHORTCUT_COMMANDS.flatMap((name) => all.filter((c) => c.name === name)));
+        }, () => undefined);
+      } catch { /* 줄 목록 생략 */ }
+    };
+    // 단축키 화면(새 탭)에서 바꾸고 돌아오면 다시 읽음
+    const onVisible = () => { if (document.visibilityState === 'visible') read(); };
+    read();
+    window.addEventListener('focus', read);
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      alive = false;
+      window.removeEventListener('focus', read);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
+  }, []);
+
+  const open = () => {
+    const url = BROWSER_TARGET === 'edge' ? 'edge://extensions/shortcuts' : 'chrome://extensions/shortcuts';
+    try {
+      void chrome.tabs.create({ url }).catch(() => undefined);
+    } catch { /* 열기 실패는 무시 */ }
+  };
+
+  return (
+    <div data-role="settings-shortcuts">
+      <p class="muted" data-role="settings-shortcuts-hint">{t('settings.shortcuts.hint')}</p>
+      {rows.length > 0 && (
+        <ul class="muted">
+          {rows.map((c) => (
+            <li key={c.name} data-role="settings-shortcut-row">
+              {c.description}: {c.shortcut || t('settings.shortcuts.unset')}
+            </li>
+          ))}
+        </ul>
+      )}
+      <button type="button" class="link" data-role="settings-shortcuts-open" onClick={open}>
+        {t('settings.shortcuts.open')}
+      </button>
+    </div>
+  );
+}
+
 export function SettingsSection() {
   const t = useT();
   // null: 아직 설정을 읽지 못함
@@ -22,6 +89,7 @@ export function SettingsSection() {
   const [loadFailed, setLoadFailed] = useState(false);
   const [saveFailed, setSaveFailed] = useState(false);
   const [retry, setRetry] = useState(0);
+  const [changesOpen, setChangesOpen] = useState(false);
   const saveSeq = useRef(0);
   const pending = useRef(0);
   const [readyPanels, setReadyPanels] = useState(0);
@@ -93,8 +161,13 @@ export function SettingsSection() {
         <FieldButtonsPanel t={t} onReady={fieldButtonsReady} ready={readyPanels === 15} />
         <ClockPanel t={t} enabled={settings.clockCheck} save={save} onReady={clockReady} />
         <AdvisorPanel t={t} onReady={advisorReady} />
+        {(BROWSER_TARGET === 'chrome' || BROWSER_TARGET === 'edge') && <ShortcutsBlock t={t} />}
         <p class="settings-about muted" data-role="settings-about">
           <span data-role="settings-version">{t('settings.about.version', { version: chrome.runtime.getManifest().version })}</span>{' '}
+          <button type="button" class="link" data-role="settings-changes" aria-expanded={changesOpen}
+            onClick={() => setChangesOpen((open) => !open)}>
+            {t('settings.about.changes')}
+          </button>{' '}
           <a href={siteUrl(lang, 'guides')} target="_blank" rel="noopener" data-role="settings-help">
             {t('settings.about.help')}
           </a>{' '}
@@ -104,10 +177,26 @@ export function SettingsSection() {
           <a href={feedbackUrl} target="_blank" rel="noopener" data-role="settings-feedback">
             {t('settings.about.feedback')}
           </a>{' '}
-          {STORE_REVIEW_URL && <a href={STORE_REVIEW_URL} target="_blank" rel="noopener" data-role="settings-review">
+          {STORE_REVIEW_URL && <a href={STORE_REVIEW_URL} target="_blank" rel="noopener" data-role="settings-review"
+            onClick={() => void chrome.storage.local.set({ reviewDismissed: true }).catch(() => undefined)}>
             {t('settings.about.review')}
           </a>}
         </p>
+        {changesOpen && (
+          <div class="settings-changes muted" data-role="settings-changes-list">
+            {Object.keys(WHATS_NEW)
+              .sort(compareVersions)
+              .reverse()
+              .map((version) => (
+                <div key={version}>
+                  <strong>{t('popup.whatsNew.title', { version })}</strong>
+                  <ul>
+                    {WHATS_NEW[version]!.map((key) => <li key={key}>{t(key)}</li>)}
+                  </ul>
+                </div>
+              ))}
+          </div>
+        )}
       </div>
     </div>
   );

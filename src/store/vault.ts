@@ -178,6 +178,7 @@ export async function addDrafts(
         if (m.group !== undefined) account.group = m.group;
         if (m.note !== undefined) account.note = m.note;
         if (m.matchHosts !== undefined) account.matchHosts = m.matchHosts;
+        if (m.iconId !== undefined) account.iconId = m.iconId;
       }
       added.push(account);
     });

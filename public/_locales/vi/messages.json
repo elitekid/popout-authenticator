@@ -1,5 +1,5 @@
 {
-  "appName": { "message": "Popout Authenticator" },
+  "appName": { "message": "Popout Authenticator — xác thực 2FA" },
   "appShortName": { "message": "Popout Authenticator" },
   "appDesc": { "message": "Ứng dụng xác thực 2FA cho trình duyệt của bạn. Tạo mã dùng một lần, mở trong cửa sổ bật lên hoặc cửa sổ riêng." },
   "cmdExecuteAction": { "message": "Mở cửa sổ bật lên" },
@@ -14,6 +14,27 @@
   "fillManual": {
     "message": "Mã: $CODE$",
     "placeholders": { "code": { "content": "$1" } }
+  },
+  "cmdCopyPinned1": {
+    "message": "Sao chép mã của tài khoản gắn sao 1"
+  },
+  "cmdCopyPinned2": {
+    "message": "Sao chép mã của tài khoản gắn sao 2"
+  },
+  "cmdCopyPinned3": {
+    "message": "Sao chép mã của tài khoản gắn sao 3"
+  },
+  "shortcutCopied": {
+    "message": "Đã sao chép mã."
+  },
+  "shortcutLocked": {
+    "message": "Hãy mở khóa Popout Authenticator trước."
+  },
+  "shortcutMissing": {
+    "message": "Không có tài khoản gắn sao cho phím tắt này."
+  },
+  "shortcutFailed": {
+    "message": "Không thể sao chép mã."
   },
   "fillPickAccount": { "message": "Chọn một tài khoản" },
   "fieldFillButton": { "message": "Điền mã" }

@@ -9,7 +9,7 @@ import { withSessionLock } from './session';
 import { getSnapshot, listSnapshotPage, type SnapshotCursor, type SnapshotInfo } from './snapshots';
 import { commitVaultFile, getVaultKey, keyFromFile, readVaultFile, withVaultWriteLock } from './vault';
 
-const DISPLAY_FIELDS = ['issuer', 'label', 'group', 'note', 'pinned', 'matchHosts'] as const;
+const DISPLAY_FIELDS = ['issuer', 'label', 'group', 'note', 'pinned', 'matchHosts', 'iconId'] as const;
 const AUTH_FIELDS = ['type', 'algorithm', 'digits', 'period', 'counter', 'secret'] as const;
 export type HistoryField = typeof DISPLAY_FIELDS[number] | typeof AUTH_FIELDS[number];
 export type HistoryProblem = 'locked' | 'passwordNeeded' | 'wrongPassword' | 'corrupt' | 'missing' | 'absent' | 'stale' | 'duplicate';
@@ -34,6 +34,7 @@ function value(account: Account, field: HistoryField): unknown {
   if (field === 'secret') return Array.from(account.secret);
   if (field === 'matchHosts') return [...account.matchHosts].sort();
   if (field === 'group') return account.group ?? '';
+  if (field === 'iconId') return account.iconId ?? '';
   return account[field];
 }
 function changes(current: Account, past: Account): HistoryField[] {
@@ -185,6 +186,7 @@ export async function createAccountHistory(accountId: string, options: { signal?
         const hotp = current.type === 'hotp' || past.type === 'hotp';
         const next: Account = { ...current, updatedAt: Date.now() };
         for (const field of DISPLAY_FIELDS) Object.assign(next, { [field]: past[field] });
+        if (past.iconId === undefined) delete next.iconId;
         if (!hotp) for (const field of AUTH_FIELDS) Object.assign(next, { [field]: past[field] });
         checkDraft(next);
         const key = duplicateKey(next);

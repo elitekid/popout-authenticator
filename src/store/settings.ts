@@ -1,5 +1,5 @@
 // 설정은 chrome.storage.local 의 'settings' 에 둔다. 저장값은 사용자 값 그대로이고, 읽을 때 관리자 정책을 덮는다.
-import { DEFAULT_SETTINGS, type Settings } from '../core/types';
+import { DEFAULT_SETTINGS, normalizeClipboardSeconds, type Settings } from '../core/types';
 import { applyPolicy, readPolicy } from './policy';
 import { BROWSER_TARGET, supportsBrowserSync, supportsClipboardClear } from '../core/browser';
 
@@ -21,6 +21,7 @@ function pick(raw: unknown): Partial<Settings> {
       if (key in raw) out[key] = (raw as Record<string, unknown>)[key];
     }
   }
+  if ('clipboardClearSeconds' in out) out.clipboardClearSeconds = normalizeClipboardSeconds(out.clipboardClearSeconds);
   return out as Partial<Settings>;
 }
 

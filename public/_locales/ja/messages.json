@@ -15,6 +15,27 @@
     "message": "コード: $CODE$",
     "placeholders": { "code": { "content": "$1" } }
   },
+  "cmdCopyPinned1": {
+    "message": "スター付きアカウント 1 のコードをコピー"
+  },
+  "cmdCopyPinned2": {
+    "message": "スター付きアカウント 2 のコードをコピー"
+  },
+  "cmdCopyPinned3": {
+    "message": "スター付きアカウント 3 のコードをコピー"
+  },
+  "shortcutCopied": {
+    "message": "コードをコピーしました。"
+  },
+  "shortcutLocked": {
+    "message": "先に Popout Authenticator のロックを解除してください。"
+  },
+  "shortcutMissing": {
+    "message": "このショートカットに対応するスター付きアカウントがありません。"
+  },
+  "shortcutFailed": {
+    "message": "コードをコピーできませんでした。"
+  },
   "fillPickAccount": { "message": "アカウントを選択" },
   "fieldFillButton": { "message": "コードを入力" }
 }

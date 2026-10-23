@@ -109,6 +109,30 @@ export function openDetachedWindow(openerUrl?: string): Promise<void> {
   return serial(() => openOnce(openerUrl));
 }
 
+// 툴바 팝업에서 이어 가는 작은 작업 창은 하나만 둔다. 다시 열면 앞으로 가져오고,
+// 다른 작업이면 그 창의 탭 주소만 바꾼다(같은 주소면 입력 내용을 지키려고 건드리지 않는다).
+async function openTaskOnce(url: string): Promise<void> {
+  const got = await chrome.storage.session.get('taskWindowId');
+  const id = got.taskWindowId;
+  if (typeof id === 'number') {
+    const win = await chrome.windows.get(id, { populate: true }).then((w) => w, () => undefined);
+    if (win) {
+      const tab = win.tabs?.[0];
+      if (tab?.id !== undefined && tab.url !== url) await chrome.tabs.update(tab.id, { url });
+      await chrome.windows.update(id, { focused: true });
+      return;
+    }
+  }
+  const created = await chrome.windows.create({
+    url, type: 'popup', focused: true, width: 440, height: 660,
+  });
+  if (created.id !== undefined) await chrome.storage.session.set({ taskWindowId: created.id });
+}
+
+export function openTaskWindowOnce(url: string): Promise<void> {
+  return serial(() => openTaskOnce(url));
+}
+
 function openFromEvent(openerUrl?: string): void {
   void openDetachedWindow(openerUrl).catch((error) => console.warn('open-window', error));
 }
@@ -144,6 +168,21 @@ export function register(): void {
   });
 
   chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+    if (typeof message === 'object' && message !== null && message.type === 'open-task-window') {
+      const target = typeof message.url === 'string' ? message.url : '';
+      if (!target.startsWith(chrome.runtime.getURL('manage.html'))) {
+        sendResponse({ ok: false });
+        return false;
+      }
+      openTaskWindowOnce(target).then(
+        () => sendResponse({ ok: true }),
+        (error) => {
+          console.warn('open-task-window', error);
+          sendResponse({ ok: false });
+        },
+      );
+      return true;
+    }
     if (typeof message !== 'object' || message === null || message.type !== 'open-window') {
       return false;
     }
@@ -174,7 +213,8 @@ export function register(): void {
   // 열기와 같은 줄에서 처리해, 늦게 온 닫힘이 새 창 id 를 지우지 않게 한다.
   chrome.windows.onRemoved.addListener((windowId) => {
     void serial(async () => {
-      const got = await chrome.storage.session.get('detachedWindowId');
+      const got = await chrome.storage.session.get(['detachedWindowId', 'taskWindowId']);
+      if (got.taskWindowId === windowId) await chrome.storage.session.remove('taskWindowId');
       if (got.detachedWindowId !== windowId) return;
       detachedId = undefined;
       await chrome.storage.session.remove('detachedWindowId');

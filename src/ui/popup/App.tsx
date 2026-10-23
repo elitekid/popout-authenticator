@@ -5,7 +5,7 @@ import { supportsPasskeys } from '../../core/browser';
 import { generateCode } from '../../core/otp';
 import { buildOtpauth } from '../../core/uri';
 import { fillCandidate, hostOf, matchesSite, suggestAccountIds } from '../../core/suggest';
-import { DEFAULT_SETTINGS, type Account, type Settings } from '../../core/types';
+import { DEFAULT_SETTINGS, accountIconSymbol, type Account, type Settings } from '../../core/types';
 import { readSiteUsage, recordSiteUse } from '../../store/site-usage';
 import { moveToTrash } from '../../store/trash';
 import { lastNormalWindow } from '../../store/browser-window';
@@ -21,7 +21,7 @@ import {
 import { checkEmptyRecovery } from '../../store/recover';
 import { checkClock } from '../../store/clock';
 import type { ClockState } from '../../core/clock';
-import { NO_POLICY, readPolicy, type Policy } from '../../store/policy';
+import { NO_POLICY, onPolicyChanged, readPolicy, type Policy } from '../../store/policy';
 import { loadSettings, onSettingsChanged, saveSettings } from '../../store/settings';
 import { syncRecoverySources } from '../../store/sync';
 import {
@@ -60,6 +60,7 @@ import {
   UNGROUPED_KEY,
   visibleRows,
   WHATS_NEW,
+  type SearchScope,
   type BackupInfo,
 } from './logic';
 import { openDetachedWindow, openPasskeyUnlock } from './open-actions';
@@ -265,7 +266,7 @@ function asLockNudge(raw: unknown): LockNudge {
 }
 
 // 평가 요청 기록: 연 횟수, 평가하기로 닫았는지, 나중에로 미룬 횟수.
-type ReviewState = { openCount: number; dismissed: boolean; snoozedUntilOpen: number };
+type ReviewState = { openCount: number; dismissed: boolean; snoozedUntilOpen: number; shown: number };
 
 type DragGesture = {
   id: string;
@@ -342,6 +343,7 @@ export function App() {
   const [fillFeedback, setFillFeedback] = useState<FillFeedback | null>(null);
   const filling = useRef(false);
   const [query, setQuery] = useState('');
+  const [scope, setScope] = useState<SearchScope>('all');
   // 접힌 그룹 이름. 열 때 한 번 읽고 그 키가 바뀔 때만 다시 읽는다.
   const [foldedGroups, setFoldedGroups] = useState<string[]>([]);
   const foldedRef = useRef<string[]>([]);
@@ -352,6 +354,15 @@ export function App() {
   const [deleteBusy, setDeleteBusy] = useState(false);
   const [deleteError, setDeleteError] = useState(false);
   const deleting = useRef(false);
+  // 선택 모드: 고른 계정 id 는 Set 하나로 둔다.
+  const [selecting, setSelecting] = useState(false);
+  const [picked, setPicked] = useState<ReadonlySet<string>>(() => new Set());
+  const [pickAsk, setPickAsk] = useState(false);
+  const [pickBusy, setPickBusy] = useState(false);
+  const [pickError, setPickError] = useState(false);
+  const picking = useRef(false);
+  // 그룹 이름 변경 중인 그룹(draft 는 입력 중인 새 이름).
+  const [renaming, setRenaming] = useState<{ name: string; draft: string; invalid: boolean } | null>(null);
   const deleteReturnId = useRef<string | null>(null);
   const deleteDialog = useRef<HTMLFormElement>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -382,6 +393,14 @@ export function App() {
   const [lockNudge, setLockNudge] = useState<LockNudge | null>(null);
   // 관리자 정책: 첫 그리기는 정책 없음으로 두고 읽으면 바꾼다.
   const [policy, setPolicy] = useState<Policy>(NO_POLICY);
+  // 열려 있는 분리 창·사이드 패널도 정책 변경(예: disableBackup)을 바로 따른다.
+  useEffect(() => {
+    let alive = true;
+    const off = onPolicyChanged(() => {
+      void readPolicy().then((next) => { if (alive) setPolicy(next); }, () => undefined);
+    });
+    return () => { alive = false; off(); };
+  }, []);
   // 평가 요청·새 기능 소개: 열 때 한 번 읽는다(null 이면 아직 못 읽음).
   const [review, setReview] = useState<ReviewState | null>(null);
   // 평가 요청은 이번에 연 창에서 코드 복사·넣기가 한 번 된 뒤에만 보인다(저장하지 않음).
@@ -569,6 +588,21 @@ export function App() {
       }
       if ('backupInfo' in changes) setBackupInfo(asBackupInfo(changes.backupInfo.newValue));
       if ('backupSnoozeUntil' in changes) setSnoozeUntil(asNumber(changes.backupSnoozeUntil.newValue));
+      // 설정의 평가 링크·다른 창의 노출 기록을 이미 열린 창의 평가 상태에 맞춘다.
+      if ('reviewDismissed' in changes || 'reviewShown' in changes || 'reviewSnoozedUntilOpen' in changes) {
+        setReview((prev) =>
+          prev === null
+            ? prev
+            : {
+                ...prev,
+                ...('reviewDismissed' in changes ? { dismissed: changes.reviewDismissed.newValue === true } : {}),
+                ...('reviewShown' in changes ? { shown: asNumber(changes.reviewShown.newValue) ?? 0 } : {}),
+                ...('reviewSnoozedUntilOpen' in changes
+                  ? { snoozedUntilOpen: asNumber(changes.reviewSnoozedUntilOpen.newValue) ?? 0 }
+                  : {}),
+              },
+        );
+      }
       // 다른 창(설정의 '지금 확인' 등)에서 다시 잰 결과로 경고 띠를 맞춘다.
       if ('clock' in changes) {
         const next = changes.clock.newValue as { state?: unknown; offsetMs?: unknown } | undefined;
@@ -630,13 +664,19 @@ export function App() {
           'reviewDismissed',
           'reviewSnoozedUntilOpen',
           'pendingWhatsNew',
+          'reviewShown',
         ]);
         const dismissed = got.reviewDismissed === true;
         const stored = asNumber(got.openCount) ?? 0;
         const openCount = dismissed || !STORE_REVIEW_URL ? stored : stored + 1;
         if (!dismissed && STORE_REVIEW_URL) await chrome.storage.local.set({ openCount });
         if (alive) {
-          setReview({ openCount, dismissed, snoozedUntilOpen: asNumber(got.reviewSnoozedUntilOpen) ?? 0 });
+          setReview({
+            openCount,
+            dismissed,
+            snoozedUntilOpen: asNumber(got.reviewSnoozedUntilOpen) ?? 0,
+            shown: asNumber(got.reviewShown) ?? 0,
+          });
         }
         const pending = typeof got.pendingWhatsNew === 'string' ? got.pendingWhatsNew : null;
         if (pending === null) return;
@@ -862,8 +902,8 @@ export function App() {
   const sections = grouped ? allSections : null;
   // 금고에 저장한 순서를 유지한다. 묶음 보기에서는 접힌 묶음의 줄을 뺀다.
   const visible = useMemo(
-    () => (sections ? visibleRows(sections) : listOnly ? active : filterAccounts(active, query)),
-    [sections, listOnly, active, query],
+    () => (sections ? visibleRows(sections) : listOnly ? active : filterAccounts(active, query, null, scope)),
+    [sections, listOnly, active, query, scope],
   );
   visibleRef.current = visible;
   groupedRef.current = grouped;
@@ -874,8 +914,22 @@ export function App() {
       setDeleteAsk(null);
       setDeleteError(false);
       setMenu(null);
+      setRenaming(null);
+      setSelecting(false);
+      setPicked(new Set());
+      setPickAsk(false);
+      setPickError(false);
     }
   }, [phase, screens.length]);
+  // 검색어·목록이 바뀌어 안 보이게 된 선택은 지운다.
+  useLayoutEffect(() => {
+    setPicked((prev) => {
+      if (prev.size === 0) return prev;
+      const shown = new Set(visible.map((a) => a.id));
+      const next = new Set([...prev].filter((id) => shown.has(id)));
+      return next.size === prev.size ? prev : next;
+    });
+  }, [visible]);
   const selectedIndex = Math.min(selected, Math.max(0, visible.length - 1));
   // 코드 계산·남은 초에는 보정한 시각을 쓴다.
   const codeNowMs = nowMs + correction;
@@ -884,6 +938,7 @@ export function App() {
 
   const showBackup =
     phase === 'list' &&
+    !policy.disableBackup &&
     shouldShowBackupReminder({
       activeCount: active.length,
       sig: signature,
@@ -918,6 +973,31 @@ export function App() {
     !needPassword &&
     whatsNew === null &&
     shouldShowReview({ ...review, accounts: active.length });
+
+  // 안내 띠는 목록 화면에 계정이 있을 때만 보인다(목록만 보기·잠김·빈 금고에서는 소비하지 않는다).
+  const whatsNewVisible =
+    !listOnly && phase === 'list' && screens.length === 0 && newRecovery === null && active.length > 0 &&
+    whatsNew !== null && whatsNewItems.length > 0;
+
+  // 띠가 실제로 보이면 본 것으로 기록한다. 화면에는 닫을 때까지 남는다.
+  useEffect(() => {
+    if (!whatsNewVisible || whatsNew === null) return;
+    void chrome.storage.local
+      .set({ lastSeenWhatsNewVersion: whatsNew })
+      .then(() => chrome.storage.local.remove('pendingWhatsNew'))
+      .catch(() => undefined);
+  }, [whatsNewVisible, whatsNew]);
+
+  // 평가 띠가 실제로 보이면 창(팝업 한 번 열기)마다 최대 1번 노출 횟수를 올린다.
+  const reviewCounted = useRef(false);
+  useEffect(() => {
+    if (!showReview || listOnly || reviewCounted.current) return;
+    reviewCounted.current = true;
+    void chrome.storage.local
+      .get('reviewShown')
+      .then((got) => chrome.storage.local.set({ reviewShown: (asNumber(got.reviewShown) ?? 0) + 1 }))
+      .catch(() => undefined);
+  }, [showReview, listOnly]);
 
   // 팝업 배율: 100 이면 넣지 않는다. 매초 다시 그려도 같은 객체를 쓴다.
   const rootStyle = useMemo(
@@ -1141,6 +1221,79 @@ export function App() {
     }
   }, []);
 
+  // 그룹 이름을 바꾸거나(to) 해제한다(null). 쓰기 잠금 안에서 읽은 최신 목록의 그 그룹 활성 계정만 바꾼다.
+  // 이미 있는 다른 그룹 이름이면 합쳐진다. 접힘 기록은 새 이름으로 옮기거나 지운다.
+  const changeGroup = useCallback(async (from: string, to: string | null) => {
+    const merging = to !== null && activeRef.current.some((a) => a.group === to);
+    try {
+      const at = Date.now();
+      const next = await updateAccounts((list) =>
+        list.map((a) => {
+          if (a.deletedAt !== undefined || a.group !== from) return a;
+          const { group: _group, ...rest } = a;
+          return to === null ? { ...rest, updatedAt: at } : { ...rest, group: to, updatedAt: at };
+        }),
+      );
+      setAccounts(next);
+      const current = foldedRef.current;
+      let folded = current.filter((x) => x !== from);
+      if (to !== null && !merging && current.includes(from)) folded = [...folded, to];
+      folded = pruneFolded(folded, groupSections(next));
+      foldedRef.current = folded;
+      setFoldedGroups(folded);
+      void chrome.storage.local.set({ popupFoldedGroups: folded }).catch(() => undefined);
+    } catch (error) {
+      if (error instanceof LockedError) {
+        setAccounts([]);
+        setPhase('locked');
+      } else {
+        setCodeAccessError('common.actionError');
+      }
+    }
+  }, []);
+
+  const submitRename = () => {
+    if (!renaming) return;
+    const name = normalizeGroupName(renaming.draft);
+    if (name === null) { setRenaming({ ...renaming, invalid: true }); return; }
+    const from = renaming.name;
+    setRenaming(null);
+    if (name !== from) void changeGroup(from, name);
+  };
+
+  const endSelect = () => {
+    setSelecting(false);
+    setPicked(new Set());
+    setPickAsk(false);
+    setPickError(false);
+  };
+  const togglePick = useCallback((id: string) => {
+    setPicked((prev) => {
+      const next = new Set(prev);
+      if (!next.delete(id)) next.add(id);
+      return next;
+    });
+  }, []);
+  // 선택한 계정을 moveToTrash 한 번으로 휴지통에 보낸다.
+  const trashPicked = async () => {
+    if (picked.size === 0 || picking.current) return;
+    const lockedAt = lockSeq.current;
+    picking.current = true;
+    setPickBusy(true);
+    setPickError(false);
+    try {
+      const next = await moveToTrash([...picked]);
+      if (lockedAt !== lockSeq.current) return;
+      setAccounts(next);
+      endSelect();
+    } catch {
+      if (lockedAt === lockSeq.current) setPickError(true);
+    } finally {
+      picking.current = false;
+      setPickBusy(false);
+    }
+  };
+
   // to 는 지금 화면(옮길 계정을 뺀 목록)의 자리. 저장 때 다른 창이 목록을 바꿔도 맞게 이웃 id 로 바꿔 넘긴다.
   const reorder = useCallback(async (id: string, to: number) => {
     const others = visibleRef.current.filter((a) => a.id !== id);
@@ -1165,8 +1318,14 @@ export function App() {
       : null);
     try {
       setAccounts(await updateAccounts((list) => moveActive(list, id, beforeId)));
-    } catch {
-      // 금고 변화 구독이 상태를 맞춘다.
+    } catch (error) {
+      // 화면은 저장이 끝난 뒤에만 바뀌므로 원래 순서 그대로다. 금고 변화 구독이 상태를 맞춘다.
+      if (error instanceof LockedError) {
+        setAccounts([]);
+        setPhase('locked');
+      } else {
+        setCodeAccessError('common.actionError');
+      }
     }
   }, []);
 
@@ -1184,7 +1343,7 @@ export function App() {
       if (phase !== 'list' || e.isComposing || deleteAsk !== null) return;
       // QR 보기·비밀번호 칸에서 친 글자를 검색칸이 가져가지 않게 한다.
       // 줄 메뉴의 새 그룹 이름 칸도 같다.
-      if ((e.target as HTMLElement | null)?.closest('.popup-qr, .popup-delete, .menu input')) return;
+      if ((e.target as HTMLElement | null)?.closest('.popup-qr, .popup-delete, .menu input, .group-rename input, select')) return;
       const hoveredIndex = visible.findIndex((a) => a.id === hoveredId.current);
       const currentIndex = hoveredIndex >= 0 ? hoveredIndex : selectedIndex;
       if (e.key === 'ContextMenu' || (e.shiftKey && e.key === 'F10')) {
@@ -1232,7 +1391,9 @@ export function App() {
         const account = visible[currentIndex];
         if (account) {
           e.preventDefault();
-          void copy(account, 0);
+          // 선택 모드에서는 복사 대신 체크한다.
+          if (selecting) togglePick(account.id);
+          else void copy(account, 0);
         }
       } else if (e.key === 'Escape') {
         if (gesture.current) {
@@ -1242,6 +1403,15 @@ export function App() {
         } else if (menu !== null) {
           e.preventDefault();
           setMenu(null);
+        } else if (renaming !== null) {
+          e.preventDefault();
+          setRenaming(null);
+        } else if (pickAsk) {
+          e.preventDefault();
+          setPickAsk(false);
+        } else if (selecting) {
+          e.preventDefault();
+          endSelect();
         } else if (query !== '') {
           e.preventDefault();
           setQuery('');
@@ -1249,7 +1419,7 @@ export function App() {
         }
       } else if (!listOnly && e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
         // 단추 위 Space 는 그 단추를 누른다.
-        if (e.key === ' ' && (e.target as HTMLElement | null)?.closest('button')) return;
+        if (e.key === ' ' && (e.target as HTMLElement | null)?.closest('button, input.pick')) return;
         const search = searchRef.current;
         if (search && document.activeElement !== search) search.focus();
       }
@@ -1261,7 +1431,7 @@ export function App() {
       document.removeEventListener('keydown', onKey);
       document.removeEventListener('pointerdown', onPointer);
     };
-  }, [phase, visible, selectedIndex, query, copy, reorder, menu, screens.length, listOnly, clearDrag, deleteAsk, grouped]);
+  }, [phase, visible, selectedIndex, query, copy, reorder, menu, screens.length, listOnly, clearDrag, deleteAsk, grouped, selecting, pickAsk, renaming, togglePick]);
 
   const unlockPasskey = async () => {
     if (passkeyAbort.current) return;
@@ -1570,7 +1740,7 @@ export function App() {
   const dragStart = (e: PointerEvent, id: string) => {
     dragClick.current = null;
     if (gesture.current) return;
-    if (e.button !== 0 || e.pointerType !== 'mouse') return;
+    if (e.button !== 0 || e.pointerType !== 'mouse' || selecting) return;
     // 코드·이름 단추는 행의 복사 영역이다. 다른 동작 단추와 메뉴는 끌지 않는다.
     if ((e.target as Element).closest('button:not(.code):not(.row-main), .menu, a, input')) return;
     const list = listRef.current;
@@ -1671,6 +1841,9 @@ export function App() {
         }
         copied={copiedId === account.id}
         menuOpen={menu === `row:${account.id}`}
+        selecting={selecting}
+        checked={picked.has(account.id)}
+        onToggleCheck={() => togglePick(account.id)}
         t={t}
         onHover={() => {
           hoveredId.current = account.id;
@@ -2038,6 +2211,7 @@ export function App() {
           data-role="search"
           aria-label={t('popup.search')}
           placeholder={t('popup.search')}
+          title={t('popup.search.hint')}
           value={query}
           autoComplete="off"
           onInput={(e) => {
@@ -2045,7 +2219,56 @@ export function App() {
             setSelected(0);
           }}
         />
+        <select
+          class="scope"
+          data-role="search-scope"
+          aria-label={t('popup.search.scope')}
+          value={scope}
+          onChange={(e) => {
+            setScope(e.currentTarget.value as SearchScope);
+            setSelected(0);
+          }}
+        >
+          <option value="all">{t('popup.search.all')}</option>
+          <option value="issuer">{t('popup.search.issuer')}</option>
+          <option value="label">{t('popup.search.label')}</option>
+          <option value="group">{t('popup.search.group')}</option>
+          <option value="note">{t('popup.search.note')}</option>
+        </select>
       </div>}
+      {!listOnly && phase === 'list' && active.length > 0 && (
+        <div class="sel-tools" data-role="sel-tools">
+          {!selecting ? (
+            <button type="button" data-role="select-start" onClick={() => { setMenu(null); setRenaming(null); setSelecting(true); }}>
+              {t('popup.selection.start')}
+            </button>
+          ) : (
+            <>
+              <span class="sel-count" role="status" data-role="select-count" data-count={picked.size}>
+                {t('popup.selection.count', { n: picked.size })}
+              </span>
+              <button type="button" data-role="select-all" onClick={() => setPicked(new Set(visible.map((a) => a.id)))}>
+                {t('popup.selection.all')}
+              </button>
+              <button type="button" class="danger" data-role="select-trash" disabled={picked.size === 0 || pickBusy}
+                onClick={() => { setPickError(false); setPickAsk(true); }}>
+                {t('popup.selection.trash')}
+              </button>
+              <button type="button" data-role="select-done" onClick={endSelect}>{t('add.done')}</button>
+              {pickAsk && (
+                <div class="sel-confirm" role="alertdialog" data-role="select-confirm">
+                  <span>{t('popup.selection.confirm', { n: picked.size })}</span>{' '}
+                  <button type="button" class="danger" data-role="select-confirm-yes" autoFocus disabled={pickBusy}
+                    onClick={() => void trashPicked()}>{t('accounts.delete.yes')}</button>{' '}
+                  <button type="button" data-role="select-confirm-cancel" disabled={pickBusy}
+                    onClick={() => setPickAsk(false)}>{t('accounts.cancel')}</button>
+                </div>
+              )}
+              {pickError && <p class="error sel-confirm" role="alert">{t('common.actionError')}</p>}
+            </>
+          )}
+        </div>
+      )}
       {codeAccessError && <p class="flag error" role="alert" data-role="code-access-error">{t(codeAccessError)}</p>}
       {fillFeedback && (
         <div class="note" role={fillFeedback.kind === 'error' ? 'alert' : 'status'} data-role="fill-feedback" data-state={fillFeedback.kind}>
@@ -2068,19 +2291,6 @@ export function App() {
         <div class="flag hidden-flag">
           <Icon name="lock" />
           {t('popup.hiddenOn')}
-        </div>
-      )}
-      {!listOnly && whatsNew !== null && whatsNewItems.length > 0 && (
-        <div class="note" data-role="whats-new">
-          <span>{t('popup.whatsNew.title', { version: whatsNew })}</span>
-          <ul>
-            {whatsNewItems.map((key) => (
-              <li key={key}>{t(key)}</li>
-            ))}
-          </ul>
-          <button type="button" data-role="whats-new-done" onClick={finishWhatsNew}>
-            {t('popup.whatsNew.done')}
-          </button>
         </div>
       )}
       {needPassword && (
@@ -2251,20 +2461,102 @@ export function App() {
               const name = section.name ?? t('popup.group.none');
               return (
                 <Fragment key={key}>
-                  <div role="presentation">
-                    <button
-                      type="button"
-                      class="sec sec-fold"
-                      data-role="group-fold"
-                      aria-expanded={!section.folded}
-                      aria-label={t(section.folded ? 'popup.group.unfold' : 'popup.group.fold', { name })}
-                      onClick={() => toggleFold(key)}
-                    >
-                      <Icon name="chevron" />
-                      <span class="sec-name">{name}</span>
-                      <span class="sec-count">{section.items.length}</span>
-                    </button>
-                  </div>
+                  {section.name !== null && renaming?.name === section.name ? (
+                    <div class="group-rename" role="presentation">
+                      <input
+                        type="text"
+                        class="field"
+                        data-role="group-rename-input"
+                        aria-label={t('popup.group.newName')}
+                        placeholder={t('popup.group.newName')}
+                        aria-invalid={renaming.invalid}
+                        autoComplete="off"
+                        autoFocus
+                        value={renaming.draft}
+                        onInput={(e) => setRenaming({ ...renaming, draft: e.currentTarget.value, invalid: false })}
+                        onBlur={() => setRenaming(null)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); setRenaming(null); }
+                          else if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); submitRename(); }
+                        }}
+                      />
+                      {(() => {
+                        const typed = normalizeGroupName(renaming.draft);
+                        return typed !== null && typed !== section.name && groupNames.includes(typed)
+                          ? <p class="hint" role="status" data-role="group-merge-hint">{t('popup.group.merge')}</p>
+                          : null;
+                      })()}
+                    </div>
+                  ) : (
+                    <div class="sec-head" role="presentation">
+                      <button
+                        type="button"
+                        class="sec sec-fold"
+                        data-role="group-fold"
+                        aria-expanded={!section.folded}
+                        aria-label={t(section.folded ? 'popup.group.unfold' : 'popup.group.fold', { name })}
+                        onClick={() => toggleFold(key)}
+                      >
+                        <Icon name="chevron" />
+                        <span class="sec-name">{name}</span>
+                        <span class="sec-count">{section.items.length}</span>
+                      </button>
+                      {section.name !== null && (
+                        <button
+                          type="button"
+                          class="more"
+                          data-role="group-more"
+                          data-menu-toggle
+                          aria-haspopup="menu"
+                          aria-expanded={menu === `group:${section.name}`}
+                          aria-label={t('popup.group.rename') + ' · ' + name}
+                          title={t('popup.group.rename')}
+                          onClick={() => toggleMenu(`group:${section.name}`)}
+                        >
+                          <Icon name="more" />
+                        </button>
+                      )}
+                      {section.name !== null && menu === `group:${section.name}` && (
+                        <div
+                          class="menu"
+                          role="menu"
+                          onKeyDown={(e) => {
+                            if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); setMenu(null); }
+                          }}
+                        >
+                          <button
+                            type="button"
+                            class="mi"
+                            role="menuitem"
+                            data-role="group-rename"
+                            autoFocus
+                            onClick={() => {
+                              const from = section.name!;
+                              setMenu(null);
+                              setRenaming({ name: from, draft: from, invalid: false });
+                            }}
+                          >
+                            <Icon name="edit" />
+                            <span class="mi-text">{t('popup.group.rename')}</span>
+                          </button>
+                          <button
+                            type="button"
+                            class="mi"
+                            role="menuitem"
+                            data-role="group-ungroup"
+                            onClick={() => {
+                              const from = section.name!;
+                              setMenu(null);
+                              void changeGroup(from, null);
+                            }}
+                          >
+                            <Icon name="x" />
+                            <span class="mi-text">{t('popup.group.ungroup')}</span>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
                   {!section.folded && (
                     <div class="card" role="presentation">
                       {section.items.map((account) => renderRow(account, index++))}
@@ -2283,6 +2575,19 @@ export function App() {
               </div>
             </>
           )}
+        </div>
+      )}
+      {whatsNewVisible && whatsNew !== null && (
+        <div class="note" data-role="whats-new">
+          <span>{t('popup.whatsNew.title', { version: whatsNew })}</span>
+          <ul>
+            {whatsNewItems.map((key) => (
+              <li key={key}>{t(key)}</li>
+            ))}
+          </ul>
+          <button type="button" data-role="whats-new-done" onClick={finishWhatsNew}>
+            {t('popup.whatsNew.done')}
+          </button>
         </div>
       )}
       {!listOnly && showReview && (
@@ -2346,6 +2651,10 @@ type RowProps = {
   suggest: boolean;
   copied: boolean;
   menuOpen: boolean;
+  // 선택 모드: 행 클릭은 복사 대신 체크.
+  selecting: boolean;
+  checked: boolean;
+  onToggleCheck: () => void;
   t: T;
   onHover: () => void;
   onLeave: () => void;
@@ -2396,10 +2705,18 @@ function Row(p: RowProps) {
     const menu = menuRef.current;
     const list = row?.closest<HTMLElement>('.popup-list');
     if (!p.menuOpen || !row || !menu || !list) return;
+    // 툴바 팝업은 내용만큼만 커서 메뉴가 잘린다. 열 때 문서 높이를 최대 600px 까지 늘리고 닫으면 되돌린다.
+    const popup = row.closest<HTMLElement>('.popup');
+    // 루트 zoom 배율(확대 전 단위 → 화면 단위). 높이를 늘려도 달라지지 않는다.
+    const scale = row.offsetWidth > 0 ? row.getBoundingClientRect().width / row.offsetWidth : 1;
+    if (popup && currentOpenName() === 'popup') {
+      const need = menu.scrollHeight + 8 - list.clientHeight;
+      const room = 600 / scale - popup.offsetHeight;
+      if (need > 0 && room > 0) popup.style.minHeight = `${popup.offsetHeight + Math.min(need, room)}px`;
+    }
     const rowBox = row.getBoundingClientRect();
     const listBox = list.getBoundingClientRect();
     const anchor = row.querySelector('.more')?.getBoundingClientRect() ?? rowBox;
-    const scale = row.offsetWidth > 0 ? rowBox.width / row.offsetWidth : 1;
     const top = Math.max(0, listBox.top) + 4 * scale;
     const bottom = Math.min(window.innerHeight, listBox.bottom) - 4 * scale;
     menu.style.maxHeight = `${Math.max(0, bottom - top) / scale}px`;
@@ -2410,6 +2727,10 @@ function Row(p: RowProps) {
     const placed = Math.max(top, Math.min(wanted, bottom - height));
     menu.style.top = `${(placed - rowBox.top) / scale}px`;
     menu.querySelector<HTMLButtonElement>('button')?.focus({ preventScroll: true });
+    return () => {
+      // 다른 행의 메뉴가 이미 열려 있으면(행 사이 전환) 그 행이 늘린 높이를 지우지 않는다.
+      if (popup && ![...popup.querySelectorAll('.row-menu')].some((m) => m !== menu)) popup.style.minHeight = '';
+    };
   }, [p.menuOpen, view, timed, !!p.onQr, !!p.onShare, t, groupPanel, p.groupNames.length, !!account.group]);
   // 새 그룹 이름 칸은 열리면 바로 입력할 수 있게 한다(위 효과가 첫 단추에 둔 포커스를 넘겨받는다).
   useLayoutEffect(() => {
@@ -2457,6 +2778,7 @@ function Row(p: RowProps) {
     seen.current.wrap && 'reset',
     p.suggest && 'suggest',
     p.copied && 'copied',
+    p.selecting && p.checked && 'picked',
     'reorderable',
     p.reorder.dragging && 'dragging',
     !p.reorder.dragging && p.reorder.offset !== 0 && 'drag-shifted',
@@ -2572,16 +2894,26 @@ function Row(p: RowProps) {
           rowRef.current?.querySelector<HTMLButtonElement>('[data-menu-toggle]')?.focus({ preventScroll: true });
         }
       }}
-      onClick={() => p.onCopy(0)}
+      onClick={() => (p.selecting ? p.onToggleCheck() : p.onCopy(0))}
       onClickCapture={p.reorder.onClickCapture}
       onPointerDown={p.reorder.onDragStart}
       onPointerMove={p.reorder.onDragMove}
       onPointerUp={(e) => p.reorder.onDragEnd(e, true)}
       onPointerCancel={(e) => p.reorder.onDragEnd(e, false)}
     >
+      {p.selecting && (
+        <input
+          type="checkbox"
+          class="pick"
+          data-role="pick"
+          checked={p.checked}
+          aria-label={[account.issuer, account.label].filter(Boolean).join(' · ')}
+          onClick={only(p.onToggleCheck)}
+        />
+      )}
       {p.avatars && (
         <div class="tile" style={`--h:${tileHue(account.issuer)}`} aria-hidden="true">
-          {avatarInitial(account.issuer)}
+          {accountIconSymbol(account.iconId) ?? avatarInitial(account.issuer)}
         </div>
       )}
       <div class="who">

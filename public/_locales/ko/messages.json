@@ -43,6 +43,27 @@
       }
     }
   },
+  "cmdCopyPinned1": {
+    "message": "중요 표시 계정 1 코드 복사"
+  },
+  "cmdCopyPinned2": {
+    "message": "중요 표시 계정 2 코드 복사"
+  },
+  "cmdCopyPinned3": {
+    "message": "중요 표시 계정 3 코드 복사"
+  },
+  "shortcutCopied": {
+    "message": "코드를 복사했습니다."
+  },
+  "shortcutLocked": {
+    "message": "먼저 잠금을 풀어 주세요."
+  },
+  "shortcutMissing": {
+    "message": "이 단축키에 맞는 중요 표시 계정이 없습니다."
+  },
+  "shortcutFailed": {
+    "message": "코드를 복사하지 못했습니다."
+  },
   "fillPickAccount": {
     "message": "계정을 골라 주세요."
   },

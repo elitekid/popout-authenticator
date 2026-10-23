@@ -43,6 +43,27 @@
       }
     }
   },
+  "cmdCopyPinned1": {
+    "message": "Copy code of important account 1"
+  },
+  "cmdCopyPinned2": {
+    "message": "Copy code of important account 2"
+  },
+  "cmdCopyPinned3": {
+    "message": "Copy code of important account 3"
+  },
+  "shortcutCopied": {
+    "message": "Code copied."
+  },
+  "shortcutLocked": {
+    "message": "Unlock Popout Authenticator first."
+  },
+  "shortcutMissing": {
+    "message": "No pinned account for this shortcut."
+  },
+  "shortcutFailed": {
+    "message": "Could not copy the code."
+  },
   "fillPickAccount": {
     "message": "Choose an account."
   },

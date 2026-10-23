@@ -1,5 +1,5 @@
 {
-  "appName": { "message": "Popout Authenticator" },
+  "appName": { "message": "Popout Authenticator — автентифікатор 2FA" },
   "appShortName": { "message": "Popout Authenticator" },
   "appDesc": { "message": "Автентифікатор 2FA для вашого браузера. Генерує одноразові коди, відкривається як спливне або окреме вікно." },
   "cmdExecuteAction": { "message": "Відкрити спливне вікно" },
@@ -14,6 +14,27 @@
   "fillManual": {
     "message": "Код: $CODE$",
     "placeholders": { "code": { "content": "$1" } }
+  },
+  "cmdCopyPinned1": {
+    "message": "Копіювати код облікового запису із зіркою 1"
+  },
+  "cmdCopyPinned2": {
+    "message": "Копіювати код облікового запису із зіркою 2"
+  },
+  "cmdCopyPinned3": {
+    "message": "Копіювати код облікового запису із зіркою 3"
+  },
+  "shortcutCopied": {
+    "message": "Код скопійовано."
+  },
+  "shortcutLocked": {
+    "message": "Спершу розблокуйте Popout Authenticator."
+  },
+  "shortcutMissing": {
+    "message": "Для цієї комбінації немає облікового запису із зіркою."
+  },
+  "shortcutFailed": {
+    "message": "Не вдалося скопіювати код."
   },
   "fillPickAccount": { "message": "Виберіть обліковий запис" },
   "fieldFillButton": { "message": "Вставити код" }

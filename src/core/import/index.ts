@@ -36,8 +36,9 @@ export async function importText(text: string, password?: string): Promise<Impor
           ...(counter !== undefined ? { counter } : {}),
         })),
         failed: [],
-        meta: accounts.map(({ pinned, group, note, matchHosts }) => ({
+        meta: accounts.map(({ pinned, group, note, matchHosts, iconId }) => ({
           pinned, note, matchHosts, ...(group !== undefined ? { group } : {}),
+          ...(iconId !== undefined ? { iconId } : {}),
         })),
         format: 'own',
       };

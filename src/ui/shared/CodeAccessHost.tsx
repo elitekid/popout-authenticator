@@ -11,7 +11,8 @@ const errorKey = (error: unknown) => error === 'codeProtection.expired' || error
   ? 'lock.codeAccess.expired' : 'lock.codeAccess.error';
 
 // 기본 화면에 계속 붙어 있는 승인 호스트. OS 인증 UI 외에 창이나 탭을 만들지 않는다.
-export function CodeAccessHost({ temporary = false }: { temporary?: boolean }) {
+// trackInput: 자체 활동 전송이 없는 화면(관리 탭·창)의 입력을 자동 잠금 활동으로 알린다. 전송 제한은 ui-port 가 건다.
+export function CodeAccessHost({ temporary = false, trackInput = false }: { temporary?: boolean; trackInput?: boolean }) {
   const t = useT();
   const [view, setView] = useState<View | null>(null);
   const retry = useRef<() => void>(() => undefined);
@@ -128,6 +129,12 @@ export function CodeAccessHost({ temporary = false }: { temporary?: boolean }) {
       if (document.hidden && active) expire();
       announce();
     };
+    const onInput = () => activity.activity();
+    const inputOptions = { capture: true, passive: true } as const;
+    if (trackInput) {
+      document.addEventListener('keydown', onInput, inputOptions);
+      document.addEventListener('pointerdown', onInput, inputOptions);
+    }
     connect();
     void chrome.windows.getCurrent().then((win) => {
       if (!alive) return;
@@ -145,12 +152,14 @@ export function CodeAccessHost({ temporary = false }: { temporary?: boolean }) {
       if (dismiss) clearTimeout(dismiss);
       port?.disconnect();
       activity.close();
+      document.removeEventListener('keydown', onInput, inputOptions);
+      document.removeEventListener('pointerdown', onInput, inputOptions);
       window.removeEventListener('focus', announce);
       window.removeEventListener('blur', announce);
       window.removeEventListener('pagehide', onPageHide);
       document.removeEventListener('visibilitychange', onVisibility);
     };
-  }, [temporary]);
+  }, [temporary, trackInput]);
 
   if (!view) return temporary ? <p class="empty" role="status">{t('popup.loading')}</p> : null;
   return <section class="code-access-inline" data-role="code-access" data-request-id={view.id} aria-live="polite">

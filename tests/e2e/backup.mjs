@@ -55,7 +55,7 @@ export async function runBackupScenario(session) {
     pages.push(seed);
     await seed.goto(`${origin}/manage.html`, { waitUntil: session.navigationWait ?? 'load' });
     await seed.evaluate(async (v) => {
-      await chrome.storage.local.remove('vault');
+      await chrome.storage.local.remove(['vault', 'backupInfo']);
       await chrome.storage.local.set({ vault: v });
     }, vault);
     await seed.close();
@@ -97,6 +97,17 @@ export async function runBackupScenario(session) {
       return problems;
     }
     const backup = `${dir}/${name}`;
+
+    // 저장 대화상자 취소를 알 수 없으므로, 다운로드만으로는 백업 완료로 기록하지 않고 '저장했습니다'를 눌러야 기록한다.
+    await page.waitForSelector('[data-role="saved-confirm"]', { timeout: 5000 });
+    if ((await page.evaluate(() => chrome.storage.local.get('backupInfo'))).backupInfo !== undefined) {
+      problems.push('저장했습니다를 누르기 전에 backupInfo 가 기록됨');
+    }
+    await page.click('[data-role="saved-confirm"]');
+    await page.waitForFunction(
+      async () => (await chrome.storage.local.get('backupInfo')).backupInfo !== undefined,
+      { timeout: 5000 },
+    );
 
     // 금고만 지우고 추가 화면에서 그 파일로 되살린다.
     await page.evaluate(() => chrome.storage.local.remove('vault'));

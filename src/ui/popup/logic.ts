@@ -13,18 +13,24 @@ export function formatCode(code: string): string {
 
 type Searchable = Pick<Account, 'issuer' | 'label' | 'group' | 'note' | 'deletedAt'>;
 
-// 휴지통은 빼고, 이름·서비스·그룹·메모에서 대소문자 무시 부분 일치. group 이 null 이면 전체.
+export type SearchScope = 'all' | 'issuer' | 'label' | 'group' | 'note';
+
+// 휴지통은 빼고, 공백으로 나눈 단어가 모두(AND) 대소문자 무시 부분 일치. group 이 null 이면 전체.
+// 범위 'all' 은 서비스·계정·그룹·메모 어디든, 그 밖은 그 필드만. 비밀키·matchHosts 는 보지 않는다.
 export function filterAccounts<T extends Searchable>(
   accounts: T[],
   query: string,
   group: string | null = null,
+  scope: SearchScope = 'all',
 ): T[] {
-  const q = query.trim().toLowerCase();
+  const words = query.toLowerCase().split(/\s+/).filter((w) => w !== '');
   return accounts.filter((a) => {
     if (a.deletedAt !== undefined) return false;
     if (group !== null && a.group !== group) return false;
-    if (q === '') return true;
-    return [a.issuer, a.label, a.group ?? '', a.note].some((s) => s.toLowerCase().includes(q));
+    if (words.length === 0) return true;
+    const fields = scope === 'all' ? [a.issuer, a.label, a.group ?? '', a.note] : [a[scope] ?? ''];
+    const texts = fields.map((s) => s.toLowerCase());
+    return words.every((w) => texts.some((s) => s.includes(w)));
   });
 }
 
@@ -183,14 +189,24 @@ const IS_WHALE =
   BROWSER_TARGET === 'chrome' && typeof navigator !== 'undefined' && /Whale/.test(navigator.userAgent ?? '');
 export const STORE_REVIEW_URL: string = STORE_REVIEW_URLS[IS_WHALE ? 'whale' : BROWSER_TARGET];
 
+// 응답 없이 띠가 보인 횟수가 이만큼 쌓이면 더 이상 띠를 보이지 않는다.
+export const REVIEW_MAX_SHOWN = 3;
+
 // 평가 요청: 팝업을 15번 이상 열었고 계정이 있으며, 닫지 않았고 미룬 횟수가 지났을 때.
-export function shouldShowReview(s: {
-  openCount: number;
-  accounts: number;
-  dismissed: boolean;
-  snoozedUntilOpen: number;
-}): boolean {
+// 노출이 3회 쌓였거나 safari 빌드(애플 지침 5.6.1)면 자동 띠는 보이지 않는다.
+export function shouldShowReview(
+  s: {
+    openCount: number;
+    accounts: number;
+    dismissed: boolean;
+    snoozedUntilOpen: number;
+    shown?: number;
+  },
+  target: BrowserTarget = BROWSER_TARGET,
+): boolean {
   return (
+    target !== 'safari' &&
+    (s.shown ?? 0) < REVIEW_MAX_SHOWN &&
     s.openCount >= REVIEW_MIN_OPENS &&
     s.accounts >= 1 &&
     !s.dismissed &&
@@ -211,4 +227,11 @@ export function siteUrl(lang: string, page: 'home' | 'guides'): string {
 }
 
 // 새 기능 소개: 버전 → 문구 키 배열. 다음 버전부터 항목을 더한다.
-export const WHATS_NEW: Record<string, string[]> = {};
+export function whatsNewFor(target: BrowserTarget = BROWSER_TARGET): Record<string, string[]> {
+  // 전역 단축키는 크롬 계열 전용이라 firefox·safari 에서는 copy 줄을 뺀다.
+  const copy = target === 'firefox' || target === 'safari' ? [] : ['popup.whatsNew.v102.copy'];
+  return {
+    '1.0.2': ['popup.whatsNew.v102.organize', 'popup.whatsNew.v102.capture', ...copy],
+  };
+}
+export const WHATS_NEW: Record<string, string[]> = whatsNewFor();

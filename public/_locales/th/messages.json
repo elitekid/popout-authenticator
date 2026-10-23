@@ -1,5 +1,5 @@
 {
-  "appName": { "message": "Popout Authenticator" },
+  "appName": { "message": "Popout Authenticator — แอปยืนยันตัวตน 2FA" },
   "appShortName": { "message": "Popout Authenticator" },
   "appDesc": { "message": "แอปยืนยันตัวตน 2FA สำหรับเบราว์เซอร์ของคุณ สร้างรหัสใช้ครั้งเดียว เปิดเป็นป๊อปอัปหรือหน้าต่างแยกได้" },
   "cmdExecuteAction": { "message": "เปิดป๊อปอัป" },
@@ -14,6 +14,27 @@
   "fillManual": {
     "message": "รหัส: $CODE$",
     "placeholders": { "code": { "content": "$1" } }
+  },
+  "cmdCopyPinned1": {
+    "message": "คัดลอกโค้ดของบัญชีที่ติดดาว 1"
+  },
+  "cmdCopyPinned2": {
+    "message": "คัดลอกโค้ดของบัญชีที่ติดดาว 2"
+  },
+  "cmdCopyPinned3": {
+    "message": "คัดลอกโค้ดของบัญชีที่ติดดาว 3"
+  },
+  "shortcutCopied": {
+    "message": "คัดลอกโค้ดแล้ว"
+  },
+  "shortcutLocked": {
+    "message": "ปลดล็อก Popout Authenticator ก่อน"
+  },
+  "shortcutMissing": {
+    "message": "ไม่มีบัญชีที่ติดดาวสำหรับทางลัดนี้"
+  },
+  "shortcutFailed": {
+    "message": "คัดลอกโค้ดไม่ได้"
   },
   "fillPickAccount": { "message": "เลือกบัญชี" },
   "fieldFillButton": { "message": "กรอกรหัส" }

@@ -83,6 +83,17 @@ export async function runLockScenario({ browser, extensionId }) {
     if (newTargets(browser, before).length) problems.push('패스키 잠금 해제 때 추가 페이지를 열었음');
     if (await page.$('[data-role="passkey-start"]')) problems.push('잠금 해제에 시작 단추를 한 번 더 요구함');
     if (!(await page.evaluate(async () => (await chrome.storage.session.get('vaultKey')).vaultKey))) problems.push('해제 뒤 session vaultKey 없음');
+
+    // 관리 화면의 입력도 활동으로 세어 bg 의 마지막 활동 시각(lastActivityAt)을 갱신해야 한다.
+    await page.goto(`${origin}/manage.html`);
+    await page.bringToFront();
+    await page.waitForSelector('#app *');
+    // 연결 직후의 활동 기록과 1초 전송 제한이 지나도록 기다린 뒤 옛 시각으로 되돌린다.
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    await page.evaluate(() => chrome.storage.session.set({ lastActivityAt: 1 }));
+    await page.keyboard.press('Shift');
+    await page.waitForFunction(async () => ((await chrome.storage.session.get('lastActivityAt')).lastActivityAt ?? 0) > 1, { timeout: 5000 })
+      .catch(() => problems.push('관리 화면 키 입력이 마지막 활동 시각을 갱신하지 않음'));
   } catch (error) {
     problems.push(`잠금 시나리오: ${error instanceof Error ? error.message : String(error)}`);
   } finally { await page.close().catch(() => undefined); }

@@ -3,13 +3,13 @@
   "properties": {
     "storageArea": {
       "title": "Storage area",
-      "description": "Where accounts are stored: sync or local.",
+      "description": "Forces browser sync on (sync) or off (local). Accounts are always stored locally; no storage area is erased.",
       "type": "string",
       "enum": ["sync", "local"]
     },
     "disableBackup": {
       "title": "Disable backup",
-      "description": "Hide the backup feature.",
+      "description": "Hide the backup menu, backup reminders and backup page, and block reset (which requires a backup first). Automatic snapshots for damage recovery stay on.",
       "type": "boolean"
     },
     "disableExport": {

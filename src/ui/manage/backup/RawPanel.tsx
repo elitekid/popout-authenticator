@@ -97,6 +97,7 @@ export function RawImport({ t, showSave }: { t: T; showSave: boolean }) {
         ...(a.group !== undefined ? { group: a.group } : {}),
         note: a.note,
         matchHosts: a.matchHosts,
+        ...(a.iconId !== undefined ? { iconId: a.iconId } : {}),
       }));
       if (!(await readVaultFile())) {
         try {

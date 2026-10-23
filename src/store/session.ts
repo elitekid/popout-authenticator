@@ -26,6 +26,15 @@ async function getNumber(name: string): Promise<number | null> {
   return typeof value === 'number' ? value : null;
 }
 
+// lockNow 가 세션 잠금 안에서 올리는 잠금 횟수. 긴 작업이 시작 뒤 잠겼는지 값이 바뀌었는지로 안다.
+export async function getLockEpoch(): Promise<number> {
+  return (await getNumber('lockEpoch')) ?? 0;
+}
+
+export async function bumpLockEpoch(): Promise<void> {
+  await chrome.storage.session.set({ lockEpoch: (await getLockEpoch()) + 1 });
+}
+
 export function getUnlockedAt(): Promise<number | null> {
   return getNumber('unlockedAt');
 }

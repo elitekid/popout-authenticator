@@ -1,6 +1,14 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { DEFAULT_SETTINGS } from '../../src/core/types';
-import { NO_POLICY, applyPolicy, isForced, normalizePolicy, passwordMeetsPolicy } from '../../src/store/policy';
+import {
+  NO_POLICY,
+  applyPolicy,
+  isForced,
+  normalizePolicy,
+  onPolicyChanged,
+  passwordMeetsPolicy,
+  readPolicy,
+} from '../../src/store/policy';
 
 describe('normalizePolicy', () => {
   it('객체가 아니면 정책 없음', () => {
@@ -72,6 +80,47 @@ describe('passwordMeetsPolicy', () => {
 
   it('정책이 없으면 통과', () => {
     expect(passwordMeetsPolicy(NO_POLICY, 'x')).toBe(true);
+  });
+});
+
+describe('캡처 진입 정책', () => {
+  it('비밀번호 강제 정책에 잠금이 꺼져 있으면 캡처 탭을 열지 않는다', async () => {
+    await chrome.storage.managed.set({ enforcePassword: true });
+    const create = vi.fn(async () => ({}));
+    const captureVisibleTab = vi.fn(async () => 'data:image/png;base64,AA');
+    (chrome as unknown as { tabs: unknown }).tabs = {
+      create,
+      captureVisibleTab,
+      query: vi.fn(async () => []),
+    };
+    const { captureTab, captureDisplay } = await import('../../src/bg/capture');
+    await expect(captureTab()).rejects.toThrow();
+    await expect(captureDisplay()).rejects.toThrow();
+    expect(captureVisibleTab).not.toHaveBeenCalled();
+    expect(create).not.toHaveBeenCalled();
+    await chrome.storage.managed.clear();
+  });
+});
+
+describe('onPolicyChanged', () => {
+  it('managed 가 바뀌면 구독자를 부르고 캐시를 비워 새 값을 읽는다', async () => {
+    await chrome.storage.managed.clear();
+    expect((await readPolicy()).disableBackup).toBe(false);
+    const seen = vi.fn();
+    const off = onPolicyChanged(seen);
+    // 다른 저장소 변경에는 반응하지 않는다.
+    await chrome.storage.local.set({ unrelated: 1 });
+    expect(seen).not.toHaveBeenCalled();
+    await chrome.storage.managed.set({ disableBackup: true, enforcePassword: true });
+    expect(seen).toHaveBeenCalled();
+    const next = await readPolicy();
+    expect(next.disableBackup).toBe(true);
+    expect(next.enforcePassword).toBe(true);
+    off();
+    seen.mockClear();
+    await chrome.storage.managed.clear();
+    expect(seen).not.toHaveBeenCalled();
+    expect((await readPolicy()).disableBackup).toBe(false);
   });
 });
 

@@ -1,5 +1,5 @@
 {
-  "appName": { "message": "Popout Authenticator" },
+  "appName": { "message": "Popout Authenticator — 2FA ऑथेंटिकेटर" },
   "appShortName": { "message": "Popout Authenticator" },
   "appDesc": { "message": "आपके ब्राउज़र के लिए 2FA ऑथेंटिकेटर। एक बार इस्तेमाल होने वाले कोड बनाता है और पॉपअप या अलग विंडो में खुलता है।" },
   "cmdExecuteAction": { "message": "पॉपअप खोलें" },
@@ -14,6 +14,27 @@
   "fillManual": {
     "message": "कोड: $CODE$",
     "placeholders": { "code": { "content": "$1" } }
+  },
+  "cmdCopyPinned1": {
+    "message": "स्टार वाले खाते 1 का कोड कॉपी करें"
+  },
+  "cmdCopyPinned2": {
+    "message": "स्टार वाले खाते 2 का कोड कॉपी करें"
+  },
+  "cmdCopyPinned3": {
+    "message": "स्टार वाले खाते 3 का कोड कॉपी करें"
+  },
+  "shortcutCopied": {
+    "message": "कोड कॉपी हो गया।"
+  },
+  "shortcutLocked": {
+    "message": "पहले Popout Authenticator अनलॉक करें।"
+  },
+  "shortcutMissing": {
+    "message": "इस शॉर्टकट के लिए कोई स्टार वाला खाता नहीं है।"
+  },
+  "shortcutFailed": {
+    "message": "कोड कॉपी नहीं हो सका।"
   },
   "fillPickAccount": { "message": "कोई खाता चुनें" },
   "fieldFillButton": { "message": "कोड भरें" }

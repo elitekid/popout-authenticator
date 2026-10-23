@@ -1,5 +1,6 @@
 import { memo } from 'preact/compat';
-import { useLayoutEffect, useRef } from 'preact/hooks';
+import { useEffect, useLayoutEffect, useRef, useState } from 'preact/hooks';
+import { onPolicyChanged, readPolicy } from '../../store/policy';
 import { sections, type SectionId } from '../manage/sections';
 import { HistoryPanel } from '../manage/accounts/HistoryPanel';
 import { AccountsSection } from '../manage/accounts/AccountsSection';
@@ -29,6 +30,15 @@ function Screen({ route, toolbarPopup, active = true, animate = true, onNavigate
     }
     wasActive.current = active;
   }, [active]);
+  // 관리자가 백업을 껐으면 설정 목록에서 백업 메뉴를 뺀다(직접 열어도 영역이 안내 문구로 막는다).
+  const [noBackup, setNoBackup] = useState(false);
+  useEffect(() => {
+    let alive = true;
+    const refresh = () => void readPolicy().then((p) => alive && setNoBackup(p.disableBackup));
+    refresh();
+    const off = onPolicyChanged(refresh);
+    return () => { alive = false; off(); };
+  }, []);
   const section = sections.find((s) => s.id === route.section);
   const Body = section?.component;
   const title = route.section === 'display' ? `${t('settings.display.title')} · ${t('settings.sync.title')}`
@@ -52,7 +62,7 @@ function Screen({ route, toolbarPopup, active = true, animate = true, onNavigate
               <button type="button" data-role="screen-display" onClick={() => onNavigate({ section: 'display' })}>
                 <span>{t('settings.display.title')} · {t('settings.sync.title')}</span>
               </button>
-              {sections.filter((s) => s.id !== 'settings' && s.id !== 'add').map((s) => (
+              {sections.filter((s) => s.id !== 'settings' && s.id !== 'add' && !(noBackup && s.id === 'backup')).map((s) => (
                 <button type="button" key={s.id} data-role={`screen-${s.id}`} onClick={() => onNavigate({ section: s.id })}>
                   <span>{t(s.titleKey)}</span>
                 </button>
@@ -62,9 +72,8 @@ function Screen({ route, toolbarPopup, active = true, animate = true, onNavigate
             : route.section === 'accounts' && route.historyId ? <HistoryPanel accountId={route.historyId} />
             : route.section === 'accounts' ? <AccountsSection initialEditId={route.editId} onDone={route.editId ? onBack : undefined} onEdit={(editId) => onNavigate({ section: 'accounts', editId })} onHistory={(historyId) => onNavigate({ section: 'accounts', historyId })} />
             : route.section === 'add' ? <AddSection initialTab={route.tab} onDone={() => {
-              if (new URLSearchParams(location.search).get('compact') === '1') {
-                location.assign(chrome.runtime.getURL('window.html'));
-              } else onBack();
+              if (new URLSearchParams(location.search).get('compact') === '1') window.close();
+              else onBack();
             }} />
             : Body ? <Body /> : null}
         </div>

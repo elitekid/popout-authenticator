@@ -24,6 +24,10 @@ import type { FieldCheckMessage, FieldCheckReply, FieldFillMessage } from '../st
   let checkSequence = 0;
   let frame = 0;
   let timer = 0;
+  let fullScan = false;
+  const dirty = new Set<HTMLInputElement>();
+  // looksLikeOtp 와 단추 묶음 판별이 읽는 속성만 본다.
+  const WATCHED = ['type', 'autocomplete', 'name', 'id', 'placeholder', 'aria-label', 'disabled', 'readonly', 'maxlength'];
 
   function visible(el: HTMLElement): boolean {
     const rect = el.getBoundingClientRect();
@@ -138,17 +142,40 @@ import type { FieldCheckMessage, FieldCheckReply, FieldFillMessage } from '../st
     }
     for (const input of document.querySelectorAll('input')) {
       if (entries.length >= MAX_BUTTONS) break;
-      if (known.has(input) || !looksLikeOtp(input)) continue;
-      // 한 글자씩 나뉜 칸은 첫 칸에만 단추를 둔다.
-      if (input.maxLength === 1) {
-        const group = groupOf(input);
-        if (seenGroups.has(group)) continue;
-        seenGroups.add(group);
+      attach(input, seenGroups);
+    }
+  }
+
+  function attach(input: HTMLInputElement, seenGroups: Set<unknown>): void {
+    if (known.has(input) || !looksLikeOtp(input)) return;
+    // 한 글자씩 나뉜 칸은 첫 칸에만 단추를 둔다.
+    if (input.maxLength === 1) {
+      const group = groupOf(input);
+      if (seenGroups.has(group)) return;
+      seenGroups.add(group);
+    }
+    const entry = makeButton(input);
+    known.set(input, entry);
+    entries.push(entry);
+    place(entry);
+  }
+
+  // 판별 속성만 바뀐 칸들을 그 칸만 다시 판별한다. 문서 전체는 훑지 않는다.
+  function recheck(): void {
+    if (stopped) return;
+    const inputs = [...dirty];
+    dirty.clear();
+    const seenGroups = new Set<unknown>();
+    for (const entry of entries) {
+      if (entry.input.maxLength === 1) seenGroups.add(groupOf(entry.input));
+    }
+    for (const input of inputs) {
+      const entry = known.get(input);
+      if (entry) {
+        if (!input.isConnected || !looksLikeOtp(input)) drop(entry);
+      } else if (entries.length < MAX_BUTTONS && input.isConnected) {
+        attach(input, seenGroups);
       }
-      const entry = makeButton(input);
-      known.set(input, entry);
-      entries.push(entry);
-      place(entry);
     }
   }
 
@@ -169,13 +196,25 @@ import type { FieldCheckMessage, FieldCheckReply, FieldFillMessage } from '../st
     if (stopped || timer !== 0) return;
     timer = window.setTimeout(() => {
       timer = 0;
-      scan();
+      // 노드 추가·제거가 있었으면 전체 검사를 하고, 속성이 바뀐 칸은 따로 다시 판별한다
+      // (전체 검사는 이미 단추가 있는 칸이 OTP 칸에서 벗어났는지 보지 않는다).
+      if (fullScan) scan();
+      fullScan = false;
+      recheck();
       // 칸 위에 문구 등이 끼어 칸이 밀렸을 수 있다.
       schedulePlace();
     }, RESCAN_MS);
   }
 
-  const observer = new MutationObserver(scheduleScan);
+  function onMutations(records: MutationRecord[]): void {
+    for (const record of records) {
+      if (record.type === 'childList') fullScan = true;
+      else if (record.target instanceof HTMLInputElement) dirty.add(record.target);
+    }
+    if (fullScan || dirty.size > 0) scheduleScan();
+  }
+
+  const observer = new MutationObserver(onMutations);
   // 문서 높이가 변하면(이미지 로드, 접힘 펼침 등) 칸이 밀린 것이다.
   const resizeObserver = new ResizeObserver(schedulePlace);
 
@@ -192,6 +231,7 @@ import type { FieldCheckMessage, FieldCheckReply, FieldFillMessage } from '../st
     if (frame !== 0) cancelAnimationFrame(frame);
     timer = 0;
     frame = 0;
+    dirty.clear();
     try {
       chrome.storage.onChanged.removeListener(onStorageChanged);
     } catch {
@@ -210,7 +250,7 @@ import type { FieldCheckMessage, FieldCheckReply, FieldFillMessage } from '../st
     started = true;
     window.addEventListener('scroll', schedulePlace, { capture: true, passive: true });
     window.addEventListener('resize', schedulePlace, { passive: true });
-    observer.observe(document.documentElement, { childList: true, subtree: true });
+    observer.observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: WATCHED });
     resizeObserver.observe(document.documentElement);
     if (document.body) resizeObserver.observe(document.body);
     scan();

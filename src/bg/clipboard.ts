@@ -1,10 +1,19 @@
 // 복사한 코드를 잠시 뒤 클립보드에서 지운다. 코드 자체는 저장하지 않고 해시만 session 에 둔다.
-import { saveSettings } from '../store/settings';
+import { loadSettings, saveSettings } from '../store/settings';
 import { supportsClipboardClear } from '../core/browser';
+import { DEFAULT_SETTINGS, normalizeClipboardSeconds } from '../core/types';
 
 const ALARM = 'clipboard-clear';
-const DELAY_MINUTES = 0.5;
 const OFFSCREEN_URL = 'offscreen/clipboard.html';
+
+// 설정값이 없거나 이상하면 30초.
+export function clipboardDelayMs(seconds: unknown): number {
+  return normalizeClipboardSeconds(seconds) * 1000;
+}
+
+export function clipboardDueAt(now: number, seconds: unknown): number {
+  return now + clipboardDelayMs(seconds);
+}
 
 async function sha256Hex(text: string): Promise<string> {
   const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
@@ -51,11 +60,13 @@ export async function scheduleClipboardClear(code: string): Promise<void> {
   if (code === '') return;
   // 시험용: 지연(ms)이 있으면 알람 대신 그 시간 뒤에 지운다.
   const test = (await chrome.storage.session.get('clipboardClearDelayMs')).clipboardClearDelayMs;
-  const delayMs = typeof test === 'number' ? test : DELAY_MINUTES * 60_000;
+  const seconds = (await loadSettings().catch(() => DEFAULT_SETTINGS)).clipboardClearSeconds;
+  const delayMs = typeof test === 'number' ? test : clipboardDelayMs(seconds);
   const hash = await sha256Hex(code);
   await withPendingLock(async () => {
-    await chrome.storage.session.set({ clipboardPending: { hash, due: Date.now() + delayMs } });
-    if (typeof test !== 'number') await chrome.alarms.create(ALARM, { delayInMinutes: DELAY_MINUTES });
+    const due = clipboardDueAt(Date.now(), seconds);
+    await chrome.storage.session.set({ clipboardPending: { hash, due: typeof test === 'number' ? Date.now() + delayMs : due } });
+    if (typeof test !== 'number') await chrome.alarms.create(ALARM, { when: due });
   });
   if (typeof test === 'number') {
     setTimeout(() => void clearIfSame().catch((e) => console.warn('clipboard-clear', e)), test);
@@ -86,28 +97,47 @@ async function clearIfSame(): Promise<void> {
     await clearInBackgroundDocument(pending.hash);
     return;
   }
-  try {
-    await chrome.offscreen.createDocument({
-      url: OFFSCREEN_URL,
-      reasons: [chrome.offscreen.Reason.CLIPBOARD],
-      justification: 'Clear a copied one-time code from the clipboard',
-    });
-  } catch {
-    // 이미 열려 있으면 그대로 쓴다.
-  }
-  try {
-    // 막 만든 offscreen 문서는 스크립트가 아직 안 붙었을 수 있어 몇 번 다시 보낸다.
-    for (let attempt = 0; attempt < 10; attempt++) {
-      // 다른 확장 페이지만 열려 있으면 빈 응답이 오므로 offscreen 의 답(cleared)이 올 때까지.
-      const reply = (await chrome.runtime
-        .sendMessage({ type: 'offscreen-clipboard-clear', hash: pending.hash })
-        .catch(() => undefined)) as { cleared?: boolean } | undefined;
-      if (typeof reply?.cleared === 'boolean') break;
-      await new Promise((resolve) => setTimeout(resolve, 100));
+  await sendToOffscreen({ type: 'offscreen-clipboard-clear', hash: pending.hash }, 'cleared');
+}
+
+// 쓰기와 지우기가 같은 offscreen 문서를 동시에 열고 닫지 않게 한 줄로 세운다.
+function withOffscreenLock<T>(task: () => Promise<T>): Promise<T> {
+  return navigator.locks ? (navigator.locks.request('clipboard-offscreen', task) as Promise<T>) : task();
+}
+
+// offscreen 문서를 열어 메시지를 보내고 답(replyKey 가 boolean)을 받은 뒤 닫는다. 답이 없으면 undefined.
+async function sendToOffscreen(message: object, replyKey: 'cleared' | 'written'): Promise<boolean | undefined> {
+  return withOffscreenLock(async () => {
+    try {
+      await chrome.offscreen.createDocument({
+        url: OFFSCREEN_URL,
+        reasons: [chrome.offscreen.Reason.CLIPBOARD],
+        justification: 'Write or clear a one-time code on the clipboard',
+      });
+    } catch {
+      // 이미 열려 있으면 그대로 쓴다.
     }
-  } finally {
-    await chrome.offscreen.closeDocument().catch(() => undefined);
-  }
+    try {
+      // 막 만든 offscreen 문서는 스크립트가 아직 안 붙었을 수 있어 몇 번 다시 보낸다.
+      for (let attempt = 0; attempt < 10; attempt++) {
+        // 다른 확장 페이지만 열려 있으면 빈 응답이 오므로 offscreen 의 답이 올 때까지.
+        const reply = (await chrome.runtime.sendMessage(message).catch(() => undefined)) as
+          | { cleared?: boolean; written?: boolean }
+          | undefined;
+        if (typeof reply?.[replyKey] === 'boolean') return reply[replyKey];
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      }
+      return undefined;
+    } finally {
+      await chrome.offscreen.closeDocument().catch(() => undefined);
+    }
+  });
+}
+
+// 포커스 없이 클립보드에 쓴다(전역 단축키용). 성공하면 true.
+export async function writeClipboardViaOffscreen(text: string): Promise<boolean> {
+  if (!chrome.offscreen) return false;
+  return (await sendToOffscreen({ type: 'offscreen-clipboard-write', text }, 'written')) === true;
 }
 
 export function register(): void {

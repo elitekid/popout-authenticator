@@ -1,6 +1,6 @@
 import { focusPage } from './browser.mjs';
 // 계정 정리: 삭제·복원, 평소 목록 끌기·복사 뒤 순서 유지·재열기, 간결 보기 끌기.
-import { randomUUID } from 'node:crypto';
+import { randomUUID, webcrypto } from 'node:crypto';
 import { makeNoneVault, totp } from './vault-fixture.mjs';
 
 // popup.mjs 와 같은 가짜 비밀키
@@ -215,6 +215,131 @@ export async function runAccountsScenario(session) {
     );
     const compactOrder = (await rowIds(popup)).map((r) => nameById.get(r.id));
     if (compactOrder.join(',') !== 'Bravo,Charlie,Alpha') problems.push(`간결 보기 순서가 다름: ${compactOrder.join(',')}`);
+    await close(popup);
+
+    // 금고 파일('none' 잠금)을 풀어 계정 목록을 읽는다.
+    const readVault = async (page) => {
+      const { vault: file } = await page.evaluate(() => chrome.storage.local.get('vault'));
+      const master = Buffer.from(file.wrappedKeys[0].data, 'base64');
+      const key = await webcrypto.subtle.importKey('raw', master, 'AES-GCM', false, ['decrypt']);
+      const plain = await webcrypto.subtle.decrypt(
+        { name: 'AES-GCM', iv: Buffer.from(file.iv, 'base64') },
+        key,
+        Buffer.from(file.data, 'base64'),
+      );
+      return JSON.parse(new TextDecoder().decode(plain));
+    };
+    const waitVault = async (page, ok, what) => {
+      for (let i = 0; i < 50; i++) {
+        const list = await readVault(page);
+        if (ok(list)) return list;
+        await new Promise((r) => setTimeout(r, 200));
+      }
+      problems.push(`금고에 반영되지 않음: ${what}`);
+      return readVault(page);
+    };
+    const reseed = async (list) => {
+      const page = await browser.newPage();
+      pages.push(page);
+      await page.goto(`${origin}/manage.html`, { waitUntil: session.navigationWait ?? 'load' });
+      await page.evaluate(async (v) => {
+        await chrome.storage.local.remove(['vault', 'popupFoldedGroups']);
+        await chrome.storage.local.set({ vault: v, settings: { view: 'normal', suggestionsEnabled: false } });
+      }, await makeNoneVault(list));
+      await close(page);
+    };
+    const old = Date.now() - 100_000;
+    const sample = (issuer, label, secret, group) => ({
+      ...fakeAccount('Alpha'),
+      issuer,
+      label,
+      secret,
+      createdAt: old,
+      updatedAt: old,
+      ...(group ? { group } : {}),
+    });
+    const acme = () => sample('Acme Mail', 'alex@example.com', secrets.Alpha, 'Work'); // JBSWY3DPEHPK3PXP
+    const wingtip = () => sample('Wingtip Cloud', 'sam@example.com', secrets.Bravo, 'Work'); // 가짜 비밀키
+    const contoso = () => sample('Contoso Vault', 'kim@example.com', secrets.Charlie, 'Home');
+    const byIssuer = (list, issuer) => list.find((a) => a.issuer === issuer);
+
+    // (d) 그룹 이름 변경 → 같은 이름 안내 → 그룹 해제
+    await reseed([acme(), wingtip(), contoso()]);
+    popup = await open('popup.html', '[data-role="group-fold"]');
+    await popup.waitForFunction(() => document.querySelectorAll('[data-role="group-fold"]').length === 2, {
+      timeout: 10000,
+    });
+    const typeName = async (name) => {
+      await popup.$eval('[data-role="group-rename-input"]', (el) => el.select());
+      await popup.keyboard.type(name);
+    };
+    await popup.click('[data-role="group-more"]'); // 첫 그룹(Work)
+    await popup.click('[data-role="group-rename"]');
+    await popup.waitForSelector('[data-role="group-rename-input"]', { visible: true });
+    await typeName('Team');
+    await popup.keyboard.press('Enter');
+    let list = await waitVault(popup, (l) => byIssuer(l, 'Acme Mail')?.group === 'Team', '그룹 이름 변경');
+    if (byIssuer(list, 'Wingtip Cloud')?.group !== 'Team') problems.push('같은 그룹의 둘째 계정 이름이 안 바뀜');
+    if (byIssuer(list, 'Contoso Vault')?.group !== 'Home') problems.push('다른 그룹이 바뀜');
+    if (byIssuer(list, 'Contoso Vault')?.updatedAt !== old) problems.push('다른 그룹 계정의 updatedAt 이 바뀜');
+    if ((byIssuer(list, 'Acme Mail')?.updatedAt ?? 0) <= old) problems.push('바뀐 계정의 updatedAt 이 갱신 안 됨');
+    if (list.length !== 3) problems.push(`이름 변경 뒤 계정 수가 다름: ${list.length}`);
+
+    // 이미 있는 이름이면 합쳐진다는 안내
+    await popup.waitForFunction(
+      () => [...document.querySelectorAll('.sec-name')].some((e) => e.textContent === 'Team'),
+      { timeout: 10000 },
+    );
+    const homeIndex = await popup.$$eval('.sec-name', (els) => els.findIndex((e) => e.textContent === 'Home'));
+    await (await popup.$$('[data-role="group-more"]'))[homeIndex].click();
+    await popup.click('[data-role="group-rename"]');
+    await popup.waitForSelector('[data-role="group-rename-input"]', { visible: true });
+    await typeName('Team');
+    await popup
+      .waitForSelector('[data-role="group-merge-hint"]', { visible: true, timeout: 5000 })
+      .catch(() => problems.push('같은 이름 그룹 합침 안내가 안 보임'));
+    await popup.keyboard.press('Escape');
+    if (await popup.$('[data-role="group-rename-input"]')) problems.push('Esc 로 이름 입력이 안 닫힘');
+    if (byIssuer(await readVault(popup), 'Contoso Vault')?.group !== 'Home') problems.push('취소했는데 그룹이 바뀜');
+
+    // 해제: Team 의 두 계정만 group 이 없어진다.
+    const teamIndex = await popup.$$eval('.sec-name', (els) => els.findIndex((e) => e.textContent === 'Team'));
+    await (await popup.$$('[data-role="group-more"]'))[teamIndex].click();
+    await popup.click('[data-role="group-ungroup"]');
+    list = await waitVault(popup, (l) => !byIssuer(l, 'Acme Mail')?.group, '그룹 해제');
+    if (byIssuer(list, 'Wingtip Cloud')?.group) problems.push('해제 뒤 둘째 계정에 group 이 남음');
+    if (byIssuer(list, 'Contoso Vault')?.group !== 'Home') problems.push('해제가 다른 그룹까지 건드림');
+    await close(popup);
+
+    // (e) 선택 모드: 3개 중 2개를 한 번에 휴지통으로
+    const picks = [sample('Acme Mail', 'alex@example.com', secrets.Alpha), sample('Wingtip Cloud', 'sam@example.com', secrets.Bravo), sample('Contoso Vault', 'kim@example.com', secrets.Charlie)];
+    await reseed(picks);
+    popup = await open('popup.html', '[data-account-id]');
+    await popup.waitForFunction(() => document.querySelectorAll('[data-account-id]').length === 3, {
+      timeout: 10000,
+    });
+    await popup.click('[data-role="select-start"]');
+    await popup.waitForSelector('[data-role="select-count"]', { visible: true });
+    // 선택 모드에서 행(코드) 클릭은 복사가 아니라 체크
+    await popup.click(`[data-account-id="${picks[0].id}"] .code`);
+    if (await popup.$('.row.copied')) problems.push('선택 모드에서 행 클릭이 복사로 처리됨');
+    await popup.click(`[data-account-id="${picks[1].id}"] input.pick`);
+    const count = await popup.$eval('[data-role="select-count"]', (el) => el.getAttribute('data-count'));
+    if (count !== '2') problems.push(`선택 개수가 2가 아님: ${count}`);
+    await popup.click('[data-role="select-trash"]');
+    await popup.waitForSelector('[data-role="select-confirm"]', { visible: true });
+    if (byIssuer(await readVault(popup), 'Acme Mail')?.deletedAt !== undefined) problems.push('확인 전에 휴지통으로 감');
+    await popup.click('[data-role="select-confirm-yes"]');
+    list = await waitVault(popup, (l) => l.filter((a) => a.deletedAt !== undefined).length === 2, '여러 개 휴지통');
+    if (list.length !== 3) problems.push(`휴지통 이동 뒤 계정 수가 다름: ${list.length}`);
+    if (byIssuer(list, 'Contoso Vault')?.deletedAt !== undefined) problems.push('고르지 않은 계정이 휴지통으로 감');
+    if (byIssuer(list, 'Acme Mail')?.deletedAt === undefined || byIssuer(list, 'Wingtip Cloud')?.deletedAt === undefined) {
+      problems.push('고른 계정이 휴지통에 안 감');
+    }
+    await popup
+      .waitForFunction(() => document.querySelectorAll('[data-account-id]').length === 1, { timeout: 10000 })
+      .catch(() => problems.push('휴지통 이동 뒤 목록이 1줄이 아님'));
+    if (await popup.$('[data-role="select-count"]')) problems.push('휴지통 이동 뒤 선택 모드가 안 끝남');
   } catch (error) {
     problems.push(`시나리오 오류: ${error instanceof Error ? error.message : String(error)}`);
   } finally {

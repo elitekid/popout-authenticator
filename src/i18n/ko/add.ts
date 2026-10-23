@@ -63,4 +63,10 @@ export const add = {
   'capture.empty': '캡처한 화면이 없습니다.',
   'capture.hint': 'QR 코드가 있는 영역을 끌어서 선택해 주세요.',
   'capture.notFound': 'QR 코드를 찾지 못했습니다. QR 코드가 있는 영역을 다시 선택해 주세요.',
+  'add.qr.display': '다른 앱의 QR',
+  'capture.chooseScreen': '화면·창 선택',
+  'capture.displayHint': 'QR 코드가 보이는 화면이나 창을 선택해 주세요.',
+  'capture.displayUnavailable': '여기서는 화면 캡처를 쓸 수 없습니다. QR 그림 파일로 추가해 주세요.',
+  'capture.displayDenied': '화면 공유를 취소했습니다.',
+  'capture.displayFailed': '화면을 캡처하지 못했습니다.',
 };

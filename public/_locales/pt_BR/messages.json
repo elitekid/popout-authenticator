@@ -15,6 +15,27 @@
     "message": "Código: $CODE$",
     "placeholders": { "code": { "content": "$1" } }
   },
+  "cmdCopyPinned1": {
+    "message": "Copiar o código da conta com estrela 1"
+  },
+  "cmdCopyPinned2": {
+    "message": "Copiar o código da conta com estrela 2"
+  },
+  "cmdCopyPinned3": {
+    "message": "Copiar o código da conta com estrela 3"
+  },
+  "shortcutCopied": {
+    "message": "Código copiado."
+  },
+  "shortcutLocked": {
+    "message": "Desbloqueie primeiro o Popout Authenticator."
+  },
+  "shortcutMissing": {
+    "message": "Não há conta com estrela para este atalho."
+  },
+  "shortcutFailed": {
+    "message": "Não foi possível copiar o código."
+  },
   "fillPickAccount": { "message": "Escolha uma conta" },
   "fieldFillButton": { "message": "Preencher código" }
 }

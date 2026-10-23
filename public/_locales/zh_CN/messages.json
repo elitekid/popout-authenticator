@@ -15,6 +15,27 @@
     "message": "验证码：$CODE$",
     "placeholders": { "code": { "content": "$1" } }
   },
+  "cmdCopyPinned1": {
+    "message": "复制加星标账户 1 的验证码"
+  },
+  "cmdCopyPinned2": {
+    "message": "复制加星标账户 2 的验证码"
+  },
+  "cmdCopyPinned3": {
+    "message": "复制加星标账户 3 的验证码"
+  },
+  "shortcutCopied": {
+    "message": "已复制验证码。"
+  },
+  "shortcutLocked": {
+    "message": "请先解锁 Popout Authenticator。"
+  },
+  "shortcutMissing": {
+    "message": "此快捷键没有对应的加星标账户。"
+  },
+  "shortcutFailed": {
+    "message": "无法复制验证码。"
+  },
   "fillPickAccount": { "message": "请选择账户" },
   "fieldFillButton": { "message": "填入验证码" }
 }

@@ -1,5 +1,5 @@
 {
-  "appName": { "message": "Popout Authenticator" },
+  "appName": { "message": "Popout Authenticator — autentikator 2FA" },
   "appShortName": { "message": "Popout Authenticator" },
   "appDesc": { "message": "Autentikator 2FA untuk browser Anda. Menghasilkan kode sekali pakai dan dibuka sebagai popup atau jendela terpisah." },
   "cmdExecuteAction": { "message": "Buka popup" },
@@ -14,6 +14,27 @@
   "fillManual": {
     "message": "Kode: $CODE$",
     "placeholders": { "code": { "content": "$1" } }
+  },
+  "cmdCopyPinned1": {
+    "message": "Salin kode akun bintang 1"
+  },
+  "cmdCopyPinned2": {
+    "message": "Salin kode akun bintang 2"
+  },
+  "cmdCopyPinned3": {
+    "message": "Salin kode akun bintang 3"
+  },
+  "shortcutCopied": {
+    "message": "Kode disalin."
+  },
+  "shortcutLocked": {
+    "message": "Buka kunci Popout Authenticator terlebih dahulu."
+  },
+  "shortcutMissing": {
+    "message": "Tidak ada akun bintang untuk pintasan ini."
+  },
+  "shortcutFailed": {
+    "message": "Tidak dapat menyalin kode."
   },
   "fillPickAccount": { "message": "Pilih akun" },
   "fieldFillButton": { "message": "Isi kode" }

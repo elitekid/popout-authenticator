@@ -387,6 +387,18 @@ body:has(.popup) {
   box-shadow: none;
 }
 
+.popup .search .scope {
+  flex: none;
+  max-width: 84px;
+  height: 26px;
+  padding: 0 4px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--sub);
+  font-size: 12px;
+}
+
 .popup .search:focus-within {
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 40%, transparent);
 }
@@ -456,6 +468,105 @@ body:has(.popup) {
 
 [dir='rtl'] .popup button.sec-fold[aria-expanded='false'] svg.i {
   transform: rotate(90deg);
+}
+
+/* 그룹 제목 줄: 접기 단추 + 작은 메뉴 단추 / 그 자리 이름 입력 */
+.popup .sec-head {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  padding-inline-end: 8px;
+}
+
+.popup .sec-head button.sec-fold {
+  flex: 1;
+  min-width: 0;
+  width: auto;
+}
+
+.popup .sec-head button.more {
+  margin-bottom: 2px;
+}
+
+.popup .sec-head .menu {
+  top: 100%;
+}
+
+.popup .group-rename {
+  display: grid;
+  gap: 4px;
+  padding: 10px 14px 4px;
+}
+
+.popup .group-rename .field {
+  height: 34px;
+  border-radius: 8px;
+}
+
+.popup .group-rename .field[aria-invalid='true'] {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--danger, #d33) 50%, transparent);
+}
+
+.popup .group-rename .hint {
+  margin: 0;
+  font-size: 11px;
+  color: var(--sub);
+}
+
+/* 선택 모드 도구 줄 */
+.popup .sel-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 0 16px 8px;
+  font-size: 12px;
+  color: var(--sub);
+  flex: none;
+}
+
+.popup .sel-tools .sel-count {
+  flex: 1;
+  min-width: 0;
+  font-weight: 600;
+}
+
+.popup .sel-tools button {
+  height: 28px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--fill);
+  font-size: 12px;
+}
+
+.popup .sel-tools button.danger {
+  color: var(--danger, #d33);
+}
+
+.popup .sel-tools button:disabled {
+  opacity: 0.5;
+}
+
+.popup .sel-tools button:focus-visible {
+  outline: 2px solid var(--accent);
+}
+
+.popup .sel-tools .sel-confirm {
+  flex-basis: 100%;
+  color: var(--fg);
+}
+
+.popup .row input.pick {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--accent);
+}
+
+.popup .row.picked {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
 }
 
 .popup .card {
@@ -2013,6 +2124,25 @@ body:has(.popup) {
   flex: 1;
   min-width: 0;
   color: var(--muted);
+}
+
+.accounts-list .account-icon {
+  flex: none;
+  width: 24px;
+  text-align: center;
+  font-size: 16px;
+}
+
+.add-panel .icon-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.add-panel .icon-choices label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .accounts-list .pin {

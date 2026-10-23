@@ -1,5 +1,5 @@
 {
-  "appName": { "message": "Popout Authenticator" },
+  "appName": { "message": "Popout Authenticator — مصادِق 2FA" },
   "appShortName": { "message": "Popout Authenticator" },
   "appDesc": { "message": "مصادِق 2FA لمتصفحك. يولّد رموزًا لمرة واحدة، ويُفتح كنافذة منبثقة أو نافذة منفصلة." },
   "cmdExecuteAction": { "message": "فتح النافذة المنبثقة" },
@@ -14,6 +14,27 @@
   "fillManual": {
     "message": "الرمز: $CODE$",
     "placeholders": { "code": { "content": "$1" } }
+  },
+  "cmdCopyPinned1": {
+    "message": "نسخ رمز الحساب المميّز بنجمة 1"
+  },
+  "cmdCopyPinned2": {
+    "message": "نسخ رمز الحساب المميّز بنجمة 2"
+  },
+  "cmdCopyPinned3": {
+    "message": "نسخ رمز الحساب المميّز بنجمة 3"
+  },
+  "shortcutCopied": {
+    "message": "تم نسخ الرمز."
+  },
+  "shortcutLocked": {
+    "message": "افتح قفل Popout Authenticator أولًا."
+  },
+  "shortcutMissing": {
+    "message": "لا يوجد حساب مميّز لهذا الاختصار."
+  },
+  "shortcutFailed": {
+    "message": "تعذّر نسخ الرمز."
   },
   "fillPickAccount": { "message": "اختر حسابًا" },
   "fieldFillButton": { "message": "إدخال الرمز" }

@@ -100,6 +100,25 @@ describe('대기 중인 단추 설정', () => {
     expect(applyAccountEditPatch(once, patch, 9)).toBe(once);
   });
 
+  it('iconId 를 설정하고(null 이면) 해제하며 같은 값이면 그대로 둔다', async () => {
+    const account = {
+      id: 'a1', issuer: 'Acme Mail', label: 'alex@example.com', note: '', matchHosts: [], pinned: false,
+      algorithm: 'SHA-1', digits: 6, period: 30, updatedAt: 1,
+    } as unknown as Account;
+    const set = applyAccountEditPatch(account, { iconId: 'mail' }, 5);
+    expect(set).toMatchObject({ iconId: 'mail', updatedAt: 5 });
+    expect(applyAccountEditPatch(set, { iconId: 'mail' }, 9)).toBe(set);
+    const cleared = applyAccountEditPatch(set, { iconId: null }, 11);
+    expect('iconId' in cleared).toBe(false);
+    expect(cleared.updatedAt).toBe(11);
+    // 대기 항목을 거쳐도 iconId 가 남는다.
+    await addPendingFieldButton('a1', ['example.com'], ['https://*.example.com/*'], 1000, { iconId: 'mail' });
+    granted.add('https://*.example.com/*');
+    const applyPatch = vi.fn(async () => true);
+    await applyPendingFieldButtons(3000, applyPatch);
+    expect(applyPatch).toHaveBeenCalledWith('a1', { iconId: 'mail' });
+  });
+
   it('거절된 앞 계정의 대기는 같은 사이트를 다른 계정이 허용해도 켜지지 않는다', async () => {
     await addPendingFieldButton('a1', ['example.com'], ['https://*.example.com/*'], 1000);
     await addPendingFieldButton('b1', ['example.com'], ['https://*.example.com/*'], 2000);

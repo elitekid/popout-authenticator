@@ -89,6 +89,21 @@ export function shareCodeCount(period: number, durationSec: number): number {
   return Math.ceil(durationSec / period);
 }
 
+// 봉투에 담는 코드 칸 범위 [first, end). 받는 쪽은 end 칸이 시작되면 만료로 본다.
+function shareRange(nowMs: number, period: number, durationSec: number): { first: number; end: number } {
+  const current = totpCounter(nowMs, period);
+  // 시계가 조금 어긋난 받는 쪽을 위해 지금 칸 바로 앞 칸부터 담는다.
+  const first = Math.max(0, current - 1);
+  // 받는 쪽 페이지는 한 시간 + 앞 칸 하나를 넘는 묶음을 거절한다(기준과 같은 상한).
+  const end = Math.min(current + shareCodeCount(period, durationSec), first + Math.floor(MAX_SHARE_SECONDS / period) + 1);
+  return { first, end };
+}
+
+// 봉투가 실제로 끝나는 시각(보정된 시계 기준 ms). 받는 쪽 만료와 같은 값.
+export function shareValidUntilMs(nowMs: number, period: number, durationSec: number): number {
+  return shareRange(nowMs, period, durationSec).end * period * 1000;
+}
+
 export async function createShareFragment(
   account: AccountDraft,
   nowMs: number,
@@ -101,10 +116,7 @@ export async function createShareFragment(
   }
   const { period, digits } = account;
   const current = totpCounter(nowMs, period);
-  // 시계가 조금 어긋난 받는 쪽을 위해 지금 칸 바로 앞 칸부터 담는다.
-  const first = Math.max(0, current - 1);
-  // 받는 쪽 페이지는 한 시간 + 앞 칸 하나를 넘는 묶음을 거절한다(기준과 같은 상한).
-  const end = Math.min(current + shareCodeCount(period, durationSec), first + Math.floor(MAX_SHARE_SECONDS / period) + 1);
+  const { first, end } = shareRange(nowMs, period, durationSec);
   const count = end - first;
 
   const bits = bitsFor(digits);

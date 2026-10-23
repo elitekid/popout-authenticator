@@ -12,8 +12,10 @@ export const useScreenContext = () => useContext(ScreenContext);
 
 export async function openTaskWindow(section: SectionId, params: Record<string, string> = {}): Promise<void> {
   const query = new URLSearchParams({ compact: '1', ...params });
-  await chrome.windows.create({
+  // 창 하나 유지·재사용은 bg 가 맡는다(open-mode.ts).
+  const reply = await chrome.runtime.sendMessage({
+    type: 'open-task-window',
     url: chrome.runtime.getURL(`manage.html?${query}#${section}`),
-    type: 'popup', focused: true, width: 440, height: 660,
   });
+  if (!reply?.ok) throw new Error('open-task-window failed');
 }

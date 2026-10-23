@@ -3,4 +3,4 @@ import '../shared/theme.css';
 import { App } from './App';
 import { CodeAccessHost } from '../shared/CodeAccessHost';
 
-render(<><App /><CodeAccessHost /></>, document.getElementById('app')!);
+render(<><App /><CodeAccessHost trackInput /></>, document.getElementById('app')!);

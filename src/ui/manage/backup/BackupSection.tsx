@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
 import { CorruptVaultError } from '../../../core/crypto/errors';
 import { LockedError } from '../../../store/errors';
-import { readPolicy, type Policy } from '../../../store/policy';
+import { onPolicyChanged, readPolicy, type Policy } from '../../../store/policy';
 import { loadAccounts, onVaultChanged, readVaultFile } from '../../../store/vault';
 import { UnlockForm } from '../../shared/UnlockForm';
 import { useT } from '../../shared/use-t';
@@ -29,7 +29,11 @@ export function BackupSection() {
   const sequence = useRef(0);
 
   useEffect(() => {
-    void readPolicy().then(setPolicy);
+    let alive = true;
+    const refresh = () => void readPolicy().then((next) => alive && setPolicy(next));
+    refresh();
+    const off = onPolicyChanged(refresh);
+    return () => { alive = false; off(); };
   }, []);
 
   const load = useCallback(async () => {
@@ -68,6 +72,14 @@ export function BackupSection() {
   }, [load]);
 
   if (state.kind === 'loading' || policy === null) return <div class="screen-loading" role="status">{t('popup.loading')}</div>;
+  // 관리자가 백업을 껐으면 영역을 막는다. 금고가 손상됐을 때의 복구(자동 스냅샷·원시 사본 가져오기)만 남기고 내보내기는 숨긴다.
+  if (policy.disableBackup && state.kind !== 'corrupt') {
+    return (
+      <div class="backup" data-section="backup">
+        <p class="muted" data-role="backup-blocked">{t('backup.policy.noBackup')}</p>
+      </div>
+    );
+  }
 
   return (
     <div class="backup" data-section="backup">
@@ -80,7 +92,7 @@ export function BackupSection() {
       {state.kind === 'corrupt' && (
         <div class="backup-alert" data-role="corrupt">
           <p>{t('backup.corrupt')}</p>
-          {policy !== null && !policy.disableExport && (toolbarPopup
+          {policy !== null && !policy.disableExport && !policy.disableBackup && (toolbarPopup
             ? <button type="button" onClick={openFiles}>{t('backup.raw.save')}</button>
             : <RawSave t={t} big />)}
         </div>
@@ -107,7 +119,7 @@ export function BackupSection() {
           {policy !== null && !(policy.enforcePassword && state.kind === 'ready' && !state.lockOn) && (
             toolbarPopup
               ? <section class="backup-raw"><button type="button" data-role="raw-file-window" onClick={openFiles}>{t('backup.raw.import')}</button></section>
-              : <RawImport t={t} showSave={state.kind === 'ready' && !policy.disableExport} />
+              : <RawImport t={t} showSave={state.kind === 'ready' && !policy.disableExport && !policy.disableBackup} />
           )}
         </>
       )}

@@ -14,6 +14,7 @@ import {
   moveActive,
   UNGROUPED_KEY,
   visibleRows,
+  whatsNewFor,
 } from '../../src/ui/popup/logic';
 
 const DAY = 24 * 60 * 60 * 1000;
@@ -78,6 +79,30 @@ describe('filterAccounts', () => {
   it('휴지통은 뺀다', () => {
     expect(ids(filterAccounts(list, '', null))).toEqual(['a', 'b', 'c']);
     expect(ids(filterAccounts(list, 'old', null))).toEqual([]);
+  });
+
+  it('공백으로 나눈 두 단어가 모두 있어야 한다(AND)', () => {
+    expect(ids(filterAccounts(list, 'github main'))).toEqual(['a']);
+    expect(ids(filterAccounts(list, '  SAVINGS   bank '))).toEqual(['b']);
+    expect(ids(filterAccounts(list, 'github bank'))).toEqual([]);
+  });
+
+  it('범위를 지정하면 그 필드만 본다', () => {
+    expect(ids(filterAccounts(list, 'savings', null, 'issuer'))).toEqual([]);
+    expect(ids(filterAccounts(list, 'savings', null, 'note'))).toEqual(['b']);
+    expect(ids(filterAccounts(list, 'bank', null, 'issuer'))).toEqual(['b']);
+    expect(ids(filterAccounts(list, 'work', null, 'group'))).toEqual(['a']);
+    expect(ids(filterAccounts(list, 'carol', null, 'label'))).toEqual(['c']);
+  });
+
+  it('비밀키 문자열로는 찾지 않는다', () => {
+    const secretList = [
+      { ...item('s', { issuer: 'Acme Mail', label: 'alex@example.com' }), secret: 'JBSWY3DPEHPK3PXP' },
+      { ...item('t', { issuer: 'Wingtip Cloud' }), secret: 'KRUGS4ZANFZSAYJAMZQWWZJAONSWG4TF' },
+    ];
+    expect(ids(filterAccounts(secretList, 'JBSWY3DPEHPK3PXP'))).toEqual([]);
+    expect(ids(filterAccounts(secretList, 'krugs4zanf'))).toEqual([]);
+    expect(ids(filterAccounts(secretList, 'acme', null, 'all'))).toEqual(['s']);
   });
 });
 
@@ -223,6 +248,25 @@ describe('shouldShowReview', () => {
     expect(shouldShowReview({ ...ok, accounts: 0 })).toBe(false);
     expect(shouldShowReview({ ...ok, dismissed: true })).toBe(false);
     expect(shouldShowReview({ ...ok, openCount: 30, snoozedUntilOpen: 65 })).toBe(false);
+  });
+
+  it('무응답 노출이 3회 쌓이면 보이지 않음', () => {
+    expect(shouldShowReview({ ...ok, shown: 2 })).toBe(true);
+    expect(shouldShowReview({ ...ok, shown: 3 })).toBe(false);
+  });
+
+  it('safari 대상이면 자동 띠를 보이지 않음', () => {
+    expect(shouldShowReview(ok, 'chrome')).toBe(true);
+    expect(shouldShowReview(ok, 'safari')).toBe(false);
+  });
+});
+
+describe('whatsNewFor', () => {
+  it('firefox·safari 는 copy 줄을 뺌', () => {
+    expect(whatsNewFor('chrome')['1.0.2']).toHaveLength(3);
+    expect(whatsNewFor('edge')['1.0.2']).toHaveLength(3);
+    expect(whatsNewFor('firefox')['1.0.2']).toEqual(['popup.whatsNew.v102.organize', 'popup.whatsNew.v102.capture']);
+    expect(whatsNewFor('safari')['1.0.2']).toHaveLength(2);
   });
 });
 

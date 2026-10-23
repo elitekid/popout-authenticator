@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { encodeHex } from '../../src/core/base32';
+import { decodeBase32, encodeHex } from '../../src/core/base32';
+import { importText } from '../../src/core/import';
 import { CorruptVaultError, WrongSecretError } from '../../src/core/crypto';
 import {
   buildCxf,
@@ -76,6 +77,21 @@ describe('own backup', () => {
     sameAccount(input[1]!, out[1]!);
     expect(out[1]!.counter).toBe(3);
     expect(out[0]).toMatchObject({ group: 'Work', note: 'memo', pinned: true, matchHosts: ['example.com'] });
+  });
+
+  it('keeps iconId (known, unknown, absent) through a plain backup and import', async () => {
+    const input = [
+      account(1, { issuer: 'Acme Mail', secret: decodeBase32('JBSWY3DPEHPK3PXP'), iconId: 'bank' }),
+      account(2, { issuer: 'Wingtip Cloud', secret: decodeBase32('KRUGS4ZANFZSAYJAMZQWWZJAONSWG4TF') }),
+      account(3, { issuer: 'Acme Mail', label: 'other', secret: decodeBase32('KRUGS4ZANFZSAYJAMZQWWZJAONSWG4TF'), iconId: 'xyz' }),
+    ];
+    const text = buildPlainBackup(input);
+    expect(JSON.parse(text).accounts[1]).not.toHaveProperty('iconId');
+    const out = await readOwnBackup(text);
+    expect(out.map((a) => a.iconId)).toEqual(['bank', undefined, 'xyz']);
+    expect(out[1]).not.toHaveProperty('iconId');
+    const imported = await importText(text);
+    expect(imported.meta?.map((m) => m.iconId)).toEqual(['bank', undefined, 'xyz']);
   });
 
   it('round-trips an encrypted file and hides the contents', async () => {

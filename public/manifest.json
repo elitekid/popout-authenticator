@@ -3,7 +3,7 @@
   "name": "__MSG_appName__",
   "description": "__MSG_appDesc__",
   "default_locale": "en",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "minimum_chrome_version": "127",
   "icons": {
     "16": "icons/icon16.png",
@@ -66,6 +66,21 @@
     },
     "open-window": {
       "description": "__MSG_cmdOpenWindow__"
+    },
+    "copy-pinned-1": {
+      "suggested_key": { "default": "Ctrl+Shift+1", "mac": "MacCtrl+Shift+1" },
+      "description": "__MSG_cmdCopyPinned1__",
+      "global": true
+    },
+    "copy-pinned-2": {
+      "suggested_key": { "default": "Ctrl+Shift+2", "mac": "MacCtrl+Shift+2" },
+      "description": "__MSG_cmdCopyPinned2__",
+      "global": true
+    },
+    "copy-pinned-3": {
+      "suggested_key": { "default": "Ctrl+Shift+3", "mac": "MacCtrl+Shift+3" },
+      "description": "__MSG_cmdCopyPinned3__",
+      "global": true
     }
   }
 }

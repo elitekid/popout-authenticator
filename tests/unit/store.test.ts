@@ -14,9 +14,11 @@ import {
   isRawCopy,
   openRawCopy,
   openSnapshot,
+  replaceWithRawCopy,
   restoreSnapshot,
 } from '../../src/store/recover';
-import { clearSessionKey, setSessionKey } from '../../src/store/session';
+import { lockNow } from '../../src/store/lock';
+import { clearSessionKey, getSessionKey, setSessionKey } from '../../src/store/session';
 import { loadSettings, onSettingsChanged, saveSettings } from '../../src/store/settings';
 import { mergeAccounts } from '../../src/store/sync';
 import {
@@ -416,5 +418,89 @@ describe('audit fixes', () => {
     const [latest] = await listSnapshots();
     expect((await restoreSnapshot(latest.id, 'replace')).added).toBe(1);
     expect(ids(await loadAccounts())).toEqual(ids([a]));
+  });
+
+  it('aligns session key and code protection when replacing from a snapshot of another master key', async () => {
+    const a = account(1);
+    const oldMaster = newMasterKey();
+    const oldFile = await encryptVault([a], oldMaster, 'password', [
+      await wrapWithPassword(oldMaster, 'fake-pass-1234', FAST),
+    ]);
+    await replaceVaultFile(async () => oldFile);
+
+    // 비밀번호와 마스터 키를 바꾼 새 금고. 이전 판은 스냅샷에 남는다.
+    const newMaster = newMasterKey();
+    const newFile = await encryptVault([a, account(2)], newMaster, 'password', [
+      await wrapWithPassword(newMaster, 'fake-pass-5678', FAST),
+    ]);
+    await replaceVaultFile(async () => newFile);
+    await setSessionKey(newMaster);
+    await chrome.storage.local.set({ codeProtection: true });
+
+    const current = (await chrome.storage.local.get('vault')).vault as VaultFile;
+    await chrome.storage.local.set({ vault: { ...current, checksum: 'broken' } });
+    await expect(loadAccounts()).rejects.toThrow();
+
+    const [latest] = await listSnapshots();
+    await restoreSnapshot(latest.id, 'replace', { password: 'fake-pass-1234' });
+
+    // 복구 직후 옛 세션 키가 아니라 스냅샷의 키로 열려야 한다.
+    expect(ids(await loadAccounts())).toEqual(ids([a]));
+    expect((await chrome.storage.local.get('codeProtection')).codeProtection).toBe(false);
+  });
+
+  it('does not store the session key again when locked during a recovery', async () => {
+    const a = account(1);
+    const oldMaster = newMasterKey();
+    await replaceVaultFile(async () => encryptVault([a], oldMaster, 'password', [
+      await wrapWithPassword(oldMaster, 'fake-pass-1234', FAST),
+    ]));
+    const newMaster = newMasterKey();
+    await replaceVaultFile(async () => encryptVault([a, account(2)], newMaster, 'password', [
+      await wrapWithPassword(newMaster, 'fake-pass-5678', FAST),
+    ]));
+    await setSessionKey(newMaster);
+    const current = (await chrome.storage.local.get('vault')).vault as VaultFile;
+    await chrome.storage.local.set({ vault: { ...current, checksum: 'broken' } });
+
+    const [latest] = await listSnapshots();
+    // 복구가 금고를 쓰는 순간 다른 창이 잠그는 상황을 흉내 낸다.
+    const original = chrome.storage.local.set.bind(chrome.storage.local);
+    const spy = vi.spyOn(chrome.storage.local, 'set').mockImplementation(async (items) => {
+      await original(items);
+      await lockNow();
+    });
+    try {
+      await restoreSnapshot(latest.id, 'replace', { password: 'fake-pass-1234' });
+    } finally {
+      spy.mockRestore();
+    }
+    expect(await getSessionKey()).toBeNull();
+  });
+
+  it('does not store the session key when locked during a recovery that started without one', async () => {
+    const a = account(1);
+    await createVault([a]);
+    const current = (await chrome.storage.local.get('vault')).vault as VaultFile;
+    await chrome.storage.local.set({ vault: { ...current, checksum: 'broken' } });
+    const master = newMasterKey();
+    const rawVault = await encryptVault([a], master, 'password', [
+      await wrapWithPassword(master, 'fake-pass-1234', FAST),
+    ]);
+    const text = JSON.stringify({ format: 'popout-authenticator-raw', version: 1, local: { vault: rawVault } });
+    expect(await getSessionKey()).toBeNull();
+
+    // 복구가 금고를 쓰는 순간 다른 창이 잠그는 상황을 흉내 낸다.
+    const original = chrome.storage.local.set.bind(chrome.storage.local);
+    const spy = vi.spyOn(chrome.storage.local, 'set').mockImplementation(async (items) => {
+      await original(items);
+      await lockNow();
+    });
+    try {
+      await replaceWithRawCopy(text, { password: 'fake-pass-1234' });
+    } finally {
+      spy.mockRestore();
+    }
+    expect(await getSessionKey()).toBeNull();
   });
 });

@@ -1,5 +1,5 @@
 {
-  "appName": { "message": "Popout Authenticator" },
+  "appName": { "message": "Popout Authenticator — 2FA kimlik doğrulayıcı" },
   "appShortName": { "message": "Popout Authenticator" },
   "appDesc": { "message": "Tarayıcınız için 2FA kimlik doğrulayıcı. Tek kullanımlık kodlar üretir; açılır pencere veya ayrı pencere olarak açılır." },
   "cmdExecuteAction": { "message": "Açılır pencereyi aç" },
@@ -14,6 +14,27 @@
   "fillManual": {
     "message": "Kod: $CODE$",
     "placeholders": { "code": { "content": "$1" } }
+  },
+  "cmdCopyPinned1": {
+    "message": "Yıldızlı hesap 1 kodunu kopyala"
+  },
+  "cmdCopyPinned2": {
+    "message": "Yıldızlı hesap 2 kodunu kopyala"
+  },
+  "cmdCopyPinned3": {
+    "message": "Yıldızlı hesap 3 kodunu kopyala"
+  },
+  "shortcutCopied": {
+    "message": "Kod kopyalandı."
+  },
+  "shortcutLocked": {
+    "message": "Önce Popout Authenticator kilidini açın."
+  },
+  "shortcutMissing": {
+    "message": "Bu kısayol için yıldızlı hesap yok."
+  },
+  "shortcutFailed": {
+    "message": "Kod kopyalanamadı."
   },
   "fillPickAccount": { "message": "Bir hesap seçin" },
   "fieldFillButton": { "message": "Kodu doldur" }

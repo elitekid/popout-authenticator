@@ -226,6 +226,44 @@ export async function runFieldButtonScenario(session) {
     await allowedPage.waitForSelector('popout-otp-button');
     if (await allowedPage.$$eval('popout-otp-button', els => els.length) !== 1) problems.push('다시 켠 뒤 단추가 중복됨');
 
+    stage = '속성 변경 부착·제거';
+    // 같은 input 의 속성만 바뀌어도(노드 추가·제거 없이) 단추가 붙고 떨어진다.
+    // 뒤 탭에서는 raf 확인이 돌지 않아 앞으로 가져오고, 시간 간격으로 확인한다.
+    await focusPage(allowedPage);
+    // 페이지 안에서 시간 간격으로 센다(waitForFunction 확인이 이 단계에서 불안정했다).
+    const buttonCount = async (n) => {
+      const ok = await allowedPage.evaluate(async (want) => {
+        for (let i = 0; i < 50; i++) {
+          if (document.querySelectorAll('popout-otp-button').length === want) return true;
+          await new Promise((resolve) => setTimeout(resolve, 100));
+        }
+        return false;
+      }, n);
+      if (!ok) throw new Error(`단추 ${n}개가 되지 않음`);
+    };
+    await allowedPage.evaluate(() => {
+      document.body.innerHTML = '<form><input id="attr" type="text" name="username"></form>';
+    });
+    await buttonCount(0);
+    await new Promise((resolve) => setTimeout(resolve, 700));
+    if (await allowedPage.$('popout-otp-button')) problems.push('OTP 가 아닌 칸에 단추가 붙음');
+    await allowedPage.evaluate(() => {
+      const input = document.getElementById('attr');
+      input.setAttribute('name', 'otp');
+      input.setAttribute('autocomplete', 'one-time-code');
+    });
+    try {
+      await buttonCount(1);
+      await allowedPage.evaluate(() => { document.getElementById('attr').disabled = true; });
+      await buttonCount(0);
+    } catch {
+      problems.push('속성 변경만으로 단추가 붙거나 떨어지지 않음');
+    }
+    // 원래 OTP 칸으로 되돌리고, 다음 단계는 관리 화면에서 이어 간다.
+    await allowedPage.reload({ waitUntil: 'load' });
+    await allowedPage.waitForSelector('popout-otp-button', { timeout: 10000 });
+    await focusPage(manage);
+
     stage = '예전 사이트 설정 복구';
     // 이전 버그로 단추 설정에만 남은 사이트는 편집 초안에 복구하고, 저장해야 계정에도 반영한다.
     await manage.evaluate(async ({ v, id }) => {
@@ -421,7 +459,7 @@ export async function runKnownFieldScenario(session, screenshotDir) {
     // 자동 모드에서 새 계정 추가를 반영하고, 같은 서비스 계정 둘이면 임의로 넣지 않는다.
     const b = fake(randomUUID(), 'GitHub');
     await manage.evaluate(v => chrome.storage.local.set({ vault: v }), await makeNoneVault([a, b, manual]));
-    await manage.waitForFunction(async id => !!(await chrome.storage.local.get('autoFieldButtons')).autoFieldButtons?.accounts?.[id], {}, b.id);
+    await manage.waitForFunction(async id => !!(await chrome.storage.local.get('autoFieldButtons')).autoFieldButtons?.accounts?.[id], { polling: 100 }, b.id);
     await focusPage(github);
     await github.evaluate(() => { document.getElementById('otp').value = ''; });
     box = await button.boundingBox();

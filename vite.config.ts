@@ -36,6 +36,8 @@ function browserManifest(target: BrowserTarget): Plugin {
         manifest.permissions = manifest.permissions.filter((permission: string) =>
           permission !== 'offscreen' && permission !== 'sidePanel');
         manifest.background = { scripts: ['bg/sw.js'], type: 'module' };
+        // 전역 단축키 코드 복사는 offscreen 문서가 필요한 크롬 계열 전용이다.
+        for (const name of ['copy-pinned-1', 'copy-pinned-2', 'copy-pinned-3']) delete manifest.commands[name];
       }
       if (target === 'firefox') {
         manifest.sidebar_action = {
@@ -70,8 +72,15 @@ function browserManifest(target: BrowserTarget): Plugin {
           messages.appDesc.message = description;
           writeFileSync(file, `${JSON.stringify(messages, null, 2)}\n`);
         }
+        // App Store 검증은 사파리 확장 이름을 언어마다 40자까지만 받는다. 넘는 언어는 브랜드 이름만 쓴다.
         for (const locale of readdirSync(`${options.dir}/_locales`)) {
-          const messages = JSON.parse(readFileSync(`${options.dir}/_locales/${locale}/messages.json`, 'utf8'));
+          const file = `${options.dir}/_locales/${locale}/messages.json`;
+          const messages = JSON.parse(readFileSync(file, 'utf8'));
+          if ([...messages.appName.message].length > 40) {
+            messages.appName.message = 'Popout Authenticator';
+            writeFileSync(file, `${JSON.stringify(messages, null, 2)}\n`);
+          }
+          if ([...messages.appName.message].length > 40) throw new Error(`Safari appName over 40 characters: ${locale}`);
           if ([...messages.appDesc.message].length > 112) throw new Error(`Safari appDesc over 112 characters: ${locale}`);
         }
       }

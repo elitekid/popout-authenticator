@@ -3,6 +3,7 @@ import { loadSettings } from '../../../store/settings';
 import type { PanelProps } from './panel-props';
 import { openTaskWindow, useScreenContext } from '../../shared/screen-context';
 import { supportsClipboardClear } from '../../../core/browser';
+import { normalizeClipboardSeconds } from '../../../core/types';
 
 const USAGE_KEY = 'siteUsage';
 
@@ -65,6 +66,21 @@ export function PrivacyPanel({ t, settings, save }: PanelProps) {
         <span>{t('settings.clipboard.toggle')}</span>
       </label>
       <p class="muted indent">{t(supportsClipboardClear() ? 'settings.clipboard.desc' : 'settings.clipboard.unsupported')}</p>
+      {supportsClipboardClear() && settings.clipboardClearAfterCopy && (
+        <label class="field indent">
+          <span>{t('settings.clipboard.delay')}</span>
+          <select
+            data-role="settings-clipboard-delay"
+            value={String(settings.clipboardClearSeconds)}
+            onChange={(e) => save({ clipboardClearSeconds: normalizeClipboardSeconds(Number(e.currentTarget.value)) })}
+          >
+            <option value="30">{t('settings.clipboard.s30')}</option>
+            <option value="60">{t('settings.clipboard.m1')}</option>
+            <option value="120">{t('settings.clipboard.m2')}</option>
+            <option value="300">{t('settings.clipboard.m5')}</option>
+          </select>
+        </label>
+      )}
       {denied && (
         <p class="error" data-role="settings-clipboard-denied">
           {t('settings.clipboard.denied')}

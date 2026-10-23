@@ -3,7 +3,7 @@ import type { AccountDraft } from '../account';
 
 export type ImportFailure = { source: string; reason: string };
 
-export type ImportMeta = { pinned?: boolean; group?: string; note?: string; matchHosts?: string[] };
+export type ImportMeta = { pinned?: boolean; group?: string; note?: string; matchHosts?: string[]; iconId?: string };
 
 export type ImportOutcome = {
   drafts: AccountDraft[];

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'preact/hooks';
 import { WrongSecretError } from '../../../core/crypto/errors';
 import { supportsPasskeys } from '../../../core/browser';
 import { changePassword, disableLock, isLocked, lockNow, replaceRecoveryCode } from '../../../store/lock';
-import { NO_POLICY, passwordMeetsPolicy, readPolicy, type Policy } from '../../../store/policy';
+import { NO_POLICY, onPolicyChanged, passwordMeetsPolicy, readPolicy, type Policy } from '../../../store/policy';
 import { newRecoveryCode } from '../../../core/crypto/recovery';
 import { reauthenticate } from '../../shared/reauth';
 import type { useT } from '../../shared/use-t';
@@ -108,7 +108,17 @@ function DisableForm({ t, codeProtection }: { t: T; codeProtection: boolean }) {
     setError(null);
     setBusy(true);
     try {
+      // 끄기 직전에 정책을 다시 읽는다(화면이 열린 사이 바뀌었을 수 있다).
+      if ((await readPolicy()).enforcePassword) {
+        setError('lock.policy.keepEnabled');
+        return;
+      }
       await reauthenticate(value);
+      // 재확인하는 사이 정책이 켜졌을 수 있다.
+      if ((await readPolicy()).enforcePassword) {
+        setError('lock.policy.keepEnabled');
+        return;
+      }
       await disableLock();
     } catch (err) {
       setError(err instanceof WrongSecretError ? 'lock.error.wrong' : 'lock.error.failed');
@@ -235,8 +245,11 @@ export function LockedPanel({
 
   useEffect(() => {
     let alive = true;
-    void readPolicy().then((next) => alive && setPolicy(next));
-    return () => { alive = false; };
+    const refresh = () => void readPolicy().then((next) => alive && setPolicy(next));
+    refresh();
+    // 열려 있는 동안 enforcePassword 가 바뀌면 잠금 끄기 칸을 바로 맞춘다.
+    const off = onPolicyChanged(refresh);
+    return () => { alive = false; off(); };
   }, []);
 
   return (

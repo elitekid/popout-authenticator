@@ -1,5 +1,28 @@
 # Changelog
 
+## 1.0.2
+
+- Task windows opened from the toolbar popup (QR image, import file, camera, backup) now open only once: opening the same task again brings the existing window to the front, and "Done" closes the window instead of turning it into a separate window.
+- The screen QR capture tab closes itself after the accounts are added and returns you to the tab you started from. If something could not be added, the tab keeps the result and offers a "Close" button.
+- New: scan a QR code shown in another app. Add → QR → "QR from another app" lets you choose a screen or window to capture.
+- New: rename or ungroup a group for all its accounts at once from the group header.
+- New: select several accounts and move them to the trash together.
+- New: choose a built-in icon for each account. Icons are kept in Popout backups and sync.
+- New: search by field (service, account, group or note), and search with several words. Accounts must contain every word. Secrets are never searched.
+- New: choose how long copied codes stay on the clipboard (30 seconds, 1, 2 or 5 minutes) when clipboard clearing is on.
+- New (Chrome, Edge, Whale): global shortcuts copy the codes of your first three important accounts, even while the browser is in the background. On Windows and Linux they are Ctrl+Shift+1–3; on Mac, set the keys from Settings → "Shortcut settings". Settings shows the keys currently assigned.
+- The popup shows a short "What's new" note under the account list once after an update, and Settings has a "What's new" button next to the version.
+- The rating prompt stops after it has been shown three times without an answer, and opening the rating link from Settings also ends it. The Safari version no longer shows the prompt.
+- Exporting a backup no longer counts as done until you confirm that you saved the file, and the backup before a reset is checked against the file you saved. A reset no longer goes ahead if the vault changed after that backup.
+- Restoring from a snapshot made with an older password no longer leaves the vault unreadable, and locking during a restore keeps the vault locked.
+- Typing in the manage page or task window now counts as activity for auto-lock.
+- The fill button next to a code field appears or disappears when only the field's attributes change.
+- The share link now shows the exact time the link stops working.
+- Failing to save a new account order now shows an error.
+- Administrator policies: "disable backup" now hides backup features and blocks reset, open screens follow policy changes right away, and capture via shortcut respects "require password".
+- Messages with a count no longer use a plural form for a single item.
+- Store titles in Arabic, Hindi, Indonesian, Italian, Dutch, Polish, Swedish, Thai, Turkish, Ukrainian and Vietnamese now describe the extension in that language.
+
 ## 1.0.1
 
 - Fixed the English "Added N accounts" message reading "Added 1 accounts".

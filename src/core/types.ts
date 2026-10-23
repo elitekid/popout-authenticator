@@ -17,11 +17,27 @@ export type Account = {
   note: string;
   pinned: boolean;
   matchHosts: string[];
+  iconId?: string; // 내장 아이콘 id(ACCOUNT_ICONS). 없거나 모르는 값이면 이니셜 타일
   lastUsedAt?: number;
   createdAt: number;
   updatedAt: number;
   deletedAt?: number; // 휴지통(30일 뒤 실제 삭제)
 };
+
+export const ACCOUNT_ICONS: readonly { id: string; symbol: string }[] = [
+  { id: 'key', symbol: '🔑' },
+  { id: 'mail', symbol: '✉️' },
+  { id: 'work', symbol: '💼' },
+  { id: 'bank', symbol: '🏦' },
+  { id: 'cloud', symbol: '☁️' },
+  { id: 'code', symbol: '💻' },
+  { id: 'game', symbol: '🎮' },
+  { id: 'shop', symbol: '🛒' },
+];
+
+export function accountIconSymbol(iconId: string | undefined): string | undefined {
+  return ACCOUNT_ICONS.find((i) => i.id === iconId)?.symbol;
+}
 
 export type WrappedKey = {
   kind: 'none' | 'password' | 'prf' | 'recovery';
@@ -70,12 +86,17 @@ export type Settings = {
   syncEnabled: boolean;
   syncPlaintextAllowed: boolean;
   clipboardClearAfterCopy: boolean;
+  clipboardClearSeconds: 30 | 60 | 120 | 300;
   autofillOnCopy: boolean;
   autoSubmit: boolean;
   suggestionsEnabled: boolean;
   clockCheck: boolean;
   lockTiming: LockTiming;
 };
+
+export function normalizeClipboardSeconds(value: unknown): Settings['clipboardClearSeconds'] {
+  return value === 60 || value === 120 || value === 300 ? value : 30;
+}
 
 export const DEFAULT_SETTINGS: Settings = {
   openMode: 'popup',
@@ -89,6 +110,7 @@ export const DEFAULT_SETTINGS: Settings = {
   syncEnabled: true, // 잠금이 켜졌거나 평문 동기화를 허락했을 때만 실제로 동기화한다
   syncPlaintextAllowed: false,
   clipboardClearAfterCopy: false, // 켜면 선택 권한 clipboardRead 를 받는다
+  clipboardClearSeconds: 30,
   autofillOnCopy: false,
   autoSubmit: true,
   suggestionsEnabled: true,

@@ -81,14 +81,28 @@ async function readManaged(): Promise<{ policy: Policy; ok: boolean }> {
   }
 }
 
+const watchers = new Set<() => void>();
+
+// 정책이 바뀌면 캐시를 비우고 구독자에게 알린다. 페이지 수명 동안 수신기는 하나만 둔다.
+function subscribe(): void {
+  if (subscribed) return;
+  subscribed = true;
+  chrome.storage.onChanged?.addListener((_changes, areaName) => {
+    if (areaName !== 'managed') return;
+    cached = null;
+    for (const fn of [...watchers]) fn();
+  });
+}
+
+// managed 정책이 바뀔 때마다 부른다. 받은 쪽은 readPolicy() 로 새 값을 읽는다. 반환값으로 구독을 끊는다.
+export function onPolicyChanged(fn: () => void): () => void {
+  subscribe();
+  watchers.add(fn);
+  return () => void watchers.delete(fn);
+}
+
 export function readPolicy(): Promise<Policy> {
-  if (!subscribed) {
-    subscribed = true;
-    // 정책이 바뀌면 캐시를 비워 다음 읽기에서 다시 읽는다. 페이지 수명 동안 하나만 둔다.
-    chrome.storage.managed?.onChanged?.addListener(() => {
-      cached = null;
-    });
-  }
+  subscribe();
   if (!cached) {
     const mine: Promise<Policy> = readManaged().then(({ policy, ok }) => {
       if (!ok && cached === mine) cached = null;

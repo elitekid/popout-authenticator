@@ -15,6 +15,27 @@
     "message": "Código: $CODE$",
     "placeholders": { "code": { "content": "$1" } }
   },
+  "cmdCopyPinned1": {
+    "message": "Copiar el código de la cuenta destacada 1"
+  },
+  "cmdCopyPinned2": {
+    "message": "Copiar el código de la cuenta destacada 2"
+  },
+  "cmdCopyPinned3": {
+    "message": "Copiar el código de la cuenta destacada 3"
+  },
+  "shortcutCopied": {
+    "message": "Código copiado."
+  },
+  "shortcutLocked": {
+    "message": "Desbloquee primero Popout Authenticator."
+  },
+  "shortcutMissing": {
+    "message": "No hay ninguna cuenta destacada para este atajo."
+  },
+  "shortcutFailed": {
+    "message": "No se pudo copiar el código."
+  },
   "fillPickAccount": { "message": "Elija una cuenta" },
   "fieldFillButton": { "message": "Introducir código" }
 }

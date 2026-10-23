@@ -1,5 +1,5 @@
 {
-  "appName": { "message": "Popout Authenticator" },
+  "appName": { "message": "Popout Authenticator — uwierzytelniacz 2FA" },
   "appShortName": { "message": "Popout Authenticator" },
   "appDesc": { "message": "Uwierzytelniacz 2FA w przeglądarce. Generuje kody jednorazowe, otwiera się jako okienko lub osobne okno." },
   "cmdExecuteAction": { "message": "Otwórz okienko" },
@@ -14,6 +14,27 @@
   "fillManual": {
     "message": "Kod: $CODE$",
     "placeholders": { "code": { "content": "$1" } }
+  },
+  "cmdCopyPinned1": {
+    "message": "Kopiuj kod konta z gwiazdką 1"
+  },
+  "cmdCopyPinned2": {
+    "message": "Kopiuj kod konta z gwiazdką 2"
+  },
+  "cmdCopyPinned3": {
+    "message": "Kopiuj kod konta z gwiazdką 3"
+  },
+  "shortcutCopied": {
+    "message": "Skopiowano kod."
+  },
+  "shortcutLocked": {
+    "message": "Najpierw odblokuj Popout Authenticator."
+  },
+  "shortcutMissing": {
+    "message": "Brak konta z gwiazdką dla tego skrótu."
+  },
+  "shortcutFailed": {
+    "message": "Nie udało się skopiować kodu."
   },
   "fillPickAccount": { "message": "Wybierz konto" },
   "fieldFillButton": { "message": "Wpisz kod" }

@@ -1,4 +1,4 @@
-import { useState } from 'preact/hooks';
+import { useEffect, useState } from 'preact/hooks';
 import {
   buildCxf,
   buildEncryptedBackup,
@@ -11,6 +11,7 @@ import {
 import { encodeMigration } from '../../../core/migration';
 import { buildOtpauth } from '../../../core/uri';
 import { WrongSecretError } from '../../../core/crypto/errors';
+import { onPolicyChanged, readPolicy } from '../../../store/policy';
 import { loadAccounts } from '../../../store/vault';
 import { backupSignature } from '../../popup/logic';
 import { QrSvg } from '../../shared/QrSvg';
@@ -43,6 +44,24 @@ export function ExportPanel({ t, lockOn }: { t: T; lockOn: boolean }) {
   const [busy, setBusy] = useState(false);
   const [built, setBuilt] = useState<Built | null>(null);
   const [index, setIndex] = useState(0);
+  // 다운로드를 시작했는지, 사용자가 저장했다고 확인했는지. 저장 대화상자 취소는 알 수 없어 확인을 받아야 기록한다.
+  const [downloaded, setDownloaded] = useState(false);
+  const [confirmed, setConfirmed] = useState(false);
+  // 관리자 정책: 내보내기·백업을 막으면 열린 화면에서도 바로 걷는다.
+  const [blocked, setBlocked] = useState<'export' | 'backup' | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    const refresh = () => void readPolicy().then((p) => {
+      if (!alive) return;
+      const next = p.disableBackup ? 'backup' : p.disableExport ? 'export' : null;
+      setBlocked(next);
+      if (next !== null) setBuilt(null);
+    });
+    refresh();
+    const off = onPolicyChanged(refresh);
+    return () => { alive = false; off(); };
+  }, []);
 
   const encrypted = format === 'own-encrypted';
   const plain = !encrypted;
@@ -55,15 +74,25 @@ export function ExportPanel({ t, lockOn }: { t: T; lockOn: boolean }) {
     setError(null);
     setBuilt(null);
     setIndex(0);
+    setDownloaded(false);
+    setConfirmed(false);
   };
 
   const make = async () => {
     setError(null);
     setBuilt(null);
     setIndex(0);
+    setDownloaded(false);
+    setConfirmed(false);
     if (encrypted) {
       if (pw1.length < MIN_PASSWORD) return setError('backup.error.short');
       if (pw1 !== pw2) return setError('backup.error.mismatch');
+    }
+    // 만들기 직전에 정책을 다시 읽는다(화면이 열린 사이 바뀌었을 수 있다).
+    const latest = await readPolicy();
+    if (latest.disableBackup || latest.disableExport) {
+      setBlocked(latest.disableBackup ? 'backup' : 'export');
+      return;
     }
     setBusy(true);
     try {
@@ -125,16 +154,30 @@ export function ExportPanel({ t, lockOn }: { t: T; lockOn: boolean }) {
       file.text,
       file.ext === 'json' ? 'application/json' : 'text/plain',
     );
-    // 다시 읽어 전부 맞고 빠진 계정이 없을 때만 백업한 것으로 친다(팝업 알림 띠가 읽는다).
-    // 저장 대화상자 취소는 알 수 없다(다운로드 권한이 없다).
+    // 저장 대화상자 취소는 알 수 없다(다운로드 권한이 없다). 여기서는 기록하지 않고 '저장했습니다'를 받는다.
+    setDownloaded(true);
+  };
+
+  // 다시 읽어 전부 맞고 빠진 계정이 없을 때만 백업한 것으로 친다(팝업 알림 띠가 읽는다).
+  const confirmSaved = () => {
+    if (!built || confirmed) return;
     if (built.verify.found === built.verify.expected && built.skipped.length === 0) {
       void chrome.storage.local.set({ backupInfo: { at: Date.now(), sig: built.sig } });
     }
+    setConfirmed(true);
   };
 
   const qr = built?.qr;
   const current = qr?.items[index];
   const verify = built?.verify;
+
+  if (blocked !== null) {
+    return (
+      <p class="muted" data-role="export-blocked">
+        {t(blocked === 'backup' ? 'backup.policy.noBackup' : 'backup.policy.noExport')}
+      </p>
+    );
+  }
 
   return (
     <section class="backup-export" data-role="export">
@@ -181,6 +224,10 @@ export function ExportPanel({ t, lockOn }: { t: T; lockOn: boolean }) {
             />
           </label>
         </>
+      )}
+
+      {format !== 'own-encrypted' && format !== 'own-plain' && (
+        <p class="muted" data-role="icons-omitted">{t('backup.iconsOmitted')}</p>
       )}
 
       {plain && (
@@ -244,6 +291,14 @@ export function ExportPanel({ t, lockOn }: { t: T; lockOn: boolean }) {
         <button type="button" data-role="download" onClick={download}>
           {t('backup.download')}
         </button>
+      )}
+      {built?.file && downloaded && !confirmed && (
+        <div data-role="saved-confirm-box">
+          <p class="muted">{t('backup.savedConfirm.hint')}</p>
+          <button type="button" data-role="saved-confirm" onClick={confirmSaved}>
+            {t('backup.savedConfirm')}
+          </button>
+        </div>
       )}
 
       {qr && (

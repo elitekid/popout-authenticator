@@ -1,4 +1,4 @@
-// 클립보드를 읽어 해시가 같을 때만 비운다. 서비스 워커가 시킨다.
+// 서비스 워커가 시키는 대로 클립보드를 쓰거나, 읽어 해시가 같을 때만 비운다.
 async function sha256Hex(text: string): Promise<string> {
   const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
   return Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, '0')).join('');
@@ -24,7 +24,32 @@ function clearClipboard(box: HTMLTextAreaElement): void {
   document.removeEventListener('copy', onCopy);
 }
 
+// 포커스가 없어도 되도록 textarea 를 선택해 execCommand('copy') 로 쓴다.
+function writeClipboard(text: string): boolean {
+  const box = document.createElement('textarea');
+  box.value = text;
+  document.body.append(box);
+  try {
+    box.focus();
+    box.select();
+    return document.execCommand('copy');
+  } finally {
+    box.value = '';
+    box.remove();
+  }
+}
+
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  if (typeof message === 'object' && message !== null && message.type === 'offscreen-clipboard-write') {
+    let written = false;
+    try {
+      written = typeof message.text === 'string' && message.text !== '' && writeClipboard(message.text);
+    } catch {
+      written = false;
+    }
+    sendResponse({ written });
+    return false;
+  }
   if (typeof message !== 'object' || message === null || message.type !== 'offscreen-clipboard-clear') {
     return false;
   }

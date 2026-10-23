@@ -5,6 +5,7 @@ import {
   SHARE_PAGE_URL,
   buildShareLink,
   createShareFragment,
+  shareValidUntilMs,
 } from '../../core/share';
 import type { Account } from '../../core/types';
 import { QrSvg } from '../shared/QrSvg';
@@ -73,7 +74,8 @@ export function ShareDialog(p: {
       if (!aliveRef.current) return;
       setResult({
         url: buildShareLink(SHARE_PAGE_URL, fragment),
-        until: at + seconds * 1000,
+        // 받는 쪽 만료는 보정된 시계의 코드 칸 끝이다. 실제 시계로 되돌려 표시한다.
+        until: shareValidUntilMs(at + correction, account.period, seconds) - correction,
         withPassword: used,
       });
       setPassword('');
