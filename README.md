@@ -20,6 +20,18 @@ Ratings and reviews in your browser's store help other people find the extension
 
 Privacy policy: [PRIVACY.md](PRIVACY.md) · Changes: [CHANGELOG.md](CHANGELOG.md)
 
+## Features
+
+- Opens in the toolbar popup, a separate window, or the side panel; fills codes into sign-in pages with a click, right-click, or shortcut.
+- Adds accounts by QR code from the current tab, another app's screen or window, the camera, or an image, and imports from many authenticator apps.
+- Searches by field (service, account, group, note) and with several words; sorts by name with the A–Z button.
+- Groups you can rename or ungroup at once, pinned accounts, 18 built-in line icons, and a compact view.
+- Selects several accounts to move to the trash together; copies an account's name from its menu.
+- Global shortcuts (Chrome, Edge, Whale) copy the codes of the first three important accounts while the browser is in the background.
+- Optional clipboard clearing after 30 seconds, 1, 2, or 5 minutes (not in Safari).
+- Encrypted vault with password lock, recovery code, and passkey unlock (not in Firefox).
+- Encrypted backups, browser sync, recovery snapshots, and code share links that never contain the secret.
+
 ## Supported builds
 
 Browser-specific builds share the same local vault and OTP implementation, with separate manifests and browser API handling.
@@ -48,7 +60,7 @@ These are build targets, not claims that every operating system or hardware auth
 | `alarms` | Auto-lock, periodic sync, clipboard clearing, and cleanup timers. |
 | `contextMenus` | "Fill 2FA code" on input fields and "Open in a separate window" on the toolbar icon. |
 | `clipboardWrite` | Copies codes, share links, and recovery codes. |
-| `offscreen` (Chrome, Edge) | Clears a copied code from the clipboard 30 seconds later, only when the user turns this on. |
+| `offscreen` (Chrome, Edge) | Clears a copied code from the clipboard after the time the user chooses (30 seconds to 5 minutes), only when the user turns this on. |
 | `sidePanel` (Chrome, Edge) | Opens the authenticator in the browser side panel. |
 | `tabs` (optional) | Lets the separate window and side panel suggest the account for the site in the active tab. |
 | `clipboardRead` (optional) | Requested only when the user turns on clipboard clearing, to check that the clipboard still holds the copied code before clearing it. Not in the Safari build. |

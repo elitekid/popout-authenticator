@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
   backupSignature,
-  canSnoozeReview,
   filterAccounts,
   formatCode,
   groupCounts,
@@ -14,6 +13,7 @@ import {
   moveActive,
   UNGROUPED_KEY,
   visibleRows,
+  sortByName,
   whatsNewFor,
 } from '../../src/ui/popup/logic';
 
@@ -240,14 +240,19 @@ describe('shouldShowBackupReminder', () => {
 });
 
 describe('shouldShowReview', () => {
-  const ok = { openCount: 15, accounts: 1, dismissed: false, snoozedUntilOpen: 0 };
+  const now = 100 * DAY;
+  const ok = { openCount: 5, accounts: 1, dismissed: false, now };
 
-  it('15회 이상·계정 1개 이상·닫지 않음·미룸이 지났을 때만 보임', () => {
-    expect(shouldShowReview({ ...ok, openCount: 14 })).toBe(false);
+  it('5회 이상·계정 1개 이상·닫지 않음일 때만 보임', () => {
+    expect(shouldShowReview({ ...ok, openCount: 4 })).toBe(false);
     expect(shouldShowReview(ok)).toBe(true);
     expect(shouldShowReview({ ...ok, accounts: 0 })).toBe(false);
     expect(shouldShowReview({ ...ok, dismissed: true })).toBe(false);
-    expect(shouldShowReview({ ...ok, openCount: 30, snoozedUntilOpen: 65 })).toBe(false);
+  });
+
+  it('마지막 노출 뒤 14일이 지나야 다시 보임', () => {
+    expect(shouldShowReview({ ...ok, shown: 1, lastShownAt: now - 13 * DAY })).toBe(false);
+    expect(shouldShowReview({ ...ok, shown: 1, lastShownAt: now - 14 * DAY })).toBe(true);
   });
 
   it('무응답 노출이 3회 쌓이면 보이지 않음', () => {
@@ -268,12 +273,35 @@ describe('whatsNewFor', () => {
     expect(whatsNewFor('firefox')['1.0.2']).toEqual(['popup.whatsNew.v102.organize', 'popup.whatsNew.v102.capture']);
     expect(whatsNewFor('safari')['1.0.2']).toHaveLength(2);
   });
+
+  it('1.0.3 은 모든 브라우저에 세 줄', () => {
+    for (const target of ['chrome', 'firefox', 'safari'] as const) {
+      expect(whatsNewFor(target)['1.0.3']).toEqual([
+        'popup.whatsNew.v103.about',
+        'popup.whatsNew.v103.icons',
+        'popup.whatsNew.v103.name',
+      ]);
+    }
+  });
 });
 
-describe('canSnoozeReview', () => {
-  it('아직 미루지 않았을 때만 "나중에" 를 보임', () => {
-    expect(canSnoozeReview(0)).toBe(true);
-    expect(canSnoozeReview(65)).toBe(false);
+describe('sortByName', () => {
+  const acc = (issuer: string, label: string) => ({ issuer, label });
+
+  it('대소문자를 구분하지 않고 숫자는 크기 순', () => {
+    const list = [acc('beta', 'a'), acc('Alpha', 'a'), acc('item10', 'a'), acc('item2', 'a')];
+    expect(sortByName(list, 'en').map((a) => a.issuer)).toEqual(['Alpha', 'beta', 'item2', 'item10']);
+  });
+
+  it('서비스가 같으면 계정 이름 순, 완전히 같으면 원래 순서', () => {
+    const first = acc('Acme', 'same');
+    const second = acc('acme', 'same');
+    const list = [acc('Acme', 'b'), second, first, acc('Acme', 'a')];
+    const sorted = sortByName(list, 'en');
+    expect(sorted.map((a) => a.label)).toEqual(['a', 'b', 'same', 'same']);
+    expect(sorted[2]).toBe(second);
+    expect(sorted[3]).toBe(first);
+    expect(list[0]!.label).toBe('b');
   });
 });
 

@@ -73,13 +73,13 @@ export async function scheduleClipboardClear(code: string): Promise<void> {
   }
 }
 
-async function takePending(): Promise<{ hash: string } | undefined> {
+async function takePending(force = false): Promise<{ hash: string } | undefined> {
   return withPendingLock(async () => {
     const got = await chrome.storage.session.get('clipboardPending');
     const pending = got.clipboardPending as { hash?: unknown; due?: unknown } | undefined;
     if (typeof pending?.hash !== 'string') return undefined;
     // 앞 복사의 알람이 뒤 복사의 기록을 읽은 경우: 아직 때가 아니면 남은 시간 뒤로 다시 예약한다.
-    if (typeof pending.due === 'number' && Date.now() < pending.due - 500) {
+    if (!force && typeof pending.due === 'number' && Date.now() < pending.due - 500) {
       await chrome.alarms.create(ALARM, { when: pending.due });
       return undefined;
     }
@@ -88,8 +88,9 @@ async function takePending(): Promise<{ hash: string } | undefined> {
   });
 }
 
-async function clearIfSame(): Promise<void> {
-  const pending = await takePending();
+// force 면 때를 기다리지 않고 지금 지운다(업데이트 적용 직전).
+async function clearIfSame(force = false): Promise<void> {
+  const pending = await takePending(force);
   if (!pending) return;
   // 읽기 권한이 없으면 아무것도 하지 않는다(권한 요청은 설정 화면 몫).
   if (!(await chrome.permissions.contains({ permissions: ['clipboardRead'] }))) return;
@@ -141,6 +142,19 @@ export async function writeClipboardViaOffscreen(text: string): Promise<boolean>
 }
 
 export function register(): void {
+  // reload 는 session 을 비우므로 예약된 지우기를 먼저 끝내고 다시 불러온다. 지우기를 못 해도 넘어간다.
+  chrome.runtime.onMessage.addListener((message) => {
+    if (typeof message !== 'object' || message === null || message.type !== 'apply-update') return false;
+    const reload = () => chrome.runtime.reload();
+    if (!supportsClipboardClear()) {
+      reload();
+      return false;
+    }
+    void clearIfSame(true)
+      .catch((error) => console.warn('clipboard-clear', error))
+      .then(reload);
+    return false;
+  });
   if (!supportsClipboardClear()) return;
   // 권한을 어디서 거두든(확장 관리 화면 등) 클립보드 지우기 설정도 끈다.
   chrome.permissions.onRemoved.addListener((removed) => {

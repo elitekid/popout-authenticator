@@ -19,12 +19,14 @@ Popout Authenticator visar dina engångskoder för tvåfaktorsautentisering (2FA
 
 **Öppna det där du behöver det**
 - Använd verktygsfältets popup, ett separat fönster eller sidopanelen (sidofältet i Firefox).
-- Sökning, grupper, fästa konton och en kompakt vy håller långa listor överskådliga.
+- Sökning per fält eller med flera ord, sortering A–Ö, grupper, fästa konton, ikoner och en kompakt vy håller långa listor överskådliga.
 - Se vilket konto som hör till webbplatsen du är på och fyll i koden med ett klick, ett högerklick eller ett kortkommando.
+- Globala kortkommandon kopierar koderna för dina tre första viktiga konton, även när webbläsaren ligger i bakgrunden (Chrome, Edge, Whale).
 - Valfria knappar bredvid kodfält på webbplatser du väljer.
+- Markera flera konton och flytta dem till papperskorgen tillsammans, byt namn på eller dela upp en hel grupp på en gång och kopiera ett kontos namn.
 
 **Lägg till konton som du vill**
-- Skanna en QR-kod från aktuell flik, med kameran, från en bild eller från urklipp.
+- Skanna en QR-kod från aktuell flik, från en annan apps fönster, med kameran, från en bild eller från urklipp.
 - Klistra in otpauth://-länkar eller skriv in den hemliga nyckeln för hand.
 - Stöder TOTP och HOTP med SHA-1, SHA-256 eller SHA-512 och 6 till 10 siffror, samt Steam (5 tecken) och Battle.net (8 siffror).
 
@@ -32,6 +34,7 @@ Popout Authenticator visar dina engångskoder för tvåfaktorsautentisering (2FA
 - Konton lagras på din enhet i ett valv som krypteras med AES-256-GCM. Ange ett lösenord för att skydda dess nyckel: utan lösenord ligger nyckeln på enheten bredvid data.
 - Lås med lösenord (Argon2id), återställningskod och valfri upplåsning med passkey (inte i Firefox). Välj när det låses automatiskt.
 - Kräv vid behov enhetsverifiering innan en kod används (inte i Firefox), och dölj koder med ett kortkommando du väljer.
+- Kopierade koder kan rensas från urklipp efter 30 sekunder, 1, 2 eller 5 minuter (inte i Safari).
 - Ingen analys, ingen reklam, ingen server hos utvecklaren. Källkoden är öppen.
 
 **Behåll åtkomsten**
@@ -62,4 +65,6 @@ Källkod: https://github.com/elitekid/popout-authenticator
 - `valfri upplåsning med passkey (inte i Firefox)` → `valfri upplåsning med passkey`
 - `innan en kod används (inte i Firefox)` → `innan en kod används`
 - `via webbläsarens egen synkronisering (Chrome, Edge, Firefox)` → `via Microsoft Edge-synkronisering`
+- `i bakgrunden (Chrome, Edge, Whale).` → `i bakgrunden.`
+- `5 minuter (inte i Safari).` → `5 minuter.`
 - 이 줄을 뺀다: `- Upplåsning med passkey och enhetsverifiering finns inte i Firefox. Safari-versionen är endast för macOS.`

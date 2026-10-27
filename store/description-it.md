@@ -19,12 +19,14 @@ Popout Authenticator mostra i codici monouso per l'autenticazione a due fattori 
 
 **Aprilo dove ti serve**
 - Usalo nel popup della barra degli strumenti, in una finestra separata o nel pannello laterale (barra laterale in Firefox).
-- Ricerca, gruppi, account fissati e vista compatta mantengono in ordine anche gli elenchi lunghi.
+- Ricerca per campo o con più parole, ordinamento dalla A alla Z, gruppi, account fissati, icone e vista compatta mantengono in ordine anche gli elenchi lunghi.
 - Mostra l'account del sito che stai visitando e ne inserisce il codice con un clic, con il tasto destro o con una scorciatoia da tastiera.
+- Le scorciatoie globali copiano i codici dei tuoi primi tre account importanti, anche con il browser in background (Chrome, Edge, Whale).
 - Pulsanti facoltativi accanto ai campi del codice sui siti che scegli.
+- Seleziona più account per spostarli insieme nel cestino, rinomina o sciogli un intero gruppo in una volta e copia il nome di un account.
 
 **Aggiungi gli account come preferisci**
-- Scansiona un codice QR dalla scheda corrente, dalla fotocamera, da un'immagine o dagli appunti.
+- Scansiona un codice QR dalla scheda corrente, dalla finestra di un'altra app, dalla fotocamera, da un'immagine o dagli appunti.
 - Incolla link otpauth:// oppure digita la chiave segreta a mano.
 - Supporta TOTP e HOTP con SHA-1, SHA-256 o SHA-512 e da 6 a 10 cifre, oltre a Steam (5 caratteri) e Battle.net (8 cifre).
 
@@ -32,6 +34,7 @@ Popout Authenticator mostra i codici monouso per l'autenticazione a due fattori 
 - Gli account sono salvati sul tuo dispositivo in una cassaforte crittografata con AES-256-GCM. Imposta una password per proteggerne la chiave: senza password, la chiave resta sul dispositivo accanto ai dati.
 - Blocca con password (Argon2id), codice di ripristino e sblocco facoltativo con passkey (non disponibile in Firefox). Scegli quando bloccarlo automaticamente.
 - Puoi richiedere la verifica del dispositivo prima di usare un codice (non disponibile in Firefox) e nascondere i codici con una scorciatoia da tastiera a tua scelta.
+- I codici copiati possono essere cancellati dagli appunti dopo 30 secondi, 1, 2 o 5 minuti (non disponibile in Safari).
 - Niente analisi, niente pubblicità, nessun server dello sviluppatore. Il codice sorgente è pubblico.
 
 **Non perdere l'accesso**
@@ -62,4 +65,6 @@ Codice sorgente: https://github.com/elitekid/popout-authenticator
 - `sblocco facoltativo con passkey (non disponibile in Firefox)` → `sblocco facoltativo con passkey`
 - `prima di usare un codice (non disponibile in Firefox)` → `prima di usare un codice`
 - `tramite la sincronizzazione del browser (Chrome, Edge, Firefox)` → `tramite la sincronizzazione di Microsoft Edge`
+- `in background (Chrome, Edge, Whale).` → `in background.`
+- `5 minuti (non disponibile in Safari).` → `5 minuti.`
 - 이 줄을 뺀다: `- Lo sblocco con passkey e la verifica del dispositivo non sono disponibili in Firefox. La versione per Safari è solo per macOS.`

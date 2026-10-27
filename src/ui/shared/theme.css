@@ -30,6 +30,15 @@
   --tile-bg-l: 92%;
   --tile-fg-s: 42%;
   --tile-fg-l: 36%;
+  --ai-bg-s: 72%;
+  --ai-bg-l: 93%;
+  --ai-fg-s: 62%;
+  --ai-fg-l: 38%;
+  /* 평가 금색 */
+  --gold: #f5b301;
+  --on-gold: #3a2600;
+  --gold-star: #e0a100;
+  --gold-shine: rgba(255, 255, 255, 0.6);
 }
 
 :root[data-theme='dark'] {
@@ -63,6 +72,14 @@
   --tile-bg-l: 28%;
   --tile-fg-s: 58%;
   --tile-fg-l: 82%;
+  --ai-bg-s: 32%;
+  --ai-bg-l: 24%;
+  --ai-fg-s: 75%;
+  --ai-fg-l: 76%;
+  --gold: #f6c344;
+  --on-gold: #2b1d00;
+  --gold-star: #f6c344;
+  --gold-shine: rgba(255, 255, 255, 0.25);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -98,6 +115,14 @@
     --tile-bg-l: 28%;
     --tile-fg-s: 58%;
     --tile-fg-l: 82%;
+    --ai-bg-s: 32%;
+    --ai-bg-l: 24%;
+    --ai-fg-s: 75%;
+    --ai-fg-l: 76%;
+    --gold: #f6c344;
+    --on-gold: #2b1d00;
+    --gold-star: #f6c344;
+    --gold-shine: rgba(255, 255, 255, 0.25);
   }
 }
 
@@ -548,6 +573,25 @@ body:has(.popup) {
   opacity: 0.5;
 }
 
+/* 이름순 칩: 아이콘+글자 가로, 켜짐이면 강조색 */
+.popup .sel-tools button.chip-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.popup .sel-tools button.chip-sort svg {
+  width: 14px;
+  height: 14px;
+  flex: none;
+}
+
+.popup .sel-tools button.chip-sort.on,
+.popup .sel-tools button.chip-sort[aria-pressed='true'] {
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  color: var(--accent);
+}
+
 .popup .sel-tools button:focus-visible {
   outline: 2px solid var(--accent);
 }
@@ -643,15 +687,34 @@ body:has(.popup) {
   color: var(--sub);
 }
 
-/* 평가 요청: 테두리·별·채운 단추로 또렷하게, 처음 한 번만 살짝 떠오른다. */
+/* 평가 요청: 금색 테두리·별·단추, 처음 한 번만 떠오르고 별이 반짝이며 빛줄기가 지나간다. */
 .popup .note.review {
-  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
-  background: color-mix(in srgb, var(--accent) 8%, var(--surface));
-  animation: popup-review-in 240ms ease-out;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--gold) 50%, transparent);
+  background: color-mix(in srgb, var(--gold) 10%, var(--surface));
+  animation: popup-review-in 400ms ease-out;
 }
 
 .popup .note.review > svg.i {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  color: var(--gold-star);
   fill: currentColor;
+  stroke: none;
+  transform-origin: 50% 55%;
+  animation: popup-review-twinkle 600ms ease-in-out 0.4s 1;
+}
+
+.popup .note.review::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(105deg, transparent 0, transparent 38%, var(--gold-shine) 50%, transparent 62%, transparent 100%);
+  transform: translateX(-100%);
+  animation: popup-review-shine 1.2s ease-in-out 0.4s 1;
 }
 
 .popup .note.review button.primary,
@@ -665,9 +728,36 @@ body:has(.popup) {
   outline-color: var(--on-strong);
 }
 
+/* 금색 단추: 업데이트 안내와 평가 띠 공용 (위 .review .primary 보다 강하다) */
+.popup .note button.gold,
+.popup .note button.gold:hover,
+.popup .note.review button.primary.gold,
+.popup .note.review button.primary.gold:hover {
+  background: var(--gold);
+  color: var(--on-gold);
+  padding: 0 12px;
+}
+
+.popup .note button.gold:focus-visible,
+.popup .note.review button.primary.gold:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
 @keyframes popup-review-in {
-  from { opacity: 0; transform: translateY(6px); }
+  from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes popup-review-twinkle {
+  0% { transform: scale(1) rotate(0); }
+  50% { transform: scale(1.35) rotate(15deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+
+@keyframes popup-review-shine {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(100%); }
 }
 
 .popup .note.line {
@@ -930,6 +1020,42 @@ body:has(.popup) {
   place-items: center;
   font-size: 15px;
   font-weight: 600;
+}
+
+/* 계정 아이콘: 옅은 타일 + 색 선. 공용 */
+.ai {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ai .dot {
+  fill: currentColor;
+  stroke: none;
+}
+
+.ai-tile {
+  background: hsl(var(--ih) var(--ai-bg-s) var(--ai-bg-l));
+  color: hsl(var(--ih) var(--ai-fg-s) var(--ai-fg-l));
+}
+
+/* .popup .tile 보다 우선하도록 클래스를 하나 더 건다 */
+.popup .tile.ai-tile {
+  background: hsl(var(--ih) var(--ai-bg-s) var(--ai-bg-l));
+  color: hsl(var(--ih) var(--ai-fg-s) var(--ai-fg-l));
+}
+
+.popup .tile .ai {
+  width: 59%;
+  height: 59%;
+}
+
+/* 아이콘 없는 줄도 같은 자리를 차지하도록 보이지 않는 타일 */
+.popup .tile.tile-gap {
+  visibility: hidden;
+  background: none;
 }
 
 .popup .who {
@@ -2129,8 +2255,85 @@ body:has(.popup) {
 .accounts-list .account-icon {
   flex: none;
   width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  display: grid;
+  place-items: center;
+}
+
+.accounts-list .account-icon .ai {
+  width: 16px;
+  height: 16px;
+}
+
+/* 편집 화면 아이콘 고르기 */
+.icon-pick {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+  gap: 8px;
+}
+
+.icon-pick button {
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 2px;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  height: auto; /* 관리 화면 공용 단추 높이(34px)를 따르지 않는다 */
+}
+
+.icon-pick .t {
+  width: 38px;
+  height: 38px;
+  flex: none;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+}
+
+.icon-pick .t .ai {
+  width: 22px;
+  height: 22px;
+}
+
+.icon-pick .t.auto {
+  background: var(--fill);
+  color: var(--sub);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.icon-pick .nm {
+  font-size: 11.5px;
   text-align: center;
-  font-size: 16px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.icon-pick [aria-pressed='true'] .t {
+  box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--accent);
+}
+
+.icon-pick [aria-pressed='true'] .nm {
+  font-weight: 700;
+}
+
+.icon-pick button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 8px;
 }
 
 .add-panel .icon-choices {
@@ -2534,15 +2737,147 @@ body:has(.popup) {
   text-align: end;
 }
 
-.settings-about {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 12px;
+/* 평가 카드: 기존 설정 카드 틀에 금색 테두리·옅은 금색 배경 */
+:is(.manage-main, .popup-screen .screen-body) section.settings-rate {
+  border-color: color-mix(in srgb, var(--gold) 50%, transparent);
+  background: color-mix(in srgb, var(--gold) 9%, var(--bg));
 }
 
-.manage-main .settings-about a {
+/* 팝업 안 설정: 카드 틀이 테두리 대신 그림자 선이라 금색도 그림자 선으로 */
+.popup-screen .screen-body section.settings-rate[data-role] {
+  background: color-mix(in srgb, var(--gold) 9%, var(--surface));
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--gold) 50%, transparent);
+}
+
+:is(.manage-main, .popup-screen .screen-body) .settings-rate h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+:is(.manage-main, .popup-screen .screen-body) .settings-rate h2 svg {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  fill: var(--gold-star);
+  stroke: none;
+}
+
+:is(.manage-main, .popup-screen .screen-body) .settings-rate .settings-rate-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 팝업 안에서는 .primary 처럼 단추가 가로로 꽉 찬다 */
+.popup-screen .screen-body .settings-rate .settings-rate-actions {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+:is(.manage-main, .popup-screen .screen-body) .settings-rate svg.gh {
+  width: 14px;
+  height: 14px;
+  margin-inline-end: 6px;
+  vertical-align: -2px;
+  fill: currentColor;
+}
+
+/* 관리 화면 금색 주 단추 (button 또는 a), .primary 와 같은 크기·모서리 */
+:is(.manage-main, .popup-screen .screen-body) :is(button, a).gold,
+:is(.manage-main, .popup-screen .screen-body) :is(button, a).gold:hover:not(:disabled) {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  height: 34px;
+  padding: 0 14px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  background: var(--gold);
+  border: 1px solid var(--gold);
+  border-radius: 8px;
+  color: var(--on-gold);
+  cursor: pointer;
+}
+
+/* 팝업 안 설정: 팝업 .primary 와 같은 크기·꽉 찬 너비 */
+.popup-screen .screen-body :is(button, a).gold,
+.popup-screen .screen-body :is(button, a).gold:hover:not(:disabled) {
+  justify-content: center;
+  align-self: stretch;
+  height: auto;
+  min-height: 44px;
+  font-size: 15px;
+}
+
+/* 팝업 안 GitHub 스타 보조 단추: 금색 단추와 같은 너비·높이 (색은 기본 보조 단추 그대로) */
+.popup-screen .screen-body .settings-rate button[data-role="settings-rate-star"] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: stretch;
+  min-height: 44px;
+  font-size: 15px;
+}
+
+:is(.manage-main, .popup-screen .screen-body) :is(button, a).gold:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+/* 정보 카드 */
+:is(.manage-main, .popup-screen .screen-body) .settings-info-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+
+:is(.manage-main, .popup-screen .screen-body) .settings-info-row .muted {
+  margin: 0;
+}
+
+:is(.manage-main, .popup-screen .screen-body) .settings-info-row button {
+  align-self: auto;
+}
+
+.settings-info-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  margin: 0;
+}
+
+:is(.manage-main, .popup-screen .screen-body) .settings-info-links a {
   color: var(--muted);
   text-underline-offset: 3px;
+}
+
+.settings-info-links .sep {
+  color: var(--muted);
+}
+
+.settings-history {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.settings-history h3 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.settings-history ul {
+  margin: 4px 0 0;
+  padding-inline-start: 18px;
+  font-size: 13px;
+  color: var(--muted);
 }
 
 .advisor-list li > span {
@@ -3065,7 +3400,9 @@ body:has(.popup) {
   .popup .ring .progress,
   .popup button.next { transition: none; }
   .popup-screen[data-enter='true'] > .screen-body,
-  .popup .note.review { animation: none; }
+  .popup .note.review,
+  .popup .note.review > svg.i,
+  .popup .note.review::after { animation: none; }
   .popup-screen .screen-body label.check.switch input,
   .popup-screen .screen-body label.check.switch input::before { transition: none; }
 }

@@ -19,12 +19,14 @@ Popout Authenticator shows your two-factor (2FA) one-time codes right in your br
 
 **Open it where you need it**
 - Use the toolbar popup, a separate window, or the side panel (sidebar in Firefox).
-- Search, groups, pinned accounts, and a compact view keep long lists tidy.
+- Search by field or with several words, sort A–Z, and use groups, pinned accounts, icons, and a compact view to keep long lists tidy.
 - See which account belongs to the site you are on, and fill its code with one click, a right-click, or a keyboard shortcut.
+- Global shortcuts copy the codes of your first three important accounts, even while the browser is in the background (Chrome, Edge, Whale).
 - Optional buttons next to code fields on the sites you choose.
+- Select several accounts to move them to the trash together, rename or ungroup a whole group at once, and copy an account's name.
 
 **Add accounts your way**
-- Scan a QR code from the current tab, your camera, an image, or the clipboard.
+- Scan a QR code from the current tab, another app's window, your camera, an image, or the clipboard.
 - Paste otpauth:// links, or type the secret by hand.
 - Supports TOTP and HOTP with SHA-1, SHA-256, or SHA-512 and 6 to 10 digits, plus Steam (5 characters) and Battle.net (8 digits).
 
@@ -32,6 +34,7 @@ Popout Authenticator shows your two-factor (2FA) one-time codes right in your br
 - Accounts are stored on your device in a vault encrypted with AES-256-GCM. Set a password to protect its key: without one, the key is kept on the device next to the data.
 - Lock it with a password (Argon2id), a recovery code, and optional passkey unlock (not available in Firefox). Choose when it locks automatically.
 - Optionally require device verification before a code is used (not available in Firefox), and hide codes with a keyboard shortcut you assign.
+- Copied codes can be cleared from the clipboard after 30 seconds, 1, 2, or 5 minutes (not in Safari).
 - No analytics, no ads, no developer server. The source code is public.
 
 **Never lose access**
@@ -65,4 +68,6 @@ authenticator, 2FA, OTP, TOTP, two-factor authentication, one-time password, sec
 - `and optional passkey unlock (not available in Firefox)` → `and optional passkey unlock`
 - `before a code is used (not available in Firefox)` → `before a code is used`
 - `through your browser's own sync (Chrome, Edge, Firefox)` → `through Microsoft Edge sync`
+- `in the background (Chrome, Edge, Whale).` → `in the background.`
+- `5 minutes (not in Safari).` → `5 minutes.`
 - 이 줄을 뺀다: `- Passkey unlock and device verification are not available in Firefox. The Safari version is for macOS only.`

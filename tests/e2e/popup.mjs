@@ -196,6 +196,35 @@ export async function runPopupScenario(session) {
       });
     }
 
+    // 1.0.3: ⋯ 메뉴의 '계정 이름 복사'는 그 계정 label 을 클립보드에 쓴다.
+    await focusPage(page);
+    await page.click(`[data-account-id="${bravoId}"] [data-role="more"]`);
+    const nameItem = `[data-account-id="${bravoId}"] [data-role="menu-copy-name"]`;
+    if ((await page.waitForSelector(nameItem, { visible: true, timeout: 5000 }).catch(() => null)) === null) {
+      problems.push('행 메뉴에 menu-copy-name 이 없음');
+    } else {
+      await page.click(nameItem);
+      await page.waitForFunction(() => document.querySelector('.toast') !== null, { timeout: 5000 })
+        .catch(() => problems.push('이름 복사 뒤 토스트가 안 나옴'));
+      const nameCopied = await page.evaluate(() => navigator.clipboard.readText());
+      if (nameCopied !== 'bravo-edited@example.test') {
+        problems.push(`이름 복사 뒤 클립보드가 label 과 다름: ${JSON.stringify(nameCopied)}`);
+      }
+    }
+
+    // 1.0.3: 이름순 칩은 화면 순서만 바꾸고, 다시 누르면 원래 순서로 돌아온다.
+    const sortChip = '[data-role="sort-name"]';
+    const orderPlain = await rowIds();
+    await page.click(sortChip);
+    await page.waitForSelector(`${sortChip}[aria-pressed="true"]`, { timeout: 5000 })
+      .catch(() => problems.push('이름순 칩을 눌렀는데 aria-pressed=true 가 안 됨'));
+    const sortedFirst = await page.$eval('[data-account-id] .nm b', (el) => el.textContent);
+    if (sortedFirst !== 'Alpha') problems.push(`이름순 첫 줄이 Alpha 여야 하는데 ${JSON.stringify(sortedFirst)}`);
+    await page.click(sortChip);
+    await page.waitForSelector(`${sortChip}[aria-pressed="false"]`, { timeout: 5000 })
+      .catch(() => problems.push('이름순 칩을 다시 눌렀는데 aria-pressed=false 가 안 됨'));
+    if ((await rowIds()).join() !== orderPlain.join()) problems.push('이름순을 끈 뒤 원래 순서가 아님');
+
     // N1·N3: 업데이트 대기 버전 1.0.2 → 띠가 목록 아래에 보이고, 확인하면 다시 열어도 안 보인다.
     // 여기서는 시험이 직접 팝업을 새로 여니 새 탭 감시를 먼저 끝낸다.
     browser.off('targetcreated', onNewTarget);
@@ -215,7 +244,7 @@ export async function runPopupScenario(session) {
     };
     const second = await open2();
     const noteShown = await second
-      .waitForSelector('[data-role="whats-new"]', { visible: true, timeout: 5000 })
+      .waitForSelector('[data-role="whats-new"]', { visible: true, timeout: 8000 })
       .then(() => true)
       .catch(() => false);
     if (!noteShown) {
@@ -227,28 +256,42 @@ export async function runPopupScenario(session) {
         return !!note && !!list && !!(list.compareDocumentPosition(note) & Node.DOCUMENT_POSITION_FOLLOWING);
       });
       if (!below) problems.push('업데이트 안내 띠가 계정 목록 아래에 있지 않음');
-      await second.click('[data-role="whats-new-done"]');
-      await second.waitForFunction(() => document.querySelector('[data-role="whats-new"]') === null, { timeout: 5000 })
+      if ((await second.$('[data-role="whats-new-rate"]')) === null) problems.push('업데이트 안내에 평가하기 단추가 없음');
+    }
+    // 확인하지 않고 닫았다 다시 열어도 남는다(3창까지).
+    await closeExtra(second);
+    const reopened = await open2();
+    const stillShown = await reopened
+      .waitForSelector('[data-role="whats-new"]', { visible: true, timeout: 8000 })
+      .then(() => true)
+      .catch(() => false);
+    if (!stillShown) problems.push('확인 없이 닫았다 다시 열었는데 안내 띠가 사라짐');
+    else {
+      await reopened.click('[data-role="whats-new-done"]');
+      await reopened.waitForFunction(() => document.querySelector('[data-role="whats-new"]') === null, { timeout: 5000 })
         .catch(() => problems.push("'확인' 뒤에도 안내 띠가 남음"));
     }
-    await closeExtra(second);
+    await closeExtra(reopened);
     const third = await open2();
     await new Promise((r) => setTimeout(r, 500));
     if ((await third.$('[data-role="whats-new"]')) !== null) problems.push('확인한 뒤 다시 열었는데 안내 띠가 또 보임');
 
-    // N3: 설정의 '변경 내용' 단추가 목록을 그 자리에서 펼친다.
+    // 설정 정보 카드: 버전이 보이고 '업데이트 내역' 단추가 내역을 그 자리에서 펼친다.
     await third.click('[data-role="settings-menu"]');
     await third.waitForSelector('[data-role="screen-display"]', { visible: true, timeout: 10000 });
     await third.click('[data-role="screen-display"]');
-    const changesBtn = await third
-      .waitForSelector('[data-role="settings-changes"]', { visible: true, timeout: 10000 })
-      .catch(() => null);
-    if (!changesBtn) problems.push("설정에 '변경 내용' 단추가 안 보임");
+    const versionShown = await third
+      .waitForSelector('[data-role="settings-info"] [data-role="settings-version"]', { visible: true, timeout: 10000 })
+      .then(() => true)
+      .catch(() => false);
+    if (!versionShown) problems.push('설정 정보 카드에 버전이 안 보임');
+    const changesBtn = await third.$('[data-role="settings-info"] [data-role="settings-changes"]');
+    if (!changesBtn) problems.push("설정에 '업데이트 내역' 단추가 안 보임");
     else {
       await changesBtn.click();
       await third
-        .waitForSelector('[data-role="settings-changes-list"] li', { visible: true, timeout: 5000 })
-        .catch(() => problems.push("'변경 내용'을 눌러도 목록이 안 펼쳐짐"));
+        .waitForSelector('.settings-history', { visible: true, timeout: 5000 })
+        .catch(() => problems.push("'업데이트 내역'을 눌러도 내역이 안 펼쳐짐"));
     }
     await closeExtra(third);
   } catch (error) {

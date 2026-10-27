@@ -19,12 +19,14 @@ Popout Authenticator menampilkan kode sekali pakai autentikasi dua faktor (2FA) 
 
 **Buka di tempat yang Anda perlukan**
 - Gunakan popup bilah alat, jendela terpisah, atau panel samping (sidebar di Firefox).
-- Pencarian, grup, akun yang disematkan, dan tampilan ringkas menjaga daftar panjang tetap rapi.
+- Pencarian per kolom atau dengan beberapa kata, urutan A–Z, grup, akun yang disematkan, ikon, dan tampilan ringkas menjaga daftar panjang tetap rapi.
 - Lihat akun mana yang sesuai dengan situs yang sedang dibuka, lalu isi kodenya dengan satu klik, klik kanan, atau pintasan keyboard.
+- Pintasan global menyalin kode tiga akun penting pertama Anda, bahkan saat browser berada di latar belakang (Chrome, Edge, Whale).
 - Tombol opsional di samping kolom kode pada situs yang Anda pilih.
+- Pilih beberapa akun untuk dipindahkan ke tempat sampah sekaligus, ganti nama atau bubarkan seluruh grup sekaligus, dan salin nama akun.
 
 **Tambahkan akun dengan cara Anda**
-- Pindai kode QR dari tab saat ini, kamera, gambar, atau papan klip.
+- Pindai kode QR dari tab saat ini, jendela aplikasi lain, kamera, gambar, atau papan klip.
 - Tempel tautan otpauth://, atau ketik kunci rahasia secara manual.
 - Mendukung TOTP dan HOTP dengan SHA-1, SHA-256, atau SHA-512 dan 6 hingga 10 digit, serta Steam (5 karakter) dan Battle.net (8 digit).
 
@@ -32,6 +34,7 @@ Popout Authenticator menampilkan kode sekali pakai autentikasi dua faktor (2FA) 
 - Akun disimpan di perangkat Anda dalam brankas yang dienkripsi dengan AES-256-GCM. Atur kata sandi untuk melindungi kuncinya: tanpa kata sandi, kunci disimpan di perangkat di samping data.
 - Kunci dengan kata sandi (Argon2id), kode pemulihan, dan buka kunci opsional dengan passkey (tidak tersedia di Firefox). Pilih kapan terkunci otomatis.
 - Opsional: wajibkan verifikasi perangkat sebelum kode digunakan (tidak tersedia di Firefox), dan sembunyikan kode dengan pintasan keyboard yang Anda tetapkan.
+- Kode yang disalin dapat dihapus dari papan klip setelah 30 detik, 1, 2, atau 5 menit (tidak tersedia di Safari).
 - Tanpa analitik, tanpa iklan, tanpa server pengembang. Kode sumbernya terbuka untuk umum.
 
 **Jangan kehilangan akses**
@@ -62,4 +65,6 @@ Kode sumber: https://github.com/elitekid/popout-authenticator
 - `buka kunci opsional dengan passkey (tidak tersedia di Firefox)` → `buka kunci opsional dengan passkey`
 - `sebelum kode digunakan (tidak tersedia di Firefox)` → `sebelum kode digunakan`
 - `melalui sinkronisasi browser Anda sendiri (Chrome, Edge, Firefox)` → `melalui sinkronisasi Microsoft Edge`
+- `di latar belakang (Chrome, Edge, Whale).` → `di latar belakang.`
+- `5 menit (tidak tersedia di Safari).` → `5 menit.`
 - 이 줄을 뺀다: `- Buka kunci dengan passkey dan verifikasi perangkat tidak tersedia di Firefox. Versi Safari hanya untuk macOS.`

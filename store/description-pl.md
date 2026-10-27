@@ -19,12 +19,14 @@ Popout Authenticator wyświetla jednorazowe kody uwierzytelniania dwuskładnikow
 
 **Otwieraj tam, gdzie potrzebujesz**
 - Korzystaj z okienka na pasku narzędzi, osobnego okna lub panelu bocznego (pasek boczny w Firefoksie).
-- Wyszukiwanie, grupy, przypięte konta i widok kompaktowy porządkują nawet długie listy.
+- Wyszukiwanie według pola lub kilku słów, sortowanie od A do Z, grupy, przypięte konta, ikony i widok kompaktowy porządkują nawet długie listy.
 - Widać, które konto pasuje do otwartej strony, a jego kod wpiszesz jednym kliknięciem, prawym przyciskiem myszy lub skrótem klawiszowym.
+- Globalne skróty kopiują kody trzech pierwszych ważnych kont, nawet gdy przeglądarka działa w tle (Chrome, Edge, Whale).
 - Opcjonalne przyciski obok pól na kod na wybranych przez Ciebie stronach.
+- Zaznacz kilka kont, aby razem przenieść je do kosza, zmień nazwę całej grupy lub rozgrupuj ją za jednym razem i skopiuj nazwę konta.
 
 **Dodawaj konta po swojemu**
-- Skanuj kod QR z bieżącej karty, aparatem, z obrazu lub ze schowka.
+- Skanuj kod QR z bieżącej karty, z okna innej aplikacji, aparatem, z obrazu lub ze schowka.
 - Wklej linki otpauth:// albo wpisz klucz tajny ręcznie.
 - Obsługuje TOTP i HOTP z SHA-1, SHA-256 lub SHA-512 i od 6 do 10 cyfr, a także Steam (5 znaków) i Battle.net (8 cyfr).
 
@@ -32,6 +34,7 @@ Popout Authenticator wyświetla jednorazowe kody uwierzytelniania dwuskładnikow
 - Konta są przechowywane na Twoim urządzeniu w sejfie szyfrowanym AES-256-GCM. Ustaw hasło, aby chronić jego klucz: bez hasła klucz leży na urządzeniu obok danych.
 - Blokada hasłem (Argon2id), kod odzyskiwania i opcjonalne odblokowanie kluczem dostępu (niedostępne w Firefoksie). Wybierz, kiedy ma się blokować automatycznie.
 - Opcjonalnie wymagaj weryfikacji urządzenia przed użyciem kodu (niedostępne w Firefoksie) i ukrywaj kody wybranym skrótem klawiszowym.
+- Skopiowane kody mogą być usuwane ze schowka po 30 sekundach, 1, 2 lub 5 minutach (niedostępne w Safari).
 - Bez analityki, bez reklam, bez serwera dewelopera. Kod źródłowy jest publiczny.
 
 **Nie trać dostępu**
@@ -62,4 +65,6 @@ Kod źródłowy: https://github.com/elitekid/popout-authenticator
 - `opcjonalne odblokowanie kluczem dostępu (niedostępne w Firefoksie)` → `opcjonalne odblokowanie kluczem dostępu`
 - `przed użyciem kodu (niedostępne w Firefoksie)` → `przed użyciem kodu`
 - `przez synchronizację przeglądarki (Chrome, Edge, Firefox)` → `przez synchronizację Microsoft Edge`
+- `działa w tle (Chrome, Edge, Whale).` → `działa w tle.`
+- `5 minutach (niedostępne w Safari).` → `5 minutach.`
 - 이 줄을 뺀다: `- Odblokowanie kluczem dostępu i weryfikacja urządzenia nie są dostępne w Firefoksie. Wersja dla Safari jest tylko na macOS.`

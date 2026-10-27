@@ -1,4 +1,5 @@
-// 스토어 이미지 만들기: 스크린샷(en·ko 각 6장, 1280×800)과 브랜드 이미지 3장.
+// 스토어 이미지 만들기: 스크린샷(en·ko 각 6장, 1280×800)과 브랜드 이미지 3장,
+// 그리고 웹사이트 영상 포스터(site/media/<언어>/overview.jpg, open-views.jpg).
 // 실행(extension 폴더에서): CHROME_PATH=<Chrome for Testing 실행 파일> node store/make-assets.mjs
 // 빌드된 dist-chrome 을 헤드리스 크롬에 넣고, 가짜 계정만 써서 실제 화면을 찍은 뒤 설명 틀에 얹는다.
 // STORE_DEBUG=1 이면 찍은 원본 화면을 store/.raw/<언어>/ 에도 남긴다.
@@ -19,12 +20,12 @@ const FAKE_PASSWORD = 'fake-store-pass-1';
 
 // 가짜 비밀키만 쓴다(base32). 이름·주소도 지어낸 것만 쓴다.
 const FAKE = [
-  ['Acme Mail', 'alex@example.com', 'JBSWY3DPEHPK3PXP', 'Work'],
-  ['Northwind Cloud', 'alex.kim', 'GEZDGNBVGY3TQOJQ', 'Work'],
-  ['Contoso Bank', 'alex@example.com', 'MFRGGZDFMZTWQ2LK', 'Personal'],
-  ['Fabrikam Dev', 'alexk', 'ONSWG4TFORXXEZLT', 'Work'],
-  ['Tailspin Shop', 'alex@example.com', 'KRUGKIDROVUWG2ZA', 'Personal'],
-  ['Globex VPN', 'alex.kim@example.com', 'NBSWY3DPO5XXE3DE', 'Work'],
+  ['Acme Mail', 'alex@example.com', 'JBSWY3DPEHPK3PXP', 'Work', 'mail'],
+  ['Northwind Cloud', 'alex.kim', 'GEZDGNBVGY3TQOJQ', 'Work', 'cloud'],
+  ['Contoso Bank', 'alex@example.com', 'MFRGGZDFMZTWQ2LK', 'Personal', 'bank'],
+  ['Fabrikam Dev', 'alexk', 'ONSWG4TFORXXEZLT', 'Work', 'code'],
+  ['Tailspin Shop', 'alex@example.com', 'KRUGKIDROVUWG2ZA', 'Personal', 'shop'],
+  ['Globex VPN', 'alex.kim@example.com', 'NBSWY3DPO5XXE3DE', 'Work', 'shield'],
 ];
 
 function base32(s) {
@@ -45,8 +46,8 @@ function base32(s) {
 
 function accounts() {
   const now = Date.now();
-  return FAKE.map(([issuer, label, secret, group], i) => ({
-    id: randomUUID(), type: 'totp', issuer, label, secret: base32(secret),
+  return FAKE.map(([issuer, label, secret, group, iconId], i) => ({
+    id: randomUUID(), type: 'totp', issuer, label, secret: base32(secret), iconId,
     algorithm: 'SHA-1', digits: 6, period: 30, note: '', pinned: i === 0,
     group, matchHosts: i === 0 ? [SITE_HOST] : [], createdAt: now - i * 1000, updatedAt: now,
   }));
@@ -184,10 +185,10 @@ const TEXT = {
     dash: 'Project dashboard',
     window: 'Popout Authenticator',
     scenes: [
-      ['01-codes', 'Your 2FA codes, one click away', 'Click a code to copy it. No limit on accounts.'],
+      ['01-codes', 'Your 2FA codes, one click away', 'Click a code to copy it. Icons, groups, search and A–Z sorting keep long lists tidy.'],
       ['02-fill', 'Fill codes right into sign-in pages', 'The account for the site you are on is suggested first.'],
       ['03-window', 'Pop it out to a window or the side panel', 'Keep your codes open next to your work.'],
-      ['04-add', 'Add accounts in seconds', 'Scan a QR code on screen or with your camera, paste links, or import a backup file.'],
+      ['04-add', 'Add accounts in seconds', 'Scan a QR code on screen, from another app or with your camera, paste links, or import a backup file.'],
       ['05-lock', 'Lock it with a password or passkey', 'Your accounts stay encrypted and lock automatically when idle.'],
       ['06-backup', 'Backups, encrypted sync and clock check', 'Export encrypted backups, sync between browsers, and get warned about a wrong clock.'],
     ],
@@ -198,10 +199,10 @@ const TEXT = {
     dash: '프로젝트 대시보드',
     window: '팝업 인증 도구',
     scenes: [
-      ['01-codes', '클릭 한 번으로 2단계 인증 코드', '코드를 누르면 바로 복사됩니다. 계정 수 제한이 없습니다.'],
+      ['01-codes', '클릭 한 번으로 2단계 인증 코드', '코드를 누르면 바로 복사됩니다. 아이콘·그룹·검색·이름순으로 깔끔하게 정리됩니다.'],
       ['02-fill', '로그인 화면에 코드를 바로 넣기', '지금 보고 있는 사이트의 계정을 먼저 알려 드립니다.'],
       ['03-window', '별도 창이나 사이드 패널로 열기', '작업하는 동안 코드를 옆에 띄워 둘 수 있습니다.'],
-      ['04-add', '몇 초 만에 계정 추가', '화면이나 카메라로 QR 코드를 읽고, 링크나 백업 파일로 가져올 수 있습니다.'],
+      ['04-add', '몇 초 만에 계정 추가', '화면·다른 앱·카메라로 QR 코드를 읽고, 링크나 백업 파일로 가져올 수 있습니다.'],
       ['05-lock', '비밀번호와 패스키로 잠금', '계정은 암호화해 보관하고, 쓰지 않으면 자동으로 잠깁니다.'],
       ['06-backup', '백업, 암호화 동기화, 시간 확인', '암호화 백업을 만들고, 브라우저끼리 동기화하고, 시계가 틀리면 알려 드립니다.'],
     ],
@@ -241,7 +242,7 @@ function sceneBody(n, lang, { raw, code }) {
       return `<div class="stage">${card(raw.popup, { w: 400 })}</div>`;
     case 1:
       return `<div class="stage">${browserMock(SITE_URL, sitePage(t, code), { w: 1000, h: 590 })}
-        <div class="float" style="right:150px;top:52px">${card(raw.fill, { w: 400 })}</div></div>`;
+        <div class="float" style="right:150px;top:52px">${card(raw.fill, { w: 400, maxH: 556 })}</div></div>`;
     case 2:
       return `<div class="stage">${browserMock('https://app.northwind.example/projects', dashPage(t) +
         `<div class="side"><img src="${img(raw.sidepanel)}" style="width:360px"></div>`, { w: 1100, h: 590 })}
@@ -299,14 +300,15 @@ function frameHtml(lang, title, sub, body) {
   body{font-family:${TEXT[lang].font}}</style><body><header><h1>${title}</h1>${sub ? `<p>${sub}</p>` : ''}</header>${body}</body></html>`;
 }
 
-async function renderHtml(browser, html, width, height, file, transparent = false) {
+async function renderHtml(browser, html, width, height, file, transparent = false, type = 'png') {
   const page = await browser.newPage();
   try {
     await page.setViewport({ width, height, deviceScaleFactor: 1 });
     await page.setContent(html, { waitUntil: 'load' });
     await page.evaluate(() => document.fonts.ready);
     await fs.mkdir(path.dirname(file), { recursive: true });
-    await page.screenshot({ path: file, type: 'png', omitBackground: transparent, clip: { x: 0, y: 0, width, height } });
+    const opts = type === 'jpeg' ? { quality: 90 } : { omitBackground: transparent };
+    await page.screenshot({ path: file, type, ...opts, clip: { x: 0, y: 0, width, height } });
     console.log('wrote', path.relative(ROOT, file));
   } finally {
     await page.close();
@@ -317,6 +319,43 @@ async function makeScreenshots(browser, lang, shots) {
   for (const [n, [name, title, sub]] of TEXT[lang].scenes.entries()) {
     const file = path.join(ROOT, 'screenshots', lang, `${name}.png`);
     await renderHtml(browser, frameHtml(lang, title, sub, sceneBody(n, lang, shots)), 1280, 800, file);
+  }
+}
+
+// ---- 웹사이트 영상 포스터 ----
+
+const POSTER_TEXT = {
+  en: { head: ['Popup, separate window, or ', 'side panel', ''], window: 'Window', popup: 'Popup' },
+  ko: { head: ['팝업, 별도 창, 사이드 패널 중 ', '편한 곳', '에서'], window: '별도 창', popup: '팝업' },
+};
+
+// 제목·이름표·카드 하나로 이루어진 포스터 한 장의 HTML. s 는 크기에 따른 값 모음.
+function posterHtml(lang, label, buf, s) {
+  const [a, b, c] = POSTER_TEXT[lang].head;
+  return `<!doctype html><html lang="${lang}"><meta charset="utf-8"><style>
+  *{box-sizing:border-box;margin:0}
+  html,body{width:${s.width}px;height:${s.height}px;overflow:hidden}
+  body{background:#f6f9fb;font-family:${TEXT[lang].font};display:flex;flex-direction:column;align-items:center}
+  h1{font-size:${s.title}px;font-weight:700;color:#141b26;padding-top:${s.top}px;line-height:1.2;text-align:center}
+  h1 span{border-bottom:3px solid #f2b347}
+  .wrap{margin-top:${s.gap}px}
+  .pill{display:inline-block;background:#17223b;color:#fff;font-size:${s.pill}px;font-weight:700;border-radius:999px;padding:6px 14px;margin-bottom:8px;line-height:1.2}
+  .card{background:#eef2f8;border-radius:14px;overflow:hidden;box-shadow:0 18px 50px rgba(20,45,100,.22),0 2px 6px rgba(20,45,100,.12)}
+  .card img{display:block}
+  </style><body><h1>${a}<span>${b}</span>${c}</h1>
+  <div class="wrap"><div class="pill">${label}</div><br>${card(buf, { w: s.w, maxH: s.maxH })}</div></body></html>`;
+}
+
+// 웹사이트 영상 자리에 쓰는 JPEG 포스터 2장: 별도 창(overview), 팝업(open-views).
+async function makePosters(browser, lang, shots) {
+  const t = POSTER_TEXT[lang];
+  const dir = path.resolve(ROOT, '../site/media', lang);
+  const items = [
+    ['overview.jpg', 1280, 720, t.window, shots.raw.window, { width: 1280, height: 720, title: 40, top: 40, gap: 24, pill: 20, w: 560, maxH: 506 }],
+    ['open-views.jpg', 960, 540, t.popup, shots.raw.fill, { width: 960, height: 540, title: 30, top: 30, gap: 18, pill: 15, w: 380, maxH: 344 }],
+  ];
+  for (const [name, w, h, label, buf, s] of items) {
+    await renderHtml(browser, posterHtml(lang, label, buf, s), w, h, path.join(dir, name), false, 'jpeg');
   }
 }
 
@@ -357,6 +396,7 @@ async function main() {
     try {
       const shots = await captureRaw(session, lang);
       await makeScreenshots(session.browser, lang, shots);
+      await makePosters(session.browser, lang, shots);
       if (lang === 'en') await makeBrand(session.browser);
     } finally {
       await cleanup(session);

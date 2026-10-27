@@ -5,7 +5,8 @@ import { supportsPasskeys } from '../../core/browser';
 import { generateCode } from '../../core/otp';
 import { buildOtpauth } from '../../core/uri';
 import { fillCandidate, hostOf, matchesSite, suggestAccountIds } from '../../core/suggest';
-import { DEFAULT_SETTINGS, accountIconSymbol, type Account, type Settings } from '../../core/types';
+import { DEFAULT_SETTINGS, accountIcon, type Account, type Settings } from '../../core/types';
+import { AccountIconSvg } from '../shared/AccountIcon';
 import { readSiteUsage, recordSiteUse } from '../../store/site-usage';
 import { moveToTrash } from '../../store/trash';
 import { lastNormalWindow } from '../../store/browser-window';
@@ -45,18 +46,17 @@ import {
   SNOOZE_MS,
   avatarInitial,
   backupSignature,
-  canSnoozeReview,
   filterAccounts,
   formatCode,
   groupSections,
   moveActive,
   normalizeGroupName,
   pruneFolded,
-  REVIEW_LATER_OPENS,
   STORE_REVIEW_URL,
   shouldShowBackupReminder,
   shouldShowReview,
   siteUrl,
+  sortByName,
   UNGROUPED_KEY,
   visibleRows,
   WHATS_NEW,
@@ -110,6 +110,8 @@ const ICONS = {
   key: '<circle cx="8" cy="15" r="4"/><path d="m11 12 8-8M16 7l2 2M14 9l2 2"/>',
   x: '<path d="M6 6l12 12M18 6 6 18"/>',
   chevron: '<path d="m6 9 6 6 6-6"/>',
+  user: '<circle cx="12" cy="8" r="4"/><path d="M4 20a8 8 0 0 1 16 0"/>',
+  sort: '<path d="M8 5v14"/><path d="m4 15 4 4 4-4"/><path d="M16 19V5"/><path d="m12 9 4-4 4 4"/>',
   star: '<path d="m12 3.5 2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9Z"/>',
 } as const;
 
@@ -256,6 +258,9 @@ type LockNudge = { count: number; until: number };
 const LOCK_NUDGE_MAX = 3;
 const LOCK_NUDGE_LATER_MS = 14 * 24 * 60 * 60 * 1000;
 
+// 업데이트 안내는 이만큼의 창에 보이면 확인하지 않아도 본 것으로 친다.
+const WHATS_NEW_MAX_VIEWS = 3;
+
 function asLockNudge(raw: unknown): LockNudge {
   if (typeof raw !== 'object' || raw === null) return { count: 0, until: 0 };
   const { count, until } = raw as Partial<LockNudge>;
@@ -265,8 +270,15 @@ function asLockNudge(raw: unknown): LockNudge {
   };
 }
 
-// 평가 요청 기록: 연 횟수, 평가하기로 닫았는지, 나중에로 미룬 횟수.
-type ReviewState = { openCount: number; dismissed: boolean; snoozedUntilOpen: number; shown: number };
+// 평가 요청 기록: 연 횟수, 평가하기로 닫았는지, 띠를 보인 횟수와 마지막 시각(ms).
+type ReviewState = { openCount: number; dismissed: boolean; shown: number; lastShownAt: number };
+
+// 여러 창이 같은 저장값을 읽고 올리지 않도록 이름 잠금 안에서 처리한다(잠금이 없으면 바로).
+function withNamedLock<T>(name: string, fn: () => Promise<T>): Promise<T> {
+  return typeof navigator !== 'undefined' && navigator.locks
+    ? (navigator.locks.request(name, fn) as Promise<T>)
+    : fn();
+}
 
 type DragGesture = {
   id: string;
@@ -589,7 +601,7 @@ export function App() {
       if ('backupInfo' in changes) setBackupInfo(asBackupInfo(changes.backupInfo.newValue));
       if ('backupSnoozeUntil' in changes) setSnoozeUntil(asNumber(changes.backupSnoozeUntil.newValue));
       // 설정의 평가 링크·다른 창의 노출 기록을 이미 열린 창의 평가 상태에 맞춘다.
-      if ('reviewDismissed' in changes || 'reviewShown' in changes || 'reviewSnoozedUntilOpen' in changes) {
+      if ('reviewDismissed' in changes || 'reviewShown' in changes || 'reviewLastShownAt' in changes) {
         setReview((prev) =>
           prev === null
             ? prev
@@ -597,8 +609,8 @@ export function App() {
                 ...prev,
                 ...('reviewDismissed' in changes ? { dismissed: changes.reviewDismissed.newValue === true } : {}),
                 ...('reviewShown' in changes ? { shown: asNumber(changes.reviewShown.newValue) ?? 0 } : {}),
-                ...('reviewSnoozedUntilOpen' in changes
-                  ? { snoozedUntilOpen: asNumber(changes.reviewSnoozedUntilOpen.newValue) ?? 0 }
+                ...('reviewLastShownAt' in changes
+                  ? { lastShownAt: asNumber(changes.reviewLastShownAt.newValue) ?? 0 }
                   : {}),
               },
         );
@@ -662,7 +674,7 @@ export function App() {
         const got = await chrome.storage.local.get([
           'openCount',
           'reviewDismissed',
-          'reviewSnoozedUntilOpen',
+          'reviewLastShownAt',
           'pendingWhatsNew',
           'reviewShown',
         ]);
@@ -674,8 +686,8 @@ export function App() {
           setReview({
             openCount,
             dismissed,
-            snoozedUntilOpen: asNumber(got.reviewSnoozedUntilOpen) ?? 0,
             shown: asNumber(got.reviewShown) ?? 0,
+            lastShownAt: asNumber(got.reviewLastShownAt) ?? 0,
           });
         }
         const pending = typeof got.pendingWhatsNew === 'string' ? got.pendingWhatsNew : null;
@@ -889,24 +901,41 @@ export function App() {
     catch { setCodeAccessError('common.loadError'); }
   };
 
+  const toggleSortByName = async () => {
+    try { setSettings(await saveSettings({ sortByName: !settings.sortByName })); }
+    catch { setCodeAccessError('common.actionError'); }
+  };
+
   const active = useMemo(() => accounts.filter((a) => a.deletedAt === undefined), [accounts]);
   activeRef.current = active;
   // 계정 목록·접힘이 바뀔 때만 다시 나눈다(매초 시계에는 움직이지 않는다).
   const allSections = useMemo(() => groupSections(active, foldedGroups), [active, foldedGroups]);
+  // 이름순 보기: 화면 목록만 구역 안에서 정렬한다(저장된 순서는 그대로).
+  const sortedOn = settings.sortByName;
+  const shownActive = useMemo(() => (sortedOn ? sortByName(active, lang) : active), [active, sortedOn, lang]);
+  const shownSections = useMemo(
+    () => (sortedOn ? allSections.map((s) => ({ ...s, items: sortByName(s.items, lang) })) : allSections),
+    [allSections, sortedOn, lang],
+  );
   const groupNames = useMemo(
     () => allSections.flatMap((s) => (s.name === null ? [] : [s.name])),
     [allSections],
   );
   // 그룹이 하나라도 있고 검색 중이 아니면 그룹별 묶음으로 보여 준다. 목록만 보기는 전체를 그대로.
   const grouped = !listOnly && query.trim() === '' && groupNames.length > 0;
-  const sections = grouped ? allSections : null;
-  // 금고에 저장한 순서를 유지한다. 묶음 보기에서는 접힌 묶음의 줄을 뺀다.
+  const sections = grouped ? shownSections : null;
+  // 금고에 저장한 순서를 유지한다(이름순 보기는 제외). 묶음 보기에서는 접힌 묶음의 줄을 뺀다.
   const visible = useMemo(
-    () => (sections ? visibleRows(sections) : listOnly ? active : filterAccounts(active, query, null, scope)),
-    [sections, listOnly, active, query, scope],
+    () => (sections ? visibleRows(sections) : listOnly ? shownActive : filterAccounts(shownActive, query, null, scope)),
+    [sections, listOnly, shownActive, query, scope],
   );
   visibleRef.current = visible;
   groupedRef.current = grouped;
+  // 이니셜 타일이 꺼져 있어도 아이콘 계정이 하나라도 보이면 나머지 행에 타일 자리를 둔다(목록마다 한 번 계산).
+  const iconGap = useMemo(
+    () => !settings.avatars && visible.some((a) => accountIcon(a.iconId) !== undefined),
+    [settings.avatars, visible],
+  );
   // 검색·잠금·다른 창의 계정 변경 때도 떠 있는 줄을 남기지 않는다.
   useLayoutEffect(() => { clearDrag(); hoveredId.current = null; }, [visible, phase, screens.length, settings.view, clearDrag]);
   useLayoutEffect(() => {
@@ -961,43 +990,87 @@ export function App() {
     lockNudge.count < LOCK_NUDGE_MAX &&
     nowMs >= lockNudge.until;
 
-  // 다른 띠가 보이거나 검색 중이면 평가 요청 카드는 숨긴다.
-  const showReview =
+  // 검색 중이거나 업데이트 안내가 있는 창에서는 평가 띠를 띄우지 않는다(다른 띠에는 가리지 않는다).
+  const reviewReady =
     STORE_REVIEW_URL !== '' &&
     phase === 'list' &&
-    review !== null &&
+    !listOnly &&
     usedCode &&
     query.trim() === '' &&
-    !showBackup &&
-    !showLockNudge &&
     !needPassword &&
-    whatsNew === null &&
-    shouldShowReview({ ...review, accounts: active.length });
+    whatsNew === null;
+  const reviewDue =
+    reviewReady &&
+    review !== null &&
+    shouldShowReview({ ...review, accounts: active.length, now: nowMs });
+  // 한 번 뜬 띠는 누를 때까지 그 창에 남는다(노출 기록이 돌아와 조건이 꺼져도 사라지지 않는다).
+  const [reviewLatched, setReviewLatched] = useState(false);
+  const showReview = reviewReady && reviewLatched && review?.dismissed !== true;
 
   // 안내 띠는 목록 화면에 계정이 있을 때만 보인다(목록만 보기·잠김·빈 금고에서는 소비하지 않는다).
   const whatsNewVisible =
     !listOnly && phase === 'list' && screens.length === 0 && newRecovery === null && active.length > 0 &&
     whatsNew !== null && whatsNewItems.length > 0;
 
-  // 띠가 실제로 보이면 본 것으로 기록한다. 화면에는 닫을 때까지 남는다.
+  // 닫힌 창에서 잠금 뒤 setState 를 하지 않게 한다.
+  const alive = useRef(true);
   useEffect(() => {
-    if (!whatsNewVisible || whatsNew === null) return;
-    void chrome.storage.local
-      .set({ lastSeenWhatsNewVersion: whatsNew })
-      .then(() => chrome.storage.local.remove('pendingWhatsNew'))
-      .catch(() => undefined);
+    alive.current = true;
+    return () => { alive.current = false; };
+  }, []);
+
+  // 띠가 보일 수 있는 창마다 한 번 본 창 수를 올리고, 3창이 되면 본 것으로 기록한다.
+  // 잠금 안에서 창 수를 올릴 수 있었던 창만 표시 자격을 얻고, 자격을 얻은 창에는 누를 때까지 남는다.
+  const whatsNewCounted = useRef(false);
+  const [whatsNewGranted, setWhatsNewGranted] = useState(false);
+  useEffect(() => {
+    if (!whatsNewVisible || whatsNew === null || whatsNewCounted.current) return;
+    whatsNewCounted.current = true;
+    void withNamedLock('popout-whats-new-views', async () => {
+      // 다른 창이 이미 이 버전을 본 것으로 기록했으면 건드리지 않는다.
+      const got = await chrome.storage.local.get(['pendingWhatsNew', 'whatsNewViews']);
+      if (got.pendingWhatsNew !== whatsNew) return;
+      const views = (asNumber(got.whatsNewViews) ?? 0) + 1;
+      if (views < WHATS_NEW_MAX_VIEWS) {
+        await chrome.storage.local.set({ whatsNewViews: views });
+      } else {
+        await chrome.storage.local.set({ lastSeenWhatsNewVersion: whatsNew });
+        await chrome.storage.local.remove(['pendingWhatsNew', 'whatsNewViews']);
+      }
+      if (alive.current) setWhatsNewGranted(true);
+    }).catch(() => undefined);
   }, [whatsNewVisible, whatsNew]);
 
-  // 평가 띠가 실제로 보이면 창(팝업 한 번 열기)마다 최대 1번 노출 횟수를 올린다.
+  // 평가 띠 조건이 처음 맞는 때 창(팝업 한 번 열기)마다 최대 1번 띄우고 노출 기록을 남긴다.
   const reviewCounted = useRef(false);
   useEffect(() => {
-    if (!showReview || listOnly || reviewCounted.current) return;
+    if (!reviewDue || reviewCounted.current) return;
     reviewCounted.current = true;
-    void chrome.storage.local
-      .get('reviewShown')
-      .then((got) => chrome.storage.local.set({ reviewShown: (asNumber(got.reviewShown) ?? 0) + 1 }))
-      .catch(() => undefined);
-  }, [showReview, listOnly]);
+    const accounts = active.length;
+    // 잠금 안에서 다시 판정하고, 저장까지 끝난 뒤에만 띠를 켠다.
+    void withNamedLock('popout-review-shown', async () => {
+      const got = await chrome.storage.local.get([
+        'openCount',
+        'reviewDismissed',
+        'reviewShown',
+        'reviewLastShownAt',
+      ]);
+      const now = Date.now();
+      const shown = asNumber(got.reviewShown) ?? 0;
+      const due = shouldShowReview({
+        openCount: asNumber(got.openCount) ?? 0,
+        accounts,
+        dismissed: got.reviewDismissed === true,
+        shown,
+        lastShownAt: asNumber(got.reviewLastShownAt) ?? 0,
+        now,
+      });
+      if (!due) return;
+      await chrome.storage.local.set({ reviewShown: shown + 1, reviewLastShownAt: now });
+      if (alive.current) setReviewLatched(true);
+    }).catch(() => undefined);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reviewDue]);
 
   // 팝업 배율: 100 이면 넣지 않는다. 매초 다시 그려도 같은 객체를 쓴다.
   const rootStyle = useMemo(
@@ -1083,6 +1156,12 @@ export function App() {
     [openName],
   );
 
+  const showToast = useCallback((text: string) => {
+    setToastName(text);
+    clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setToastName(null), COPIED_MS);
+  }, []);
+
   const copy = useCallback(async (account: Account, step: number, codeAt?: number) => {
     let code: string;
     try {
@@ -1118,10 +1197,19 @@ export function App() {
     setCopiedId(account.id);
     clearTimeout(copiedTimer.current);
     copiedTimer.current = setTimeout(() => setCopiedId(null), COPIED_MS);
-    setToastName(account.issuer !== '' ? account.issuer : account.label);
-    clearTimeout(toastTimer.current);
-    toastTimer.current = setTimeout(() => setToastName(null), COPIED_MS);
-  }, [openName, settings.suggestionsEnabled, settings.clipboardClearAfterCopy, settings.autofillOnCopy, suggested, fill, correction]);
+    showToast(`${account.issuer !== '' ? account.issuer : account.label} ${t('popup.copied')}`);
+  }, [openName, settings.suggestionsEnabled, settings.clipboardClearAfterCopy, settings.autofillOnCopy, suggested, fill, correction, showToast, t]);
+
+  // 계정 이름은 코드가 아니므로 클립보드 자동 지우기를 예약하지 않는다.
+  const copyName = useCallback(async (account: Account) => {
+    try {
+      await navigator.clipboard.writeText(account.label.trim());
+    } catch {
+      setCodeAccessError('common.actionError');
+      return;
+    }
+    showToast(t('popup.nameCopied'));
+  }, [showToast, t]);
 
   const answerRemember = async (yes: boolean) => {
     const current = remember;
@@ -1358,6 +1446,7 @@ export function App() {
         const rowId = (e.target as HTMLElement | null)?.closest<HTMLElement>('[data-account-id]')
           ?.dataset.accountId;
         if (e.altKey && rowId) {
+          if (settings.sortByName) return;
           const from = visible.findIndex((a) => a.id === rowId);
           const to = from + delta;
           // 묶음 보기에서는 같은 그룹 안에서만 옮긴다.
@@ -1431,7 +1520,7 @@ export function App() {
       document.removeEventListener('keydown', onKey);
       document.removeEventListener('pointerdown', onPointer);
     };
-  }, [phase, visible, selectedIndex, query, copy, reorder, menu, screens.length, listOnly, clearDrag, deleteAsk, grouped, selecting, pickAsk, renaming, togglePick]);
+  }, [phase, visible, selectedIndex, query, copy, reorder, menu, screens.length, listOnly, clearDrag, deleteAsk, grouped, selecting, pickAsk, renaming, togglePick, settings.sortByName]);
 
   const unlockPasskey = async () => {
     if (passkeyAbort.current) return;
@@ -1589,12 +1678,8 @@ export function App() {
     void chrome.storage.local.set({ reviewDismissed: true });
   };
 
-  const laterReview = () => {
-    if (review === null) return;
-    const until = review.openCount + REVIEW_LATER_OPENS;
-    setReview({ ...review, snoozedUntilOpen: until });
-    void chrome.storage.local.set({ reviewSnoozedUntilOpen: until });
-  };
+  // 나중에: 이 창에서 띠만 닫는다(저장 없음, 14일 뒤 다시 묻는다).
+  const laterReview = () => setReviewLatched(false);
 
   const neverReview = () => {
     setReview((prev) => prev && { ...prev, dismissed: true });
@@ -1606,7 +1691,13 @@ export function App() {
     setWhatsNew(null);
     if (version === null) return;
     void chrome.storage.local.set({ lastSeenWhatsNewVersion: version });
-    void chrome.storage.local.remove('pendingWhatsNew');
+    void chrome.storage.local.remove(['pendingWhatsNew', 'whatsNewViews']);
+  };
+
+  // 안내의 평가하기: 스토어를 열고 평가를 끝낸 뒤 안내도 닫는다.
+  const rateFromWhatsNew = () => {
+    rateReview();
+    finishWhatsNew();
   };
 
   // 지금 탭을 캡처해 캡처 화면에서 QR 을 찾는다. 잠금이 켜져 있으면 1회용 키를 함께 보낸다.
@@ -1739,7 +1830,7 @@ export function App() {
 
   const dragStart = (e: PointerEvent, id: string) => {
     dragClick.current = null;
-    if (gesture.current) return;
+    if (gesture.current || settings.sortByName) return;
     if (e.button !== 0 || e.pointerType !== 'mouse' || selecting) return;
     // 코드·이름 단추는 행의 복사 영역이다. 다른 동작 단추와 메뉴는 끌지 않는다.
     if ((e.target as Element).closest('button:not(.code):not(.row-main), .menu, a, input')) return;
@@ -1830,6 +1921,7 @@ export function App() {
         account={account}
         view={settings.view}
         avatars={settings.avatars}
+        iconGap={iconGap}
         hidden={codesHidden}
         pair={codes.get(account.id)}
         nowMs={codeNowMs}
@@ -1856,6 +1948,8 @@ export function App() {
         onToggleMenu={() => toggleMenu(`row:${account.id}`)}
         onCloseMenu={() => setMenu(null)}
         onCopy={(step) => void copy(account, step, step === 1 ? codes.get(account.id)?.at : undefined)}
+        onCopyName={() => void copyName(account)}
+        sorted={settings.sortByName}
         onFill={() => void fill(account.id)}
         groupNames={groupNames}
         onSetGroup={(next) => void setAccountGroup(account.id, next)}
@@ -2239,9 +2333,21 @@ export function App() {
       {!listOnly && phase === 'list' && active.length > 0 && (
         <div class="sel-tools" data-role="sel-tools">
           {!selecting ? (
-            <button type="button" data-role="select-start" onClick={() => { setMenu(null); setRenaming(null); setSelecting(true); }}>
-              {t('popup.selection.start')}
-            </button>
+            <>
+              <button type="button" data-role="select-start" onClick={() => { setMenu(null); setRenaming(null); setSelecting(true); }}>
+                {t('popup.selection.start')}
+              </button>
+              <button
+                type="button"
+                data-role="sort-name"
+                aria-pressed={settings.sortByName}
+                class={settings.sortByName ? 'chip-sort on' : 'chip-sort'}
+                onClick={() => void toggleSortByName()}
+              >
+                <Icon name="sort" />
+                {t('popup.sortName')}
+              </button>
+            </>
           ) : (
             <>
               <span class="sel-count" role="status" data-role="select-count" data-count={picked.size}>
@@ -2577,7 +2683,7 @@ export function App() {
           )}
         </div>
       )}
-      {whatsNewVisible && whatsNew !== null && (
+      {whatsNewVisible && whatsNewGranted && whatsNew !== null && (
         <div class="note" data-role="whats-new">
           <span>{t('popup.whatsNew.title', { version: whatsNew })}</span>
           <ul>
@@ -2585,6 +2691,11 @@ export function App() {
               <li key={key}>{t(key)}</li>
             ))}
           </ul>
+          {STORE_REVIEW_URL !== '' && review?.dismissed !== true && (
+            <button type="button" class="gold" data-role="whats-new-rate" onClick={rateFromWhatsNew}>
+              ★ {t('popup.review.rate')}
+            </button>
+          )}
           <button type="button" data-role="whats-new-done" onClick={finishWhatsNew}>
             {t('popup.whatsNew.done')}
           </button>
@@ -2594,14 +2705,12 @@ export function App() {
         <div class="note review" data-role="review-prompt">
           <Icon name="star" />
           <span>{t('popup.review.text')}</span>
-          <button type="button" class="primary" data-role="review-rate" onClick={rateReview}>
+          <button type="button" class="primary gold" data-role="review-rate" onClick={rateReview}>
             {t('popup.review.rate')}
           </button>
-          {review !== null && canSnoozeReview(review.snoozedUntilOpen) && (
-            <button type="button" data-role="review-later" onClick={laterReview}>
-              {t('popup.review.later')}
-            </button>
-          )}
+          <button type="button" data-role="review-later" onClick={laterReview}>
+            {t('popup.review.later')}
+          </button>
           <button type="button" data-role="review-never" onClick={neverReview}>
             {t('popup.review.never')}
           </button>
@@ -2614,7 +2723,7 @@ export function App() {
       )}
       {toastName !== null && (
         <div class="toast" role="status">
-          {toastName} {t('popup.copied')}
+          {toastName}
         </div>
       )}
       {deleteAsk !== null && (
@@ -2642,6 +2751,8 @@ type RowProps = {
   account: Account;
   view: Settings['view'];
   avatars: boolean;
+  // 이니셜 타일이 꺼져 있고 목록에 아이콘 계정이 있을 때, 아이콘 없는 행에 타일 자리를 둔다.
+  iconGap: boolean;
   hidden: boolean;
   pair: CodePair | undefined;
   nowMs: number;
@@ -2663,6 +2774,9 @@ type RowProps = {
   onToggleMenu: () => void;
   onCloseMenu: () => void;
   onCopy: (step: number) => void;
+  onCopyName: () => void;
+  // 이름순 보기 중: 끌어서 순서 바꾸기를 끈다.
+  sorted: boolean;
   onFill: () => void;
   groupNames: string[];
   // null 이면 그룹에서 뺀다.
@@ -2768,18 +2882,20 @@ function Row(p: RowProps) {
   const codeText = hidden ? MASKED : pair ? formatCode(pair.code) : '';
   const nextText = hidden ? MASKED : pair ? formatCode(pair.next) : '';
   const params = { issuer: account.issuer, label: account.label };
+  const icon = accountIcon(account.iconId);
+  const showTile = p.avatars || icon !== undefined;
   const rowClass = [
     'row',
     view === 'compact' && 'row-compact',
     view === 'hidden' && 'row-hidden',
-    !p.avatars && 'no-tile',
+    !showTile && !p.iconGap && 'no-tile',
     urgent && 'urgent',
     (pair ? pair.code.length > 6 : account.digits > 6) && 'long-code',
     seen.current.wrap && 'reset',
     p.suggest && 'suggest',
     p.copied && 'copied',
     p.selecting && p.checked && 'picked',
-    'reorderable',
+    !p.sorted && 'reorderable',
     p.reorder.dragging && 'dragging',
     !p.reorder.dragging && p.reorder.offset !== 0 && 'drag-shifted',
   ]
@@ -2911,10 +3027,18 @@ function Row(p: RowProps) {
           onClick={only(p.onToggleCheck)}
         />
       )}
-      {p.avatars && (
-        <div class="tile" style={`--h:${tileHue(account.issuer)}`} aria-hidden="true">
-          {accountIconSymbol(account.iconId) ?? avatarInitial(account.issuer)}
-        </div>
+      {showTile ? (
+        icon ? (
+          <div class="tile ai-tile" style={`--ih:${icon.hue}`} aria-hidden="true">
+            <AccountIconSvg icon={icon} />
+          </div>
+        ) : (
+          <div class="tile" style={`--h:${tileHue(account.issuer)}`} aria-hidden="true">
+            {avatarInitial(account.issuer)}
+          </div>
+        )
+      ) : (
+        p.iconGap && <div class="tile tile-gap" aria-hidden="true" />
       )}
       <div class="who">
         {view === 'hidden' ? (
@@ -2988,6 +3112,7 @@ function Row(p: RowProps) {
             <>
               {menuItem('menu-fill', 'fill', t('popup.menu.fill'), p.onFill)}
               {timed && menuItem('menu-next', 'next', t('popup.menu.next'), () => p.onCopy(1))}
+              {account.label.trim() !== '' && menuItem('menu-copy-name', 'user', t('popup.menu.copyName'), p.onCopyName)}
               {p.onQr && menuItem('qr', 'qr', t('popup.menu.qr'), p.onQr)}
               {p.onShare && menuItem('share', 'share', t('share.title'), p.onShare)}
               <hr />

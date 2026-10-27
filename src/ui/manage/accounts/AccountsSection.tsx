@@ -4,7 +4,9 @@ import { duplicateKey } from '../../../core/account';
 import { encodeBase32, parseSecret } from '../../../core/base32';
 import { generateCode } from '../../../core/otp';
 import { knownSiteHosts } from '../../../core/known-sites';
-import { ACCOUNT_ICONS, accountIconSymbol, type Account, type Algorithm } from '../../../core/types';
+import { ACCOUNT_ICONS, accountIcon, type Account, type Algorithm } from '../../../core/types';
+import { avatarInitial } from '../../popup/logic';
+import { AccountIconSvg } from '../../shared/AccountIcon';
 import { LockedError } from '../../../store/errors';
 import {
   addPendingFieldButton,
@@ -149,24 +151,31 @@ export function AccountsSection({ initialEditId, onDone, onEdit, onHistory }: { 
       )}
       {!locked && list && !editing && list.length > 0 && (
         <ul class="accounts-list">
-          {list.map((a) => (
-            <li key={a.id}>
-              <button
-                type="button"
-                data-role="account-row"
-                data-account-id={a.id}
-                onClick={() => onEdit ? onEdit(a.id) : setEditId(a.id)}
-              >
-                {accountIconSymbol(a.iconId) && <span class="account-icon" aria-hidden="true">{accountIconSymbol(a.iconId)}</span>}
-                {a.pinned && <span class="pin">★</span>}
-                <span class="account-names">
-                  <span class="issuer">{a.issuer}</span>
-                  <span class="label">{a.label}</span>
-                </span>
-                {a.group && <span class="chip">{a.group}</span>}
-              </button>
-            </li>
-          ))}
+          {list.map((a) => {
+            const icon = accountIcon(a.iconId);
+            return (
+              <li key={a.id}>
+                <button
+                  type="button"
+                  data-role="account-row"
+                  data-account-id={a.id}
+                  onClick={() => onEdit ? onEdit(a.id) : setEditId(a.id)}
+                >
+                  {icon && (
+                    <span class="account-icon ai-tile" style={`--ih:${icon.hue}`} aria-hidden="true">
+                      <AccountIconSvg icon={icon} />
+                    </span>
+                  )}
+                  {a.pinned && <span class="pin">★</span>}
+                  <span class="account-names">
+                    <span class="issuer">{a.issuer}</span>
+                    <span class="label">{a.label}</span>
+                  </span>
+                  {a.group && <span class="chip">{a.group}</span>}
+                </button>
+              </li>
+            );
+          })}
         </ul>
       )}
     </div>
@@ -533,21 +542,37 @@ function AccountEditor({ t, account, all, hideBack, onHistory, onLocked, onDone,
       {text(issuer, setIssuer, t('add.issuer'), 'issuer')}
       {text(label, setLabel, t('add.label'), 'label')}
       {text(group, setGroup, t('accounts.group'), 'group', errors.group)}
-      <label>
+      <div class="icon-pick-field">
         <span>{t('accounts.icon')}</span>
-        <select
-          class="field"
-          data-role="icon"
-          value={iconId}
-          onChange={(e) => setIconId(e.currentTarget.value)}
-        >
-          <option value="">{t('accounts.icon.auto')}</option>
+        <div class="icon-pick" role="group" aria-label={t('accounts.icon')} data-role="icon">
+          <button
+            type="button"
+            data-icon-id=""
+            aria-pressed={iconId === ''}
+            title={t('accounts.icon.auto')}
+            onClick={() => setIconId('')}
+          >
+            <span class="t auto">{avatarInitial(issuer)}</span>
+            <span class="nm">{t('accounts.icon.auto')}</span>
+          </button>
+          {/* 목록에 없는 저장값은 어느 단추도 누르지 않고 값만 보존한다. */}
           {ACCOUNT_ICONS.map((i) => (
-            <option key={i.id} value={i.id}>{i.symbol} {t(`accounts.icon.${i.id}`)}</option>
+            <button
+              key={i.id}
+              type="button"
+              data-icon-id={i.id}
+              aria-pressed={iconId === i.id}
+              title={t(`accounts.icon.${i.id}`)}
+              onClick={() => setIconId(i.id)}
+            >
+              <span class="t ai-tile" style={`--ih:${i.hue}`}>
+                <AccountIconSvg icon={i} />
+              </span>
+              <span class="nm">{t(`accounts.icon.${i.id}`)}</span>
+            </button>
           ))}
-          {iconId !== '' && !accountIconSymbol(iconId) && <option value={iconId}>{iconId}</option>}
-        </select>
-      </label>
+        </div>
+      </div>
       <label>
         <span>{t('accounts.note')}</span>
         <textarea

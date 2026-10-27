@@ -19,12 +19,14 @@ Popout Authenticator toont je eenmalige codes voor tweestapsverificatie (2FA) di
 
 **Open het waar je het nodig hebt**
 - Gebruik de pop-up van de werkbalk, een apart venster of het zijpaneel (zijbalk in Firefox).
-- Zoeken, groepen, vastgezette accounts en een compacte weergave houden lange lijsten overzichtelijk.
+- Zoeken per veld of op meerdere woorden, sorteren van A tot Z, groepen, vastgezette accounts, pictogrammen en een compacte weergave houden lange lijsten overzichtelijk.
 - Zie welk account bij de geopende website hoort en vul de code in met één klik, een rechtermuisklik of een sneltoets.
+- Globale sneltoetsen kopiëren de codes van je eerste drie belangrijke accounts, ook als de browser op de achtergrond staat (Chrome, Edge, Whale).
 - Optionele knoppen naast codevelden op websites die je kiest.
+- Selecteer meerdere accounts om ze samen naar de prullenbak te verplaatsen, hernoem of ontbind een hele groep in één keer en kopieer de naam van een account.
 
 **Accounts toevoegen zoals jij wilt**
-- Scan een QR-code uit het huidige tabblad, met je camera, uit een afbeelding of van het klembord.
+- Scan een QR-code uit het huidige tabblad, uit het venster van een andere app, met je camera, uit een afbeelding of van het klembord.
 - Plak otpauth://-links of typ de geheime sleutel zelf in.
 - Ondersteunt TOTP en HOTP met SHA-1, SHA-256 of SHA-512 en 6 tot 10 cijfers, plus Steam (5 tekens) en Battle.net (8 cijfers).
 
@@ -32,6 +34,7 @@ Popout Authenticator toont je eenmalige codes voor tweestapsverificatie (2FA) di
 - Accounts worden op je apparaat bewaard in een kluis die is versleuteld met AES-256-GCM. Stel een wachtwoord in om de sleutel te beschermen: zonder wachtwoord staat de sleutel op het apparaat naast de gegevens.
 - Gebruik wachtwoordvergrendeling (Argon2id), een herstelcode en optionele ontgrendeling met een passkey (niet in Firefox). Kies wanneer het automatisch vergrendelt.
 - Vraag optioneel om apparaatverificatie voordat een code wordt gebruikt (niet in Firefox), en verberg codes met een sneltoets naar keuze.
+- Gekopieerde codes kunnen na 30 seconden, 1, 2 of 5 minuten van het klembord worden gewist (niet in Safari).
 - Geen analytics, geen advertenties, geen server van de ontwikkelaar. De broncode is openbaar.
 
 **Verlies de toegang niet**
@@ -62,4 +65,6 @@ Broncode: https://github.com/elitekid/popout-authenticator
 - `optionele ontgrendeling met een passkey (niet in Firefox)` → `optionele ontgrendeling met een passkey`
 - `voordat een code wordt gebruikt (niet in Firefox)` → `voordat een code wordt gebruikt`
 - `via de synchronisatie van je browser (Chrome, Edge, Firefox)` → `via Microsoft Edge-synchronisatie`
+- `op de achtergrond staat (Chrome, Edge, Whale).` → `op de achtergrond staat.`
+- `worden gewist (niet in Safari).` → `worden gewist.`
 - 이 줄을 뺀다: `- Ontgrendelen met een passkey en apparaatverificatie zijn niet beschikbaar in Firefox. De Safari-versie is alleen voor macOS.`

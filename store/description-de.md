@@ -19,12 +19,14 @@ Popout Authenticator zeigt Ihre Einmalcodes für die Zwei-Faktor-Authentifizieru
 
 **Dort öffnen, wo Sie es brauchen**
 - Öffnen im Popup der Symbolleiste, in einem eigenen Fenster oder in der Seitenleiste (Sidebar in Firefox).
-- Suche, Gruppen, angeheftete Konten und eine kompakte Ansicht halten auch lange Listen übersichtlich.
+- Suche nach Feld oder mit mehreren Wörtern, Sortierung von A bis Z, Gruppen, angeheftete Konten, Symbole und eine kompakte Ansicht halten auch lange Listen übersichtlich.
 - Zeigt zuerst das Konto zur geöffneten Website und fügt dessen Code per Klick, Rechtsklick oder Tastenkürzel ein.
+- Globale Tastenkürzel kopieren die Codes Ihrer ersten drei wichtigen Konten, auch wenn der Browser im Hintergrund ist (Chrome, Edge, Whale).
 - Optional Schaltflächen neben Codefeldern auf den Websites, die Sie auswählen.
+- Mehrere Konten auswählen und gemeinsam in den Papierkorb verschieben, eine ganze Gruppe auf einmal umbenennen oder auflösen und den Namen eines Kontos kopieren.
 
 **Konten hinzufügen, wie es Ihnen passt**
-- QR-Code aus dem aktuellen Tab, mit der Kamera, aus einem Bild oder aus der Zwischenablage scannen.
+- QR-Code aus dem aktuellen Tab, aus dem Fenster einer anderen App, mit der Kamera, aus einem Bild oder aus der Zwischenablage scannen.
 - otpauth://-Links einfügen oder den geheimen Schlüssel von Hand eingeben.
 - Unterstützt TOTP und HOTP mit SHA-1, SHA-256 oder SHA-512 und 6 bis 10 Stellen sowie Steam (5 Zeichen) und Battle.net (8 Stellen).
 
@@ -32,6 +34,7 @@ Popout Authenticator zeigt Ihre Einmalcodes für die Zwei-Faktor-Authentifizieru
 - Konten werden auf Ihrem Gerät in einem mit AES-256-GCM verschlüsselten Tresor gespeichert. Legen Sie ein Passwort fest, um dessen Schlüssel zu schützen: Ohne Passwort liegt der Schlüssel neben den Daten auf dem Gerät.
 - Sperren mit Passwort (Argon2id), Wiederherstellungscode und optionaler Entsperrung per Passkey (nicht in Firefox). Sie wählen, wann automatisch gesperrt wird.
 - Optional eine Geräteprüfung verlangen, bevor ein Code verwendet wird (nicht in Firefox), und Codes mit einem eigenen Tastenkürzel ausblenden.
+- Kopierte Codes können nach 30 Sekunden, 1, 2 oder 5 Minuten aus der Zwischenablage gelöscht werden (nicht in Safari).
 - Keine Analyse, keine Werbung, kein Server des Entwicklers. Der Quellcode ist öffentlich.
 
 **Zugang nicht verlieren**
@@ -62,4 +65,6 @@ Quellcode: https://github.com/elitekid/popout-authenticator
 - `optionaler Entsperrung per Passkey (nicht in Firefox)` → `optionaler Entsperrung per Passkey`
 - `bevor ein Code verwendet wird (nicht in Firefox)` → `bevor ein Code verwendet wird`
 - `über die Synchronisierung des Browsers (Chrome, Edge, Firefox),` → `über die Microsoft Edge-Synchronisierung,`
+- `im Hintergrund ist (Chrome, Edge, Whale).` → `im Hintergrund ist.`
+- `gelöscht werden (nicht in Safari).` → `gelöscht werden.`
 - 이 줄을 뺀다: `- Entsperrung per Passkey und Geräteprüfung sind in Firefox nicht verfügbar. Die Safari-Version gibt es nur für macOS.`

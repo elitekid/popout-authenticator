@@ -120,6 +120,11 @@
     <li>Press <kbd>↑</kbd> or <kbd>↓</kbd> to select, <kbd>Enter</kbd> to copy the code, and <kbd>Esc</kbd> to clear the search.</li>
   </ol>
   <p>Typing anywhere in the list moves you to "Search". Clicking a row also copies its code, and a "Copied" message appears.</p>
+  <ul>
+    <li><strong>Search in:</strong> next to the search box, "Search in" lets you look in "All", "Service", "Account", "Group", or "Note" only.</li>
+    <li><strong>Several words:</strong> type more than one word, and an account must contain every word to match.</li>
+    <li>Secrets are never searched.</li>
+  </ul>
 
   <h2 id="groups">Groups</h2>
   <p>Groups keep related accounts together, such as "Work". A group name can be up to 64 characters. Each account has one group.</p>
@@ -129,15 +134,18 @@
   </ol>
   <p>Once an account has a group, a row of chips appears: "All" and one chip per group. Select a chip to show only that group.</p>
   <p class="ver"><strong>1.0.1</strong> From version 1.0.1, the popup shows accounts under group headers instead of chips. Each header has the group name and a count. Select it to fold or unfold the group. Accounts without a group are under "No group". In the account menu, "Group" lets you pick a group, create one with "New group" (type a "Group name"), or choose "Remove from group". While you search, the list is flat.</p>
+  <p>On a group header, "Rename group" and "Ungroup" apply to all accounts in that group at once.</p>
 
   <h2 id="order">Order and important accounts</h2>
   <ul>
     <li><strong>Reorder:</strong> drag a row up or down. With keyboard focus on a row, press <kbd>Alt</kbd>+<kbd>↑</kbd> or <kbd>Alt</kbd>+<kbd>↓</kbd>. Your order is kept. Copying a code or visiting a site does not move rows.</li>
     <li><strong>Important:</strong> in the account's "Edit" screen, turn on "Mark as important". A ★ appears on the row ("Important account"). It does not change the order.</li>
+    <li><strong>A–Z:</strong> below the search box, "A–Z" shows the list sorted by service and account name. Your own order is kept and comes back when you turn "A–Z" off. Drag reordering is paused while it is on.</li>
   </ul>
 
   <h2 id="compact">Compact view and hidden codes</h2>
   <p>In "Display · Sync", "View" has three choices: "Normal", "Compact", and "Hide codes". "Compact" tightens the rows. "Hide codes" shows names only; select a row to copy its code. You can also press <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>H</kbd> in the list to hide or show codes. Other options on this screen are "Theme", "Zoom", "Language", and "Show colored initials before accounts".</p>
+  <p>On an account's "Edit" screen you can also choose one of 18 built-in line icons as buttons: Key, Mail, Work, Bank, Cloud, Code, Game, Shop, Social, Personal, Payment, Crypto, Server, Security, School, Home, Website, and Health. A chosen icon always shows in the popup, even when initial tiles are off. Icons are kept in Popout backups and sync.</p>
 
   <h2 id="menu">The account menu</h2>
   <p>Select <code>⋯</code> on a row, right-click it, or press <kbd>Shift</kbd>+<kbd>F10</kbd>. The menu offers:</p>
@@ -146,6 +154,7 @@
     <li>"Copy next code" — for accounts with a timer.</li>
     <li>"Show QR" — to add the account on another device. With a password set, you enter it again first.</li>
     <li>"Share codes" — see <a href="../share-codes/" data-keep-utm>Share codes</a>.</li>
+    <li>"Copy account name" — the name is not cleared from the clipboard automatically, because it is not a code.</li>
     <li>"Edit" and "Account history".</li>
     <li>"Delete" — moves the account to the trash after you confirm.</li>
   </ul>
@@ -161,6 +170,7 @@
 
   <h2 id="trash">Trash</h2>
   <p>"Delete" asks: "Move this account to trash? It will be permanently deleted after 30 days." Select "Move to trash".</p>
+  <p>To remove several at once, select "Select" below the search box, tick the accounts (or use "Select all shown" to pick every account in the current list), and move them to the trash together after you confirm. The trash keeps them for 30 days.</p>
   <ol>
     <li>Select "Settings" → "Trash".</li>
     <li>Each account shows how many days are left, for example "29 days left". Select "Restore" to bring it back, or "Delete permanently".</li>

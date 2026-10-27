@@ -5,8 +5,9 @@ import { loadSettings, onSettingsChanged, saveSettings } from '../../../store/se
 import { useT } from '../../shared/use-t';
 import { currentLang } from '../../../i18n';
 import { BROWSER_TARGET } from '../../../core/browser';
-import { STORE_REVIEW_URL, WHATS_NEW, siteUrl } from '../../popup/logic';
+import { siteUrl } from '../../popup/logic';
 
+import { InfoCard, RateCard } from './AboutCards';
 import { AdvisorPanel } from './AdvisorPanel';
 import { ClockPanel } from './ClockPanel';
 import { DisplayPanel } from './DisplayPanel';
@@ -15,17 +16,6 @@ import { PrivacyPanel } from './PrivacyPanel';
 import { SyncPanel } from './SyncPanel';
 
 const DEFAULT_FEEDBACK_URL = 'https://github.com/elitekid/popout-authenticator/issues';
-
-// 점으로 나뉜 숫자 버전 비교(오름차순).
-const compareVersions = (a: string, b: string): number => {
-  const pa = a.split('.').map(Number);
-  const pb = b.split('.').map(Number);
-  for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
-    const d = (pa[i] ?? 0) - (pb[i] ?? 0);
-    if (d !== 0) return d;
-  }
-  return 0;
-};
 
 const SHORTCUT_COMMANDS = ['copy-pinned-1', 'copy-pinned-2', 'copy-pinned-3'];
 
@@ -89,7 +79,8 @@ export function SettingsSection() {
   const [loadFailed, setLoadFailed] = useState(false);
   const [saveFailed, setSaveFailed] = useState(false);
   const [retry, setRetry] = useState(0);
-  const [changesOpen, setChangesOpen] = useState(false);
+  // 읽기 전에는 true(정보 카드 위)로 둬서 맨 위 카드가 깜빡이지 않게 함
+  const [reviewDismissed, setReviewDismissed] = useState(true);
   const saveSeq = useRef(0);
   const pending = useRef(0);
   const [readyPanels, setReadyPanels] = useState(0);
@@ -114,6 +105,22 @@ export function SettingsSection() {
       off();
     };
   }, [retry]);
+
+  useEffect(() => {
+    let alive = true;
+    // 읽기 실패는 평가 전으로 보지 않고 아래 자리 유지
+    void chrome.storage.local.get('reviewDismissed').then((r) => {
+      if (alive) setReviewDismissed(r.reviewDismissed === true);
+    }, () => undefined);
+    const onChanged = (changes: Record<string, chrome.storage.StorageChange>, area: string) => {
+      if (area === 'local' && changes.reviewDismissed) setReviewDismissed(changes.reviewDismissed.newValue === true);
+    };
+    chrome.storage.onChanged.addListener(onChanged);
+    return () => {
+      alive = false;
+      chrome.storage.onChanged.removeListener(onChanged);
+    };
+  }, []);
 
   const save = (patch: Partial<Settings>) => {
     if (settings === null) return Promise.resolve();
@@ -149,12 +156,14 @@ export function SettingsSection() {
 
   const feedbackUrl = policy.feedbackURL ?? DEFAULT_FEEDBACK_URL;
   const lang = currentLang(settings.language);
+  const rateCard = <RateCard t={t} />;
 
   return (
     <div class="settings" aria-busy={readyPanels !== 15}>
       {readyPanels !== 15 && <div class="screen-loading" role="status">{t('popup.loading')}</div>}
       <div class="settings-panels" hidden={readyPanels !== 15}>
         {saveFailed && <p class="error" role="alert" data-role="settings-save-error">{t('add.error.save')}</p>}
+        {!reviewDismissed && rateCard}
         <DisplayPanel t={t} settings={settings} policy={policy} save={save} />
         <SyncPanel t={t} settings={settings} policy={policy} save={save} onReady={syncReady} />
         <PrivacyPanel t={t} settings={settings} policy={policy} save={save} />
@@ -162,41 +171,8 @@ export function SettingsSection() {
         <ClockPanel t={t} enabled={settings.clockCheck} save={save} onReady={clockReady} />
         <AdvisorPanel t={t} onReady={advisorReady} />
         {(BROWSER_TARGET === 'chrome' || BROWSER_TARGET === 'edge') && <ShortcutsBlock t={t} />}
-        <p class="settings-about muted" data-role="settings-about">
-          <span data-role="settings-version">{t('settings.about.version', { version: chrome.runtime.getManifest().version })}</span>{' '}
-          <button type="button" class="link" data-role="settings-changes" aria-expanded={changesOpen}
-            onClick={() => setChangesOpen((open) => !open)}>
-            {t('settings.about.changes')}
-          </button>{' '}
-          <a href={siteUrl(lang, 'guides')} target="_blank" rel="noopener" data-role="settings-help">
-            {t('settings.about.help')}
-          </a>{' '}
-          <a href={siteUrl(lang, 'home')} target="_blank" rel="noopener" data-role="settings-site">
-            {t('settings.about.site')}
-          </a>{' '}
-          <a href={feedbackUrl} target="_blank" rel="noopener" data-role="settings-feedback">
-            {t('settings.about.feedback')}
-          </a>{' '}
-          {STORE_REVIEW_URL && <a href={STORE_REVIEW_URL} target="_blank" rel="noopener" data-role="settings-review"
-            onClick={() => void chrome.storage.local.set({ reviewDismissed: true }).catch(() => undefined)}>
-            {t('settings.about.review')}
-          </a>}
-        </p>
-        {changesOpen && (
-          <div class="settings-changes muted" data-role="settings-changes-list">
-            {Object.keys(WHATS_NEW)
-              .sort(compareVersions)
-              .reverse()
-              .map((version) => (
-                <div key={version}>
-                  <strong>{t('popup.whatsNew.title', { version })}</strong>
-                  <ul>
-                    {WHATS_NEW[version]!.map((key) => <li key={key}>{t(key)}</li>)}
-                  </ul>
-                </div>
-              ))}
-          </div>
-        )}
+        {reviewDismissed && rateCard}
+        <InfoCard t={t} helpUrl={siteUrl(lang, 'guides')} siteHref={siteUrl(lang, 'home')} feedbackUrl={feedbackUrl} />
       </div>
     </div>
   );

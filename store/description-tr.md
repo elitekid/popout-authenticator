@@ -19,12 +19,14 @@ Popout Authenticator, iki faktörlü kimlik doğrulama (2FA) için tek kullanım
 
 **İhtiyacınız olan yerde açın**
 - Araç çubuğundaki açılır pencereyi, ayrı bir pencereyi veya yan paneli (Firefox'ta kenar çubuğu) kullanın.
-- Arama, gruplar, sabitlenmiş hesaplar ve sıkışık görünüm uzun listeleri düzenli tutar.
+- Alana göre veya birden çok kelimeyle arama, A'dan Z'ye sıralama, gruplar, sabitlenmiş hesaplar, simgeler ve sıkışık görünüm uzun listeleri düzenli tutar.
 - Açık olan sitenin hesabını görün ve kodunu tek tıkla, sağ tıkla veya klavye kısayoluyla doldurun.
+- Genel kısayollar, tarayıcı arka plandayken bile ilk üç önemli hesabınızın kodlarını kopyalar (Chrome, Edge, Whale).
 - Seçtiğiniz sitelerde kod alanlarının yanında isteğe bağlı düğmeler.
+- Birden çok hesabı seçip birlikte çöp kutusuna taşıyın, bir grubun tamamını tek seferde yeniden adlandırın veya dağıtın ve bir hesabın adını kopyalayın.
 
 **Hesapları istediğiniz gibi ekleyin**
-- Geçerli sekmeden, kameradan, bir görselden veya panodan QR kodu tarayın.
+- Geçerli sekmeden, başka bir uygulamanın penceresinden, kameradan, bir görselden veya panodan QR kodu tarayın.
 - otpauth:// bağlantılarını yapıştırın veya gizli anahtarı elle yazın.
 - SHA-1, SHA-256 veya SHA-512 ve 6 ila 10 haneli TOTP ile HOTP'yi, ayrıca Steam (5 karakter) ve Battle.net'i (8 hane) destekler.
 
@@ -32,6 +34,7 @@ Popout Authenticator, iki faktörlü kimlik doğrulama (2FA) için tek kullanım
 - Hesaplar cihazınızda AES-256-GCM ile şifrelenmiş bir kasada saklanır. Kasanın anahtarını korumak için bir parola belirleyin: parola olmadan anahtar cihazda verilerin yanında tutulur.
 - Parolayla kilitleme (Argon2id), kurtarma kodu ve isteğe bağlı geçiş anahtarıyla kilit açma (Firefox'ta yok). Ne zaman otomatik kilitleneceğini seçin.
 - İsterseniz bir kod kullanılmadan önce cihaz doğrulaması isteyin (Firefox'ta yok) ve kodları belirlediğiniz bir klavye kısayoluyla gizleyin.
+- Kopyalanan kodlar 30 saniye, 1, 2 veya 5 dakika sonra panodan silinebilir (Safari'de yok).
 - Analiz yok, reklam yok, geliştirici sunucusu yok. Kaynak kodu herkese açıktır.
 
 **Erişiminizi kaybetmeyin**
@@ -62,4 +65,6 @@ Kaynak kodu: https://github.com/elitekid/popout-authenticator
 - `isteğe bağlı geçiş anahtarıyla kilit açma (Firefox'ta yok)` → `isteğe bağlı geçiş anahtarıyla kilit açma`
 - `cihaz doğrulaması isteyin (Firefox'ta yok)` → `cihaz doğrulaması isteyin`
 - `Tarayıcınızın kendi eşitlemesi (Chrome, Edge, Firefox) üzerinden` → `Microsoft Edge eşitlemesi üzerinden`
+- `kodlarını kopyalar (Chrome, Edge, Whale).` → `kodlarını kopyalar.`
+- `panodan silinebilir (Safari'de yok).` → `panodan silinebilir.`
 - 이 줄을 뺀다: `- Geçiş anahtarıyla kilit açma ve cihaz doğrulaması Firefox'ta yoktur. Safari sürümü yalnızca macOS içindir.`

@@ -19,12 +19,14 @@ Popout Authenticator muestra sus códigos de un solo uso de autenticación en do
 
 **Ábralo donde lo necesite**
 - Úselo en la ventana emergente de la barra de herramientas, en una ventana aparte o en el panel lateral (barra lateral en Firefox).
-- La búsqueda, los grupos, las cuentas fijadas y la vista compacta mantienen ordenadas las listas largas.
+- La búsqueda por campo o con varias palabras, el orden alfabético, los grupos, las cuentas fijadas, los iconos y la vista compacta mantienen ordenadas las listas largas.
 - Muestra primero la cuenta del sitio en el que está y rellena su código con un clic, con el menú contextual o con un atajo de teclado.
+- Los atajos globales copian los códigos de sus tres primeras cuentas importantes, incluso con el navegador en segundo plano (Chrome, Edge, Whale).
 - Botones opcionales junto a los campos de código en los sitios que usted elija.
+- Seleccione varias cuentas para moverlas juntas a la papelera, cambie el nombre de un grupo entero o desagrúpelo de una vez y copie el nombre de una cuenta.
 
 **Añada cuentas como prefiera**
-- Escanee un código QR de la pestaña actual, de la cámara, de una imagen o del portapapeles.
+- Escanee un código QR de la pestaña actual, de la ventana de otra aplicación, de la cámara, de una imagen o del portapapeles.
 - Pegue enlaces otpauth:// o escriba la clave secreta a mano.
 - Admite TOTP y HOTP con SHA-1, SHA-256 o SHA-512 y de 6 a 10 dígitos, además de Steam (5 caracteres) y Battle.net (8 dígitos).
 
@@ -32,6 +34,7 @@ Popout Authenticator muestra sus códigos de un solo uso de autenticación en do
 - Las cuentas se guardan en su equipo en una bóveda cifrada con AES-256-GCM. Defina una contraseña para proteger su clave: sin contraseña, la clave se guarda en el equipo junto a los datos.
 - Bloquéela con una contraseña (Argon2id), un código de recuperación y, si quiere, desbloqueo con clave de acceso (no disponible en Firefox). Elija cuándo se bloquea automáticamente.
 - Si quiere, pida una verificación del dispositivo antes de usar un código (no disponible en Firefox) y oculte los códigos con un atajo que usted asigne.
+- Los códigos copiados pueden borrarse del portapapeles tras 30 segundos, 1, 2 o 5 minutos (no disponible en Safari).
 - Sin analítica, sin anuncios, sin servidor del desarrollador. El código fuente es público.
 
 **No pierda el acceso**
@@ -62,4 +65,6 @@ Código fuente: https://github.com/elitekid/popout-authenticator
 - `desbloqueo con clave de acceso (no disponible en Firefox)` → `desbloqueo con clave de acceso`
 - `antes de usar un código (no disponible en Firefox)` → `antes de usar un código`
 - `mediante la sincronización del propio navegador (Chrome, Edge, Firefox),` → `mediante la sincronización de Microsoft Edge,`
+- `en segundo plano (Chrome, Edge, Whale).` → `en segundo plano.`
+- `5 minutos (no disponible en Safari).` → `5 minutos.`
 - 이 줄을 뺀다: `- El desbloqueo con clave de acceso y la verificación del dispositivo no están disponibles en Firefox. La versión para Safari es solo para macOS.`

@@ -19,12 +19,14 @@ O Popout Authenticator mostra seus códigos de uso único de verificação em du
 
 **Abra onde você precisar**
 - Use no pop-up da barra de ferramentas, em uma janela separada ou no painel lateral (barra lateral no Firefox).
-- Busca, grupos, contas fixadas e visualização compacta mantêm listas longas organizadas.
+- Busca por campo ou com várias palavras, ordem de A a Z, grupos, contas fixadas, ícones e visualização compacta mantêm listas longas organizadas.
 - Mostra primeiro a conta do site em que você está e preenche o código com um clique, pelo menu do botão direito ou com um atalho de teclado.
+- Atalhos globais copiam os códigos das suas três primeiras contas importantes, mesmo com o navegador em segundo plano (Chrome, Edge, Whale).
 - Botões opcionais ao lado dos campos de código nos sites que você escolher.
+- Selecione várias contas para movê-las juntas para a lixeira, renomeie ou desfaça um grupo inteiro de uma vez e copie o nome de uma conta.
 
 **Adicione contas do seu jeito**
-- Leia um QR code da aba atual, da câmera, de uma imagem ou da área de transferência.
+- Leia um QR code da aba atual, da janela de outro app, da câmera, de uma imagem ou da área de transferência.
 - Cole links otpauth:// ou digite a chave secreta à mão.
 - Suporta TOTP e HOTP com SHA-1, SHA-256 ou SHA-512 e de 6 a 10 dígitos, além de Steam (5 caracteres) e Battle.net (8 dígitos).
 
@@ -32,6 +34,7 @@ O Popout Authenticator mostra seus códigos de uso único de verificação em du
 - As contas ficam no seu dispositivo em um cofre criptografado com AES-256-GCM. Defina uma senha para proteger a chave dele: sem senha, a chave fica no dispositivo junto com os dados.
 - Bloqueie com senha (Argon2id), código de recuperação e, se quiser, desbloqueio por chave de acesso (indisponível no Firefox). Escolha quando ele bloqueia automaticamente.
 - Se quiser, exija a verificação do dispositivo antes de usar um código (indisponível no Firefox) e oculte os códigos com um atalho definido por você.
+- Os códigos copiados podem ser apagados da área de transferência após 30 segundos, 1, 2 ou 5 minutos (indisponível no Safari).
 - Sem análise de uso, sem anúncios, sem servidor do desenvolvedor. O código-fonte é público.
 
 **Não perca o acesso**
@@ -62,4 +65,6 @@ Código-fonte: https://github.com/elitekid/popout-authenticator
 - `desbloqueio por chave de acesso (indisponível no Firefox)` → `desbloqueio por chave de acesso`
 - `antes de usar um código (indisponível no Firefox)` → `antes de usar um código`
 - `pela sincronização do próprio navegador (Chrome, Edge, Firefox),` → `pela sincronização do Microsoft Edge,`
+- `em segundo plano (Chrome, Edge, Whale).` → `em segundo plano.`
+- `5 minutos (indisponível no Safari).` → `5 minutos.`
 - 이 줄을 뺀다: `- O desbloqueio por chave de acesso e a verificação do dispositivo não estão disponíveis no Firefox. A versão para Safari é só para macOS.`

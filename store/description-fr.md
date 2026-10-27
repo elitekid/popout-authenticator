@@ -19,12 +19,14 @@ Popout Authenticator affiche vos codes à usage unique d’authentification à d
 
 **Ouvrez-le là où vous en avez besoin**
 - Utilisez-le dans le pop-up de la barre d’outils, dans une fenêtre séparée ou dans le panneau latéral (barre latérale dans Firefox).
-- Recherche, groupes, comptes épinglés et affichage compact gardent les longues listes en ordre.
+- Recherche par champ ou avec plusieurs mots, tri de A à Z, groupes, comptes épinglés, icônes et affichage compact gardent les longues listes en ordre.
 - Le compte du site ouvert est proposé en premier ; son code se remplit d’un clic, par clic droit ou avec un raccourci clavier.
+- Des raccourcis globaux copient les codes de vos trois premiers comptes importants, même quand le navigateur est en arrière-plan (Chrome, Edge, Whale).
 - Boutons facultatifs à côté des champs de code sur les sites que vous choisissez.
+- Sélectionnez plusieurs comptes pour les placer ensemble dans la corbeille, renommez ou dissolvez un groupe entier en une fois et copiez le nom d’un compte.
 
 **Ajoutez des comptes comme vous voulez**
-- Scannez un code QR depuis l’onglet actuel, la caméra, une image ou le presse-papiers.
+- Scannez un code QR depuis l’onglet actuel, la fenêtre d’une autre application, la caméra, une image ou le presse-papiers.
 - Collez des liens otpauth:// ou saisissez la clé secrète à la main.
 - Prend en charge TOTP et HOTP avec SHA-1, SHA-256 ou SHA-512, de 6 à 10 chiffres, ainsi que Steam (5 caractères) et Battle.net (8 chiffres).
 
@@ -32,6 +34,7 @@ Popout Authenticator affiche vos codes à usage unique d’authentification à d
 - Les comptes sont stockés sur votre appareil dans un coffre chiffré avec AES-256-GCM. Définissez un mot de passe pour protéger sa clé : sans mot de passe, la clé est conservée sur l’appareil à côté des données.
 - Verrouillez-le avec un mot de passe (Argon2id), un code de récupération et, si vous le souhaitez, un déverrouillage par clé d’accès (indisponible dans Firefox). Choisissez quand il se verrouille automatiquement.
 - Vous pouvez exiger une vérification de l’appareil avant l’utilisation d’un code (indisponible dans Firefox) et masquer les codes avec un raccourci que vous définissez.
+- Les codes copiés peuvent être effacés du presse-papiers après 30 secondes, 1, 2 ou 5 minutes (indisponible dans Safari).
 - Pas d’analyse, pas de publicité, pas de serveur du développeur. Le code source est public.
 
 **Ne perdez pas l’accès**
@@ -62,4 +65,6 @@ Code source : https://github.com/elitekid/popout-authenticator
 - `un déverrouillage par clé d’accès (indisponible dans Firefox)` → `un déverrouillage par clé d’accès`
 - `avant l’utilisation d’un code (indisponible dans Firefox)` → `avant l’utilisation d’un code`
 - `grâce à la synchronisation du navigateur (Chrome, Edge, Firefox),` → `grâce à la synchronisation de Microsoft Edge,`
+- `en arrière-plan (Chrome, Edge, Whale).` → `en arrière-plan.`
+- `5 minutes (indisponible dans Safari).` → `5 minutes.`
 - 이 줄을 뺀다: `- Le déverrouillage par clé d’accès et la vérification de l’appareil ne sont pas disponibles dans Firefox. La version Safari est réservée à macOS.`

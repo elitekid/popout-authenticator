@@ -7,7 +7,10 @@ export function register(): void {
       .get('lastSeenWhatsNewVersion')
       .then((got) => {
         if (got.lastSeenWhatsNewVersion === version) return undefined;
-        return chrome.storage.local.set({ pendingWhatsNew: version });
+        // 새 안내는 본 창 수를 처음부터 센다.
+        return chrome.storage.local
+          .remove('whatsNewViews')
+          .then(() => chrome.storage.local.set({ pendingWhatsNew: version }));
       })
       .catch((error) => console.warn('whats-new: mark failed', error));
   });

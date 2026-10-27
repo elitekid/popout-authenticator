@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.0.3
+
+- New: Settings has an "About" card with the version, a "Check for updates" button (Chrome, Edge and Whale check right away and can update now; Firefox and Safari open the store page) and the update history.
+- New: a "Rate" card in Settings with a link to the store and a GitHub star link. It sits at the top until you rate or choose "Don't ask again", then moves down above the About card.
+- New: copy an account's name from its "⋯" menu. The name is not cleared from the clipboard automatically because it is not a code.
+- New: an "A–Z" button next to "Select" shows the list sorted by service and account name. Your own order is kept and comes back when you turn it off; reordering is paused while it is on.
+- New: account icons are redrawn as line icons that look the same on every system, and there are now 18 (added Social, Personal, Payment, Crypto, Server, Security, School, Home, Website and Health). The edit screen shows them as buttons instead of a drop-down.
+- Account icons you pick now always show in the popup, even when initial tiles are off.
+- The "What's new" note after an update stays until you press OK or Rate, for up to three openings of the popup, and has a Rate button.
+- The rating prompt can appear after five openings when you copy a code, is no longer hidden by other notes, comes back at most every 14 days and stops after three times. The Safari version still never shows it automatically.
+- "Update now" clears a code waiting on the clipboard before the extension restarts.
+
 ## 1.0.2
 
 - Task windows opened from the toolbar popup (QR image, import file, camera, backup) now open only once: opening the same task again brings the existing window to the front, and "Done" closes the window instead of turning it into a separate window.

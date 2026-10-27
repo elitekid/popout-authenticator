@@ -123,6 +123,20 @@ export function groupSections<T extends Pick<Account, 'group' | 'deletedAt'>>(
   return out;
 }
 
+// 서비스 이름 → 계정 이름 순으로 보여 줄 사본. 같은 값이면 원래 순서를 지키고 저장된 순서는 건드리지 않는다.
+export function sortByName<T extends Pick<Account, 'issuer' | 'label'>>(accounts: T[], lang: string): T[] {
+  const opts = { sensitivity: 'base', numeric: true } as const;
+  return accounts
+    .map((a, i) => ({ a, i }))
+    .sort(
+      (x, y) =>
+        x.a.issuer.localeCompare(y.a.issuer, lang, opts) ||
+        x.a.label.localeCompare(y.a.label, lang, opts) ||
+        x.i - y.i,
+    )
+    .map((e) => e.a);
+}
+
 // 화면에 그려지는(접히지 않은) 줄을 위에서부터 이어 붙인다. 키보드 이동·선택 자리의 기준.
 export function visibleRows<T>(sections: GroupSection<T>[]): T[] {
   return sections.flatMap((s) => (s.folded ? [] : s.items));
@@ -174,8 +188,8 @@ export function shouldShowBackupReminder(input: {
   return now - backupInfo.at > BACKUP_AGE_MS && backupInfo.sig !== sig;
 }
 
-const REVIEW_MIN_OPENS = 15;
-export const REVIEW_LATER_OPENS = 50;
+export const REVIEW_MIN_OPENS = 5;
+export const REVIEW_INTERVAL_MS = 14 * DAY;
 // 빌드 대상별 스토어 평가 주소. 웨일은 chrome 빌드를 쓰므로 userAgent 로 가른다.
 // 서비스 워커 등 navigator 가 없는 곳에서도 import 가 깨지지 않게 확인한다.
 const STORE_REVIEW_URLS: Record<BrowserTarget | 'whale', string> = {
@@ -189,34 +203,44 @@ const IS_WHALE =
   BROWSER_TARGET === 'chrome' && typeof navigator !== 'undefined' && /Whale/.test(navigator.userAgent ?? '');
 export const STORE_REVIEW_URL: string = STORE_REVIEW_URLS[IS_WHALE ? 'whale' : BROWSER_TARGET];
 
+export type StoreKind = BrowserTarget | 'whale';
+export const STORE_KIND: StoreKind = IS_WHALE ? 'whale' : BROWSER_TARGET;
+
+// 스토어 상세 페이지(리뷰 쪽이 아님). 업데이트 확인의 대체 길로도 쓴다.
+const STORE_PAGE_URLS: Record<StoreKind, string> = {
+  chrome: 'https://chromewebstore.google.com/detail/nakgmloofpboegibcjhainbpjjokmbgj',
+  edge: 'https://microsoftedge.microsoft.com/addons/detail/edipphpgdmfabonchodjfnejlbjoknhh',
+  firefox: 'https://addons.mozilla.org/firefox/addon/popout-authenticator/',
+  whale: 'https://store.whale.naver.com/detail/bcfobdldplagmohdgaiocjddlokiolgc',
+  safari: 'https://apps.apple.com/app/id6823010294',
+};
+export const STORE_PAGE_URL: string = STORE_PAGE_URLS[STORE_KIND];
+export const GITHUB_URL = 'https://github.com/elitekid/popout-authenticator';
+
 // 응답 없이 띠가 보인 횟수가 이만큼 쌓이면 더 이상 띠를 보이지 않는다.
 export const REVIEW_MAX_SHOWN = 3;
 
-// 평가 요청: 팝업을 15번 이상 열었고 계정이 있으며, 닫지 않았고 미룬 횟수가 지났을 때.
+// 평가 요청: 팝업을 5번 이상 열었고 계정이 있으며, 닫지 않았고 마지막 노출 뒤 14일이 지났을 때.
 // 노출이 3회 쌓였거나 safari 빌드(애플 지침 5.6.1)면 자동 띠는 보이지 않는다.
 export function shouldShowReview(
   s: {
     openCount: number;
     accounts: number;
     dismissed: boolean;
-    snoozedUntilOpen: number;
     shown?: number;
+    lastShownAt?: number;
+    now: number;
   },
   target: BrowserTarget = BROWSER_TARGET,
 ): boolean {
   return (
     target !== 'safari' &&
+    !s.dismissed &&
     (s.shown ?? 0) < REVIEW_MAX_SHOWN &&
     s.openCount >= REVIEW_MIN_OPENS &&
     s.accounts >= 1 &&
-    !s.dismissed &&
-    s.openCount >= s.snoozedUntilOpen
+    s.now - (s.lastShownAt ?? 0) >= REVIEW_INTERVAL_MS
   );
-}
-
-// "나중에" 는 한 번만 미룬다. 이미 미뤘으면(값이 0보다 크면) "다시 묻지 않기"만 남긴다.
-export function canSnoozeReview(snoozedUntilOpen: number): boolean {
-  return snoozedUntilOpen === 0;
 }
 
 const SITE_URL = 'https://elitekid.github.io/popout-authenticator/';
@@ -232,6 +256,7 @@ export function whatsNewFor(target: BrowserTarget = BROWSER_TARGET): Record<stri
   const copy = target === 'firefox' || target === 'safari' ? [] : ['popup.whatsNew.v102.copy'];
   return {
     '1.0.2': ['popup.whatsNew.v102.organize', 'popup.whatsNew.v102.capture', ...copy],
+    '1.0.3': ['popup.whatsNew.v103.about', 'popup.whatsNew.v103.icons', 'popup.whatsNew.v103.name'],
   };
 }
 export const WHATS_NEW: Record<string, string[]> = whatsNewFor();

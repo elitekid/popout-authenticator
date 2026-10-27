@@ -2,7 +2,7 @@
 
 Effective date: 2026-10-14 · [한국어](#개인정보처리방침--popout-authenticator)
 
-Popout Authenticator is a free, open-source browser extension that generates two-factor (2FA) one-time codes. The developer runs no server for it. The extension contains no analytics, advertising, crash reporting, or tracking code, and the developer never receives your accounts, secrets, codes, or browsing data.
+Popout Authenticator is an open-source browser extension that generates two-factor (2FA) one-time codes. The developer runs no server for it. The extension contains no analytics, advertising, crash reporting, or tracking code, and the developer never receives your accounts, secrets, codes, or browsing data.
 
 ## What stays on your device
 
