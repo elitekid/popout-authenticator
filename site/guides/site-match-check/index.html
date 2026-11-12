@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; media-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Site match check: fill only on the address you set — Popout Authenticator</title>
+<meta name="description" content="How Popout compares the page with the site addresses you saved for an account, and what it asks before filling a code on any other address.">
+<link rel="canonical" href="https://elitekid.github.io/popout-authenticator/guides/site-match-check/">
+<link rel="alternate" hreflang="en" href="https://elitekid.github.io/popout-authenticator/guides/site-match-check/">
+<link rel="alternate" hreflang="ko" href="https://elitekid.github.io/popout-authenticator/ko/guides/site-match-check/">
+<link rel="alternate" hreflang="x-default" href="https://elitekid.github.io/popout-authenticator/guides/site-match-check/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Popout Authenticator">
+<meta property="og:title" content="Site match check: fill only on the address you set">
+<meta property="og:description" content="How Popout compares the page with the site addresses you saved for an account, and what it asks before filling a code on any other address.">
+<meta property="og:url" content="https://elitekid.github.io/popout-authenticator/guides/site-match-check/">
+<meta property="og:image" content="https://elitekid.github.io/popout-authenticator/img/en/03-window.png">
+<meta property="og:locale" content="en">
+<meta property="og:locale:alternate" content="ko">
+<link rel="icon" href="../../img/logo.png">
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/site.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="../../" data-keep-utm><img src="../../img/logo.png" width="36" height="36" alt="">Popout Authenticator</a>
+    <nav class="main" aria-label="Main">
+      <a href="../../" data-keep-utm>Home</a>
+      <a href="../" data-keep-utm>Guides</a>
+      <a href="https://github.com/elitekid/popout-authenticator">GitHub</a>
+      <a class="lang" href="../../ko/guides/site-match-check/" data-keep-utm hreflang="ko" lang="ko">한국어</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="wrap guide">
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="../../" data-keep-utm>Home</a> › <a href="../" data-keep-utm>Guides</a></nav>
+  <h1>Site match check: fill only on the address you set</h1>
+  <p class="lead">Popout compares the page you are on with the site addresses you saved for an account. It helps keep a code from going automatically to a similar-looking address.</p>
+
+  <nav class="toc card" aria-label="On this page">
+    <ol>
+      <li><a href="#what">What is compared</a></li>
+      <li><a href="#match">What counts as a match</a></li>
+      <li><a href="#ask">When the site does not match</a></li>
+      <li><a href="#pick">Which account is picked for you</a></li>
+      <li><a href="#secure">Secure pages only</a></li>
+      <li><a href="#habit">A habit to avoid</a></li>
+    </ol>
+  </nav>
+
+  <h2 id="what">What is compared</h2>
+  <p>Each account can have "Site addresses", for example <code>example.com</code>. When you fill a code, Popout compares the address of the page that holds the code field with the addresses saved for that account. It compares against the addresses you set, so the result does not depend on how a page looks or what it is called.</p>
+  <p>To add an address, open the account's "⋯" menu → "Edit" and type it under "Site addresses (separate with commas or new lines)". See <a href="../fill-codes/" data-keep-utm>Fill codes into sign-in pages</a> for the ways to fill.</p>
+
+  <h2 id="match">What counts as a match</h2>
+  <p>The page counts as a match only when its host is the same as a saved address, or is a subdomain of it.</p>
+  <div class="table-wrap">
+    <table class="stack">
+      <thead>
+        <tr><th scope="col">Saved address</th><th scope="col">Page host</th><th scope="col">Match</th></tr>
+      </thead>
+      <tbody>
+        <tr><th scope="row"><code>example.com</code></th><td data-label="Page host"><code>example.com</code></td><td data-label="Match">Yes</td></tr>
+        <tr><th scope="row"><code>example.com</code></th><td data-label="Page host"><code>login.example.com</code></td><td data-label="Match">Yes, a subdomain</td></tr>
+        <tr><th scope="row"><code>login.example.com</code></th><td data-label="Page host"><code>example.com</code></td><td data-label="Match">No</td></tr>
+        <tr><th scope="row"><code>example.com</code></th><td data-label="Page host"><code>example.com.other.test</code></td><td data-label="Match">No</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Popout does not group addresses by their base domain. Some domains, such as <code>github.io</code>, give every subdomain to a different owner, so a shared base domain says nothing about who runs the page.</p>
+  <p>The sites you turned on for the "Fill code" button beside the code field also count as saved sites for that account.</p>
+  <p>The check uses the page that actually holds the code field, not only the tab's address. A frame on the page is checked by its own address.</p>
+
+  <h2 id="ask">When the site does not match</h2>
+  <p>If the page is not a saved site of the account, Popout does not fill. It asks in the popup first, showing the host it found and "Check the address before filling." You choose:</p>
+  <ul>
+    <li>"Remember and fill": saves the host as a site address of this account, then fills. Later fills there match.</li>
+    <li>"Fill once": fills now and saves nothing. It never auto-submits, even if auto-submit is on.</li>
+    <li>"Cancel": fills nothing.</li>
+  </ul>
+  <p>Check the address in the browser's address bar before you choose.</p>
+
+  <h2 id="pick">Which account is picked for you</h2>
+  <p>The shortcut, the right-click menu item, and the highlighted account in the popup pick an account for you. They pick only an account whose saved site matches the page. They do not use a similar name or how often you used an account.</p>
+  <p>The suggestion list in the popup may also show accounts with a similar name. Those are candidates you can see and choose yourself. Filling one of them on a site that is not saved for it brings up the question above.</p>
+
+  <h2 id="secure">Secure pages only</h2>
+  <ul>
+    <li>Popout fills only on <code>https</code> pages. The local test addresses <code>localhost</code> and <code>127.0.0.1</code> are also allowed over <code>http</code>.</li>
+    <li>It checks both the address of the top page and the address of the document being filled. A frame from another site is not filled just because the top page is trusted.</li>
+    <li>Frames such as <code>about:blank</code> are refused.</li>
+  </ul>
+
+  <h2 id="habit">A habit to avoid</h2>
+  <div class="card note">
+    <p>If you press "Remember and fill" out of habit, the check protects you less: a similar-looking address becomes a saved site. Press it only when the address in the address bar is the one you mean.</p>
+  </div>
+
+  <aside class="review-ask" aria-label="Rate Popout Authenticator" hidden>
+    <p><strong>Rate Popout Authenticator.</strong> A short review in your browser's store helps other people find it.</p>
+    <div class="stores reviews" data-campaign="pa-review-guide"></div>
+  </aside>
+
+  <nav class="guide-nav" aria-label="More guides"><a href="../fill-codes/" data-keep-utm>← Fill codes into sign-in pages</a><a href="../lock-and-protect/" data-keep-utm>Lock and protect your accounts →</a></nav>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <ul>
+      <li><a href="https://github.com/elitekid/popout-authenticator">GitHub</a></li>
+      <li><a href="https://github.com/elitekid/popout-authenticator/blob/main/PRIVACY.md">Privacy</a></li>
+      <li><a href="https://github.com/elitekid/popout-authenticator/issues">Issues</a></li>
+      <li>MIT License</li>
+    </ul>
+  </div>
+</footer>
+</body>
+</html>

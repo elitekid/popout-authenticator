@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; media-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>사이트 일치 확인: 지정한 주소에만 넣기 — Popout Authenticator</title>
+<meta name="description" content="Popout이 지금 페이지를 계정에 저장한 사이트 주소와 어떻게 비교하는지, 다른 주소에 코드를 넣기 전에 무엇을 묻는지 설명합니다.">
+<link rel="canonical" href="https://elitekid.github.io/popout-authenticator/ko/guides/site-match-check/">
+<link rel="alternate" hreflang="en" href="https://elitekid.github.io/popout-authenticator/guides/site-match-check/">
+<link rel="alternate" hreflang="ko" href="https://elitekid.github.io/popout-authenticator/ko/guides/site-match-check/">
+<link rel="alternate" hreflang="x-default" href="https://elitekid.github.io/popout-authenticator/guides/site-match-check/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Popout Authenticator">
+<meta property="og:title" content="사이트 일치 확인: 지정한 주소에만 넣기">
+<meta property="og:description" content="Popout이 지금 페이지를 계정에 저장한 사이트 주소와 어떻게 비교하는지, 다른 주소에 코드를 넣기 전에 무엇을 묻는지 설명합니다.">
+<meta property="og:url" content="https://elitekid.github.io/popout-authenticator/ko/guides/site-match-check/">
+<meta property="og:image" content="https://elitekid.github.io/popout-authenticator/img/ko/03-window.png">
+<meta property="og:locale" content="ko">
+<meta property="og:locale:alternate" content="en">
+<link rel="icon" href="../../../img/logo.png">
+<link rel="stylesheet" href="../../../assets/site.css">
+<script src="../../../assets/site.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">본문으로 건너뛰기</a>
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="../../" data-keep-utm><img src="../../../img/logo.png" width="36" height="36" alt="">Popout Authenticator</a>
+    <nav class="main" aria-label="주 메뉴">
+      <a href="../../" data-keep-utm>홈</a>
+      <a href="../" data-keep-utm>가이드</a>
+      <a href="https://github.com/elitekid/popout-authenticator">GitHub</a>
+      <a class="lang" href="../../../guides/site-match-check/" data-keep-utm hreflang="en" lang="en">English</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="wrap guide">
+  <nav class="crumbs" aria-label="이동 경로"><a href="../../" data-keep-utm>홈</a> › <a href="../" data-keep-utm>가이드</a></nav>
+  <h1>사이트 일치 확인: 지정한 주소에만 넣기</h1>
+  <p class="lead">Popout은 지금 보는 페이지를 계정에 저장한 사이트 주소와 비교합니다. 코드가 비슷하게 생긴 주소로 저절로 넘어가는 일을 줄이는 데 도움이 됩니다.</p>
+
+  <nav class="toc card" aria-label="이 쪽의 내용">
+    <ol>
+      <li><a href="#what">무엇을 비교하나</a></li>
+      <li><a href="#match">어떤 경우가 일치인가</a></li>
+      <li><a href="#ask">사이트가 일치하지 않을 때</a></li>
+      <li><a href="#pick">계정을 대신 고르는 경우</a></li>
+      <li><a href="#secure">보안 연결 페이지에서만</a></li>
+      <li><a href="#habit">피할 습관</a></li>
+    </ol>
+  </nav>
+
+  <h2 id="what">무엇을 비교하나</h2>
+  <p>계정마다 "사이트 주소"를 지정할 수 있습니다. 예: <code>example.com</code>. 코드를 넣을 때 Popout은 코드 칸이 있는 페이지의 주소를 그 계정에 저장한 주소와 비교합니다. 내가 지정한 주소와 비교하므로, 페이지가 어떻게 생겼는지나 이름이 무엇인지에 따라 결과가 달라지지 않습니다.</p>
+  <p>주소를 추가하려면 계정의 "⋯" 메뉴 → "편집"에서 "사이트 주소 (쉼표 또는 줄바꿈으로 구분)" 칸에 입력하세요. 코드를 넣는 방법은 <a href="../fill-codes/" data-keep-utm>로그인 화면에 코드 넣기</a>를 보세요.</p>
+
+  <h2 id="match">어떤 경우가 일치인가</h2>
+  <p>페이지의 호스트가 저장한 주소와 같거나, 그 주소의 하위 도메인일 때만 일치로 봅니다.</p>
+  <div class="table-wrap">
+    <table class="stack">
+      <thead>
+        <tr><th scope="col">저장한 주소</th><th scope="col">페이지 호스트</th><th scope="col">일치</th></tr>
+      </thead>
+      <tbody>
+        <tr><th scope="row"><code>example.com</code></th><td data-label="페이지 호스트"><code>example.com</code></td><td data-label="일치">예</td></tr>
+        <tr><th scope="row"><code>example.com</code></th><td data-label="페이지 호스트"><code>login.example.com</code></td><td data-label="일치">예, 하위 도메인</td></tr>
+        <tr><th scope="row"><code>login.example.com</code></th><td data-label="페이지 호스트"><code>example.com</code></td><td data-label="일치">아니요</td></tr>
+        <tr><th scope="row"><code>example.com</code></th><td data-label="페이지 호스트"><code>example.com.other.test</code></td><td data-label="일치">아니요</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Popout은 주소를 기본 도메인 단위로 묶지 않습니다. <code>github.io</code>처럼 하위 도메인마다 주인이 다른 도메인이 있어서, 기본 도메인이 같다는 사실만으로는 누가 운영하는 페이지인지 알 수 없기 때문입니다.</p>
+  <p>코드 칸 옆 "코드 넣기" 단추를 켜 둔 사이트도 그 계정의 저장한 사이트로 칩니다.</p>
+  <p>확인은 탭의 주소만 보지 않고 코드 칸이 실제로 있는 문서의 주소로 합니다. 페이지 안의 프레임은 그 프레임 자체의 주소로 확인합니다.</p>
+
+  <h2 id="ask">사이트가 일치하지 않을 때</h2>
+  <p>페이지가 그 계정에 저장한 사이트가 아니면 Popout은 코드를 넣지 않고 먼저 팝업에서 묻습니다. 찾은 호스트와 "주소를 확인한 뒤 넣어 주세요."라는 안내가 함께 보입니다. 이렇게 고릅니다.</p>
+  <ul>
+    <li>"기억하고 넣기": 이 호스트를 이 계정의 사이트 주소로 저장한 뒤 넣습니다. 다음부터 그곳에서는 일치로 처리됩니다.</li>
+    <li>"이번만 넣기": 지금 넣기만 하고 저장하지 않습니다. 자동 제출이 켜져 있어도 제출하지 않습니다.</li>
+    <li>"취소": 아무것도 넣지 않습니다.</li>
+  </ul>
+  <p>고르기 전에 브라우저 주소 표시줄의 주소를 확인하세요.</p>
+
+  <h2 id="pick">계정을 대신 고르는 경우</h2>
+  <p>단축키, 오른쪽 클릭 메뉴, 팝업에서 강조된 계정은 Popout이 계정을 대신 고릅니다. 이때는 저장한 사이트가 페이지와 일치하는 계정만 고릅니다. 이름이 비슷한지, 얼마나 자주 썼는지는 쓰지 않습니다.</p>
+  <p>팝업의 추천 목록에는 이름이 비슷한 계정이 함께 보일 수 있습니다. 눈에 보이는 후보일 뿐이고 직접 골라야 합니다. 그 계정에 저장하지 않은 사이트에서 그 후보로 넣으려 하면 위의 질문이 나옵니다.</p>
+
+  <h2 id="secure">보안 연결 페이지에서만</h2>
+  <ul>
+    <li>Popout은 <code>https</code> 페이지에서만 코드를 넣습니다. 로컬 시험 주소 <code>localhost</code>와 <code>127.0.0.1</code>은 <code>http</code>도 허용합니다.</li>
+    <li>맨 위 페이지의 주소와, 코드를 넣을 문서의 주소를 둘 다 확인합니다. 맨 위 페이지가 안전해도 다른 사이트의 프레임에는 넣지 않습니다.</li>
+    <li><code>about:blank</code> 같은 프레임은 거절합니다.</li>
+  </ul>
+
+  <h2 id="habit">피할 습관</h2>
+  <div class="card note">
+    <p>습관처럼 "기억하고 넣기"를 누르면 이 확인의 보호가 약해집니다. 비슷하게 생긴 주소가 저장한 사이트가 되기 때문입니다. 주소 표시줄의 주소가 내가 뜻한 주소일 때만 누르세요.</p>
+  </div>
+
+  <aside class="review-ask" aria-label="평가 남기기" hidden>
+    <p><strong>평가 남기기</strong> 쓰는 브라우저의 스토어에 남긴 짧은 평가가 다른 사람이 Popout을 찾는 데 도움이 됩니다.</p>
+    <div class="stores reviews" data-campaign="pa-review-guide"></div>
+  </aside>
+
+  <nav class="guide-nav" aria-label="다른 가이드"><a href="../fill-codes/" data-keep-utm>← 로그인 화면에 코드 넣기</a><a href="../lock-and-protect/" data-keep-utm>잠금과 보호 →</a></nav>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <ul>
+      <li><a href="https://github.com/elitekid/popout-authenticator">GitHub</a></li>
+      <li><a href="https://github.com/elitekid/popout-authenticator/blob/main/PRIVACY.md">개인정보처리방침</a></li>
+      <li><a href="https://github.com/elitekid/popout-authenticator/issues">이슈</a></li>
+      <li>MIT 라이선스</li>
+    </ul>
+  </div>
+</footer>
+</body>
+</html>

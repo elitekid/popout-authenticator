@@ -25,6 +25,7 @@ Supported browsers: Chrome, Edge, Firefox, Whale, and Safari (macOS only, no iOS
 - [Get started](https://elitekid.github.io/popout-authenticator/guides/getting-started/): Install and add your first account from a QR code, a link, or by typing the secret
 - [Popup, window, and side panel](https://elitekid.github.io/popout-authenticator/guides/open-and-organize/): Open codes in three views and keep a long list tidy with search, groups, and pins
 - [Fill codes into sign-in pages](https://elitekid.github.io/popout-authenticator/guides/fill-codes/): Fill a code with one click, the right-click menu, a shortcut, or a button next to the field
+- [Site match check](https://elitekid.github.io/popout-authenticator/guides/site-match-check/): How Popout compares the page with the site addresses saved for an account, and what it asks on any other address
 - [Lock and protect your accounts](https://elitekid.github.io/popout-authenticator/guides/lock-and-protect/): Password lock, recovery code, passkey unlock, auto-lock, and hiding codes while sharing your screen
 - [Backup, export, and sync](https://elitekid.github.io/popout-authenticator/guides/backup-and-sync/): Encrypted backups, exports, recovery snapshots, the trash, and browser sync between devices
 - [Share a code with a link](https://elitekid.github.io/popout-authenticator/guides/share-codes/): A link that shows an account's codes for a limited time and never contains the secret
