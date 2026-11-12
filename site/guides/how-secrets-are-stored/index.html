@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; media-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Is a browser extension safe for 2FA codes? How Popout Authenticator stores your secrets — Popout Authenticator</title>
+<meta name="description" content="Where Popout keeps your OTP secret keys, how they are encrypted, what the extension sends over the network, which permissions it asks for, and what it cannot protect against.">
+<link rel="canonical" href="https://elitekid.github.io/popout-authenticator/guides/how-secrets-are-stored/">
+<link rel="alternate" hreflang="en" href="https://elitekid.github.io/popout-authenticator/guides/how-secrets-are-stored/">
+<link rel="alternate" hreflang="ko" href="https://elitekid.github.io/popout-authenticator/ko/guides/how-secrets-are-stored/">
+<link rel="alternate" hreflang="x-default" href="https://elitekid.github.io/popout-authenticator/guides/how-secrets-are-stored/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Popout Authenticator">
+<meta property="og:title" content="Is a browser extension safe for 2FA codes? How Popout Authenticator stores your secrets">
+<meta property="og:description" content="Where Popout keeps your OTP secret keys, how they are encrypted, what the extension sends over the network, which permissions it asks for, and what it cannot protect against.">
+<meta property="og:url" content="https://elitekid.github.io/popout-authenticator/guides/how-secrets-are-stored/">
+<meta property="og:image" content="https://elitekid.github.io/popout-authenticator/img/en/03-window.png">
+<meta property="og:locale" content="en">
+<meta property="og:locale:alternate" content="ko">
+<link rel="icon" href="../../img/logo.png">
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/site.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="../../" data-keep-utm><img src="../../img/logo.png" width="36" height="36" alt="">Popout Authenticator</a>
+    <nav class="main" aria-label="Main">
+      <a href="../../" data-keep-utm>Home</a>
+      <a href="../" data-keep-utm>Guides</a>
+      <a href="https://github.com/elitekid/popout-authenticator">GitHub</a>
+      <a class="lang" href="../../ko/guides/how-secrets-are-stored/" data-keep-utm hreflang="ko" lang="ko">한국어</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="wrap guide">
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="../../" data-keep-utm>Home</a> › <a href="../" data-keep-utm>Guides</a></nav>
+  <h1>Is a browser extension safe for 2FA codes? How Popout Authenticator stores your secrets</h1>
+  <p class="lead">This page describes what Popout does with the secret key behind each code: where it is kept, how it is encrypted, what leaves the extension, and which risks remain. Every statement here comes from the extension's source code, which is open.</p>
+
+  <nav class="toc card" aria-label="On this page">
+    <ol>
+      <li><a href="#where">Where the secret keys are kept</a></li>
+      <li><a href="#encryption">How they are encrypted</a></li>
+      <li><a href="#nolock">With no lock set</a></li>
+      <li><a href="#network">What leaves the extension</a></li>
+      <li><a href="#sync">Browser sync</a></li>
+      <li><a href="#permissions">Permissions it asks for</a></li>
+      <li><a href="#backups">Backups and share links</a></li>
+      <li><a href="#limits">What it cannot protect against</a></li>
+      <li><a href="#source">Check it yourself</a></li>
+    </ol>
+  </nav>
+
+  <h2 id="where">Where the secret keys are kept</h2>
+  <ul>
+    <li>All accounts, including their secret keys, are stored in one vault in the extension's local storage (<code>chrome.storage.local</code>, key <code>vault</code>). The vault is a single encrypted block, not one entry per account.</li>
+    <li>When you unlock the vault, its key is held in the extension's session storage (<code>chrome.storage.session</code>) so you are not asked again until the auto-lock time you chose. It is not written to local storage.</li>
+    <li>Earlier versions of the vault are kept as backup history in the browser's IndexedDB database (<code>popout-authenticator</code>). Popout keeps the latest 30, plus the most recent one for each of the last 30 days. When you turn the lock on, those older versions are re-encrypted with the new key.</li>
+    <li>The sites you turned on for the "Fill code" button are stored as plain site addresses next to the vault. They contain no secret keys.</li>
+  </ul>
+
+  <h2 id="encryption">How they are encrypted</h2>
+  <p>Popout uses two layers, so that changing your password does not mean re-encrypting every account.</p>
+  <div class="table-wrap">
+    <table class="stack">
+      <thead>
+        <tr><th scope="col">Layer</th><th scope="col">What it is</th></tr>
+      </thead>
+      <tbody>
+        <tr><th scope="row">Vault key</th><td data-label="What it is">A random 32-byte key, generated on your device. It encrypts the whole account list with AES-256-GCM, using a fresh random 12-byte value for each save. A SHA-256 checksum of the stored data is kept alongside it.</td></tr>
+        <tr><th scope="row">Password</th><td data-label="What it is">Your password is stretched with Argon2id (3 passes, 64 MiB of memory, 1 lane, a random 16-byte salt) into a 32-byte key. That key encrypts the vault key. The password must be at least 8 characters.</td></tr>
+        <tr><th scope="row">Recovery code</th><td data-label="What it is">If you create one, a second copy of the vault key is encrypted with a key derived from the recovery code (HKDF-SHA256).</td></tr>
+        <tr><th scope="row">Passkey</th><td data-label="What it is">If you add one, a further copy of the vault key is encrypted with a key derived from the passkey's PRF output (HKDF-SHA256). It is used together with the password.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>See <a href="../lock-and-protect/" data-keep-utm>Lock and protect your accounts</a> for how to set the lock and its timing.</p>
+
+  <h2 id="nolock">With no lock set</h2>
+  <div class="card note">
+    <p>If you do not set a lock, the vault is still encrypted with AES-256-GCM, but the vault key is stored next to the encrypted data in the same place, without a password around it. Anything that can read the extension's storage can read the key and decrypt the accounts. Treat this state as unencrypted. It does not protect your secret keys from someone who can open your browser profile.</p>
+  </div>
+  <p>Setting a lock changes this: the vault key is then stored only in its encrypted form, and your password (or recovery code) is needed to unlock it. Check in the lock settings which state you are in.</p>
+
+  <h2 id="network">What leaves the extension</h2>
+  <ul>
+    <li>Popout generates codes on your device from the stored secret key and the clock. Generating a code makes no network request.</li>
+    <li>The only network request in the extension's code is an optional clock check. It makes plain GET requests to <code>time.akamai.com</code>, <code>timeapi.io</code>, and <code>cloudflare.com</code> to compare your computer's clock with real time, because a wrong clock produces wrong codes. The requests carry no account data and no body. The result is reused for 6 hours when the clock is right, and re-checked after 5 minutes otherwise. As with any web request, those hosts see your IP address. The check is on by default and can be turned off in settings.</li>
+    <li>There is no analytics, usage statistics, account sign-in, or developer-run server in the extension.</li>
+  </ul>
+
+  <h2 id="sync">Browser sync</h2>
+  <ul>
+    <li>If sync is on, Popout writes each account, encrypted with AES-256-GCM, to the browser's own sync storage (<code>chrome.storage.sync</code>). Your browser vendor's sync service then carries it between your devices. Popout does not run a sync server.</li>
+    <li>By default Popout syncs only after you have set a lock. Syncing without a lock needs a separate choice, "Allow syncing without a lock". Because the vault key is stored in clear when no lock is set (see above), this setting sends accounts that anyone with access to the synced data could read. The Firefox build also asks for its data-collection permission when you turn sync on.</li>
+    <li>The Safari build has no cross-device sync.</li>
+    <li>See <a href="../backup-and-sync/" data-keep-utm>Backup, export, and sync</a> for the steps.</li>
+  </ul>
+
+  <h2 id="permissions">Permissions it asks for</h2>
+  <p>These are the permissions in the extension's manifest. The reasons are the ones listed in the project README.</p>
+  <div class="table-wrap">
+    <table class="stack">
+      <thead>
+        <tr><th scope="col">Permission</th><th scope="col">Why</th></tr>
+      </thead>
+      <tbody>
+        <tr><th scope="row"><code>storage</code>, <code>unlimitedStorage</code></th><td data-label="Why">Keeps the vault, settings, and backup history on your device; the second one avoids the default storage quota for that history.</td></tr>
+        <tr><th scope="row"><code>activeTab</code>, <code>scripting</code></th><td data-label="Why">Fills a code into the current tab and reads a QR code on it, only after you click, right-click, or use a shortcut.</td></tr>
+        <tr><th scope="row"><code>alarms</code></th><td data-label="Why">Auto-lock, periodic sync, clipboard clearing, and cleanup timers.</td></tr>
+        <tr><th scope="row"><code>contextMenus</code></th><td data-label="Why">The "Fill 2FA code" item on input fields and "Open in a separate window" on the toolbar icon.</td></tr>
+        <tr><th scope="row"><code>clipboardWrite</code></th><td data-label="Why">Copies codes, share links, and recovery codes.</td></tr>
+        <tr><th scope="row"><code>offscreen</code>, <code>sidePanel</code> (Chrome, Edge)</th><td data-label="Why">Clearing a copied code from the clipboard after the time you choose, and opening the side panel.</td></tr>
+        <tr><th scope="row"><code>tabs</code>, <code>clipboardRead</code> (optional)</th><td data-label="Why">Asked only when needed: the first lets the separate window and side panel suggest an account for the active tab's site; the second is requested only when you turn on clipboard clearing.</td></tr>
+        <tr><th scope="row">Site access: <code>https://*/*</code>, <code>localhost</code>, <code>127.0.0.1</code> (optional)</th><td data-label="Why">Not granted at install. Popout asks for it only for the sites involved: the current site when you fill from the separate window or side panel, the sites you enter for a "Fill code" button, or a fixed list of known services if you turn on automatic recognition. It never asks for all sites at once.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>The manifest declares no site access that is granted at install. All of it is optional and requested later, as described in the last row.</p>
+
+  <h2 id="backups">Backups and share links</h2>
+  <ul>
+    <li>A plain backup file is readable: it contains your secret keys in clear text. Keep it like a password, or choose an encrypted backup, which uses Argon2id and AES-GCM with a password you set.</li>
+    <li>A share link contains only upcoming codes, not the secret key. It is built on your device; the data is in the part of the address after <code>#</code>, which browsers do not send to the page's server. A link without a password can be opened by anyone who has the link. A link with a password is encrypted with a key derived from that password (PBKDF2-SHA256, 600,000 iterations). See <a href="../share-codes/" data-keep-utm>Share a code with a link</a>.</li>
+  </ul>
+
+  <h2 id="limits">What it cannot protect against</h2>
+  <p>These limits come from where the data lives, and no setting removes them.</p>
+  <ul>
+    <li><strong>Malware or a hostile program under your own account.</strong> Something running as you in the same browser profile can read what the extension can read, and can watch the unlocked state. A lock helps only while the vault is locked.</li>
+    <li><strong>No lock, and access to your files.</strong> Without a lock, someone who can copy your browser profile folder can read the accounts, as described above.</li>
+    <li><strong>A backup file in the wrong hands.</strong> A plain backup works for whoever holds it. Where you store it is up to you.</li>
+    <li><strong>A copied code.</strong> A copied code sits on the system clipboard, where other programs can read it. Automatic clipboard clearing is off by default; you can turn it on.</li>
+    <li><strong>A weak or reused password.</strong> Argon2id slows down guessing, but it cannot make a short or common password strong.</li>
+    <li><strong>Filling on the wrong site.</strong> Popout checks the page address before it fills and asks if the site does not match (<a href="../site-match-check/" data-keep-utm>Site match check</a>), but you still decide when it asks.</li>
+  </ul>
+  <p>A phone app keeps its data outside the browser, on a different device. A browser extension keeps it inside the browser profile on the computer you are using. They have different risks, and this page describes only Popout.</p>
+
+  <h2 id="source">Check it yourself</h2>
+  <p>The extension's source code is published under the MIT License at <a href="https://github.com/elitekid/popout-authenticator">github.com/elitekid/popout-authenticator</a>. The manifest lists the permissions above, and the project's <a href="https://github.com/elitekid/popout-authenticator/blob/main/PRIVACY.md">privacy policy</a> describes the same network use. If you find a statement here that does not match the code, please report it in the project's <a href="https://github.com/elitekid/popout-authenticator/issues">Issues</a>.</p>
+
+  <aside class="review-ask" aria-label="Rate Popout Authenticator" hidden>
+    <p><strong>Rate Popout Authenticator.</strong> A short review in your browser's store helps other people find it.</p>
+    <div class="stores reviews" data-campaign="pa-review-guide"></div>
+  </aside>
+
+  <nav class="guide-nav" aria-label="More guides"><a href="../getting-started/" data-keep-utm>← Get started: install and add your first account</a><a href="../lock-and-protect/" data-keep-utm>Lock and protect your accounts →</a></nav>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <ul>
+      <li><a href="https://github.com/elitekid/popout-authenticator">GitHub</a></li>
+      <li><a href="https://github.com/elitekid/popout-authenticator/blob/main/PRIVACY.md">Privacy</a></li>
+      <li><a href="https://github.com/elitekid/popout-authenticator/issues">Issues</a></li>
+      <li>MIT License</li>
+    </ul>
+  </div>
+</footer>
+</body>
+</html>
