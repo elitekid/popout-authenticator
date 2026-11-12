@@ -1,0 +1,41 @@
+{
+  "appName": { "message": "Popout Authenticator — xác thực 2FA" },
+  "appShortName": { "message": "Popout Authenticator" },
+  "appDesc": { "message": "Ứng dụng xác thực 2FA cho trình duyệt của bạn. Tạo mã dùng một lần, mở trong cửa sổ bật lên hoặc cửa sổ riêng." },
+  "cmdExecuteAction": { "message": "Mở cửa sổ bật lên" },
+  "cmdQuickFill": { "message": "Điền mã 2FA vào trang này" },
+  "cmdScanQr": { "message": "Quét mã QR trên màn hình" },
+  "cmdAutofill": { "message": "Điền mã của tài khoản phù hợp nhất" },
+  "cmdHideCodes": { "message": "Ẩn hoặc hiện mã" },
+  "cmdOpenWindow": { "message": "Mở trong cửa sổ riêng" },
+  "menuOpenWindow": { "message": "Mở trong cửa sổ riêng" },
+  "menuQuickFill": { "message": "Điền mã 2FA" },
+  "fillCopied": { "message": "Đã sao chép mã. Hãy dán mã vào trang web." },
+  "fillManual": {
+    "message": "Mã: $CODE$",
+    "placeholders": { "code": { "content": "$1" } }
+  },
+  "cmdCopyPinned1": {
+    "message": "Sao chép mã của tài khoản gắn sao 1"
+  },
+  "cmdCopyPinned2": {
+    "message": "Sao chép mã của tài khoản gắn sao 2"
+  },
+  "cmdCopyPinned3": {
+    "message": "Sao chép mã của tài khoản gắn sao 3"
+  },
+  "shortcutCopied": {
+    "message": "Đã sao chép mã."
+  },
+  "shortcutLocked": {
+    "message": "Hãy mở khóa Popout Authenticator trước."
+  },
+  "shortcutMissing": {
+    "message": "Không có tài khoản gắn sao cho phím tắt này."
+  },
+  "shortcutFailed": {
+    "message": "Không thể sao chép mã."
+  },
+  "fillPickAccount": { "message": "Chọn một tài khoản" },
+  "fieldFillButton": { "message": "Điền mã" }
+}

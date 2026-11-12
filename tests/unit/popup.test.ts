@@ -1,0 +1,322 @@
+import { describe, expect, it } from 'vitest';
+import {
+  backupSignature,
+  filterAccounts,
+  formatCode,
+  groupCounts,
+  groupSections,
+  normalizeGroupName,
+  pruneFolded,
+  shouldShowBackupReminder,
+  shouldShowReview,
+  siteUrl,
+  moveActive,
+  UNGROUPED_KEY,
+  visibleRows,
+  sortByName,
+  whatsNewFor,
+} from '../../src/ui/popup/logic';
+
+const DAY = 24 * 60 * 60 * 1000;
+const NOW = 1_800_000_000_000;
+
+type Item = {
+  id: string;
+  issuer: string;
+  label: string;
+  group?: string;
+  note: string;
+  pinned: boolean;
+  updatedAt: number;
+  deletedAt?: number;
+};
+
+const item = (id: string, over: Partial<Item> = {}): Item => ({
+  id,
+  issuer: `Issuer-${id}`,
+  label: `label-${id}`,
+  note: '',
+  pinned: false,
+  updatedAt: 1,
+  ...over,
+});
+
+describe('formatCode', () => {
+  it('3자리씩 끊는다', () => {
+    expect(formatCode('996554')).toBe('996 554');
+    expect(formatCode('2041996554')).toBe('204 199 655 4');
+    expect(formatCode('12345678')).toBe('123 456 78');
+    expect(formatCode('CWDGV')).toBe('CWD GV');
+  });
+});
+
+describe('filterAccounts', () => {
+  const list = [
+    item('a', { issuer: 'GitHub', label: 'alice@example.com', group: 'Work', note: 'main' }),
+    item('b', { issuer: 'Bank', label: 'bob', group: 'Money', note: 'Savings card' }),
+    item('c', { issuer: 'Mail', label: 'carol', note: '' }),
+    item('d', { issuer: 'GitHub Old', label: 'dave', deletedAt: 5 }),
+  ];
+  const ids = (xs: Item[]) => xs.map((x) => x.id);
+
+  it('이름·서비스·그룹·메모에서 부분 일치', () => {
+    expect(ids(filterAccounts(list, 'hub', null))).toEqual(['a']);
+    expect(ids(filterAccounts(list, 'bob', null))).toEqual(['b']);
+    expect(ids(filterAccounts(list, 'money', null))).toEqual(['b']);
+    expect(ids(filterAccounts(list, 'savings', null))).toEqual(['b']);
+  });
+
+  it('대소문자를 가리지 않는다', () => {
+    expect(ids(filterAccounts(list, 'GITHUB', null))).toEqual(['a']);
+    expect(ids(filterAccounts(list, 'CAROL', null))).toEqual(['c']);
+  });
+
+  it('그룹 필터', () => {
+    expect(ids(filterAccounts(list, '', 'Work'))).toEqual(['a']);
+    expect(ids(filterAccounts(list, 'o', 'Money'))).toEqual(['b']);
+  });
+
+  it('휴지통은 뺀다', () => {
+    expect(ids(filterAccounts(list, '', null))).toEqual(['a', 'b', 'c']);
+    expect(ids(filterAccounts(list, 'old', null))).toEqual([]);
+  });
+
+  it('공백으로 나눈 두 단어가 모두 있어야 한다(AND)', () => {
+    expect(ids(filterAccounts(list, 'github main'))).toEqual(['a']);
+    expect(ids(filterAccounts(list, '  SAVINGS   bank '))).toEqual(['b']);
+    expect(ids(filterAccounts(list, 'github bank'))).toEqual([]);
+  });
+
+  it('범위를 지정하면 그 필드만 본다', () => {
+    expect(ids(filterAccounts(list, 'savings', null, 'issuer'))).toEqual([]);
+    expect(ids(filterAccounts(list, 'savings', null, 'note'))).toEqual(['b']);
+    expect(ids(filterAccounts(list, 'bank', null, 'issuer'))).toEqual(['b']);
+    expect(ids(filterAccounts(list, 'work', null, 'group'))).toEqual(['a']);
+    expect(ids(filterAccounts(list, 'carol', null, 'label'))).toEqual(['c']);
+  });
+
+  it('비밀키 문자열로는 찾지 않는다', () => {
+    const secretList = [
+      { ...item('s', { issuer: 'Acme Mail', label: 'alex@example.com' }), secret: 'JBSWY3DPEHPK3PXP' },
+      { ...item('t', { issuer: 'Wingtip Cloud' }), secret: 'KRUGS4ZANFZSAYJAMZQWWZJAONSWG4TF' },
+    ];
+    expect(ids(filterAccounts(secretList, 'JBSWY3DPEHPK3PXP'))).toEqual([]);
+    expect(ids(filterAccounts(secretList, 'krugs4zanf'))).toEqual([]);
+    expect(ids(filterAccounts(secretList, 'acme', null, 'all'))).toEqual(['s']);
+  });
+});
+
+describe('수동 순서', () => {
+  it('고정 표시와 검색은 저장 순서를 바꾸지 않는다', () => {
+    const list = [item('a'), item('b', { pinned: true }), item('c')];
+    expect(filterAccounts(list, '').map((x) => x.id)).toEqual(['a', 'b', 'c']);
+  });
+
+  it('보이는 이웃 앞으로 옮겨도 숨은 계정과 휴지통을 보존한다', () => {
+    const list = [item('a'), item('hidden'), item('trash', { deletedAt: 1 }), item('b'), item('c')];
+    const moved = moveActive(list, 'c', 'b');
+    expect(moved.map((x) => x.id)).toEqual(['a', 'hidden', 'trash', 'c', 'b']);
+    expect(list.map((x) => x.id)).toEqual(['a', 'hidden', 'trash', 'b', 'c']);
+  });
+
+  it('저장 중 이웃이 사라졌으면 순서를 그대로 둔다', () => {
+    const list = [item('a'), item('b')];
+    expect(moveActive(list, 'a', 'missing')).toBe(list);
+  });
+});
+
+describe('groupCounts', () => {
+  it('그룹별 개수, 휴지통 제외', () => {
+    const list = [
+      item('a', { group: 'Work' }),
+      item('b', { group: 'Work' }),
+      item('c', { group: 'Home' }),
+      item('d', { group: 'Home', deletedAt: 1 }),
+      item('e'),
+    ];
+    expect(groupCounts(list)).toEqual([
+      { name: 'Work', count: 2 },
+      { name: 'Home', count: 1 },
+    ]);
+  });
+});
+
+describe('groupSections', () => {
+  const list = [
+    item('a', { group: 'Dev' }),
+    item('b'),
+    item('c', { group: 'Work' }),
+    item('d', { group: 'Dev' }),
+    item('e', { group: 'Work', deletedAt: 1 }),
+    item('f', { group: 'Work' }),
+  ];
+  const ids = (xs: Item[]) => xs.map((x) => x.id);
+
+  it('묶음 순서는 그룹 첫 계정 순서, 안은 목록 순서, 그룹 없음은 맨 끝', () => {
+    const sections = groupSections(list);
+    expect(sections.map((s) => s.name)).toEqual(['Dev', 'Work', null]);
+    expect(sections.map((s) => ids(s.items))).toEqual([['a', 'd'], ['c', 'f'], ['b']]);
+    expect(sections.every((s) => !s.folded)).toBe(true);
+  });
+
+  it('그룹 없는 계정이 없으면 그룹 없음 묶음을 만들지 않는다', () => {
+    expect(groupSections([item('a', { group: 'Work' })]).map((s) => s.name)).toEqual(['Work']);
+    expect(groupSections([item('a', { deletedAt: 1 })])).toEqual([]);
+  });
+
+  it('접힌 묶음의 줄은 보이는 목록에서 빠진다', () => {
+    const sections = groupSections(list, ['Dev']);
+    expect(sections.map((s) => s.folded)).toEqual([true, false, false]);
+    expect(ids(visibleRows(sections))).toEqual(['c', 'f', 'b']);
+    expect(ids(visibleRows(groupSections(list, new Set([UNGROUPED_KEY, 'Work']))))).toEqual(['a', 'd']);
+  });
+
+  it('접힘 기록에서 없어진 이름을 지운다', () => {
+    const sections = groupSections(list);
+    expect(pruneFolded(['Dev', 'Gone', UNGROUPED_KEY], sections)).toEqual(['Dev', UNGROUPED_KEY]);
+    expect(pruneFolded([UNGROUPED_KEY], groupSections([item('a', { group: 'Work' })]))).toEqual([]);
+  });
+});
+
+describe('normalizeGroupName', () => {
+  it('앞뒤 공백을 떼고 1~64 글자만 받는다', () => {
+    expect(normalizeGroupName('  업무 ')).toBe('업무');
+    expect(normalizeGroupName('   ')).toBeNull();
+    expect(normalizeGroupName('가'.repeat(64))).toBe('가'.repeat(64));
+    expect(normalizeGroupName('가'.repeat(65))).toBeNull();
+    // 코드 포인트 기준: 이모지 64개는 통과
+    expect(normalizeGroupName('😀'.repeat(64))).toBe('😀'.repeat(64));
+  });
+});
+
+describe('backupSignature', () => {
+  it('휴지통을 빼고 정렬해 잇는다', () => {
+    const sig = backupSignature([
+      { id: 'b', updatedAt: 2 },
+      { id: 'a', updatedAt: 1 },
+      { id: 'x', updatedAt: 9, deletedAt: 3 },
+    ]);
+    expect(sig).toBe('a:1|b:2');
+  });
+});
+
+describe('shouldShowBackupReminder', () => {
+  const base = { activeCount: 3, sig: 's1', backupInfo: null, snoozeUntil: null, now: NOW };
+
+  it('계정이 3개 미만이면 띠 없음', () => {
+    expect(shouldShowBackupReminder({ ...base, activeCount: 2 })).toBe(false);
+  });
+
+  it('백업 기록이 없으면 보임', () => {
+    expect(shouldShowBackupReminder(base)).toBe(true);
+  });
+
+  it('31일 전 백업 + 내용이 달라졌으면 보임', () => {
+    const backupInfo = { at: NOW - 31 * DAY, sig: 'old' };
+    expect(shouldShowBackupReminder({ ...base, backupInfo })).toBe(true);
+  });
+
+  it('31일 전 백업이어도 내용이 같으면 안 보임', () => {
+    const backupInfo = { at: NOW - 31 * DAY, sig: 's1' };
+    expect(shouldShowBackupReminder({ ...base, backupInfo })).toBe(false);
+  });
+
+  it('10일 전 백업이면 내용이 달라도 안 보임', () => {
+    const backupInfo = { at: NOW - 10 * DAY, sig: 'old' };
+    expect(shouldShowBackupReminder({ ...base, backupInfo })).toBe(false);
+  });
+
+  it('미룸이 남아 있으면 안 보임', () => {
+    expect(shouldShowBackupReminder({ ...base, snoozeUntil: NOW + 3 * DAY })).toBe(false);
+  });
+
+  it('7일보다 먼 미룸 값은 시계 이상으로 보고 무시', () => {
+    expect(shouldShowBackupReminder({ ...base, snoozeUntil: NOW + 30 * DAY })).toBe(true);
+  });
+
+  it('미룸이 지났으면 다시 보임', () => {
+    expect(shouldShowBackupReminder({ ...base, snoozeUntil: NOW - 1 })).toBe(true);
+  });
+});
+
+describe('shouldShowReview', () => {
+  const now = 100 * DAY;
+  const ok = { openCount: 5, accounts: 1, dismissed: false, now };
+
+  it('5회 이상·계정 1개 이상·닫지 않음일 때만 보임', () => {
+    expect(shouldShowReview({ ...ok, openCount: 4 })).toBe(false);
+    expect(shouldShowReview(ok)).toBe(true);
+    expect(shouldShowReview({ ...ok, accounts: 0 })).toBe(false);
+    expect(shouldShowReview({ ...ok, dismissed: true })).toBe(false);
+  });
+
+  it('마지막 노출 뒤 14일이 지나야 다시 보임', () => {
+    expect(shouldShowReview({ ...ok, shown: 1, lastShownAt: now - 13 * DAY })).toBe(false);
+    expect(shouldShowReview({ ...ok, shown: 1, lastShownAt: now - 14 * DAY })).toBe(true);
+  });
+
+  it('무응답 노출이 3회 쌓이면 보이지 않음', () => {
+    expect(shouldShowReview({ ...ok, shown: 2 })).toBe(true);
+    expect(shouldShowReview({ ...ok, shown: 3 })).toBe(false);
+  });
+
+  it('safari 대상이면 자동 띠를 보이지 않음', () => {
+    expect(shouldShowReview(ok, 'chrome')).toBe(true);
+    expect(shouldShowReview(ok, 'safari')).toBe(false);
+  });
+});
+
+describe('whatsNewFor', () => {
+  it('firefox·safari 는 copy 줄을 뺌', () => {
+    expect(whatsNewFor('chrome')['1.0.2']).toHaveLength(3);
+    expect(whatsNewFor('edge')['1.0.2']).toHaveLength(3);
+    expect(whatsNewFor('firefox')['1.0.2']).toEqual(['popup.whatsNew.v102.organize', 'popup.whatsNew.v102.capture']);
+    expect(whatsNewFor('safari')['1.0.2']).toHaveLength(2);
+  });
+
+  it('1.0.3 은 모든 브라우저에 세 줄', () => {
+    for (const target of ['chrome', 'firefox', 'safari'] as const) {
+      expect(whatsNewFor(target)['1.0.3']).toEqual([
+        'popup.whatsNew.v103.about',
+        'popup.whatsNew.v103.icons',
+        'popup.whatsNew.v103.name',
+      ]);
+    }
+  });
+
+  it('1.0.4 는 크롬 계열에만 있고 firefox·safari 에는 키가 없음', () => {
+    expect(whatsNewFor('chrome')['1.0.4']).toEqual(['popup.whatsNew.v104.shortcuts']);
+    expect(whatsNewFor('edge')['1.0.4']).toEqual(['popup.whatsNew.v104.shortcuts']);
+    expect(whatsNewFor('firefox')).not.toHaveProperty('1.0.4');
+    expect(whatsNewFor('safari')).not.toHaveProperty('1.0.4');
+  });
+});
+
+describe('sortByName', () => {
+  const acc = (issuer: string, label: string) => ({ issuer, label });
+
+  it('대소문자를 구분하지 않고 숫자는 크기 순', () => {
+    const list = [acc('beta', 'a'), acc('Alpha', 'a'), acc('item10', 'a'), acc('item2', 'a')];
+    expect(sortByName(list, 'en').map((a) => a.issuer)).toEqual(['Alpha', 'beta', 'item2', 'item10']);
+  });
+
+  it('서비스가 같으면 계정 이름 순, 완전히 같으면 원래 순서', () => {
+    const first = acc('Acme', 'same');
+    const second = acc('acme', 'same');
+    const list = [acc('Acme', 'b'), second, first, acc('Acme', 'a')];
+    const sorted = sortByName(list, 'en');
+    expect(sorted.map((a) => a.label)).toEqual(['a', 'b', 'same', 'same']);
+    expect(sorted[2]).toBe(second);
+    expect(sorted[3]).toBe(first);
+    expect(list[0]!.label).toBe('b');
+  });
+});
+
+describe('siteUrl', () => {
+  const utm = '?utm_source=extension&utm_medium=product&utm_campaign=pa-help';
+
+  it('한국어 화면이면 /ko/ 쪽, 그 밖에는 영어 쪽을 연다', () => {
+    expect(siteUrl('ko', 'guides')).toBe(`https://elitekid.github.io/popout-authenticator/ko/guides/${utm}`);
+    expect(siteUrl('en', 'home')).toBe(`https://elitekid.github.io/popout-authenticator/${utm}`);
+  });
+});

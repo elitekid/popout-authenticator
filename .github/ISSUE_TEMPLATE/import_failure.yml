@@ -1,0 +1,41 @@
+name: Import failed
+description: A backup, QR code, or file from another app could not be imported.
+labels: [import]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Do not attach the backup file, QR image, or any secret.** Describe the file instead. If needed, we will ask for a sample made with a test account.
+  - type: input
+    id: version
+    attributes:
+      label: Extension version and browser
+      placeholder: 1.0.0 on Chrome 141
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Source app and its version
+      description: Which app created the file or QR code?
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What did you import?
+      options:
+        - Backup file (plain text)
+        - Backup file (encrypted)
+        - Export / migration QR code
+        - otpauth:// link or list
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: What happened?
+      description: The exact error message, or how many accounts were imported versus expected.
+    validations:
+      required: true

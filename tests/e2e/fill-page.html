@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>fill test page</title>
+  </head>
+  <body>
+    <!-- (a) 칸 하나 -->
+    <form onsubmit="return false">
+      <input id="single" autocomplete="one-time-code" />
+    </form>
+
+    <!-- (b) 한 글자 칸 6개 묶음 -->
+    <div id="split">
+      <input maxlength="1" inputmode="numeric" aria-label="digit 1" />
+      <input maxlength="1" inputmode="numeric" aria-label="digit 2" />
+      <input maxlength="1" inputmode="numeric" aria-label="digit 3" />
+      <input maxlength="1" inputmode="numeric" aria-label="digit 4" />
+      <input maxlength="1" inputmode="numeric" aria-label="digit 5" />
+      <input maxlength="1" inputmode="numeric" aria-label="digit 6" />
+    </div>
+
+    <!-- (c) shadow root(open) 안 칸 -->
+    <x-otp id="host"></x-otp>
+    <script>
+      customElements.define(
+        'x-otp',
+        class extends HTMLElement {
+          constructor() {
+            super();
+            this.attachShadow({ mode: 'open' }).innerHTML = '<input id="shadow" autocomplete="one-time-code" />';
+          }
+        },
+      );
+    </script>
+  </body>
+</html>

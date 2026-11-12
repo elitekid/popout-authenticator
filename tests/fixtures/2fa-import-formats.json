@@ -1,0 +1,101 @@
+{
+  "_comment": "Backup files as other authenticators write them, shaped after each app's documented export and filled with the RFC 6238 test seeds (SHA1 '12345678901234567890', SHA256 the 32-byte and SHA512 the 64-byte extension of it) so every imported account can be checked against the published codes. No real secrets. Read by test/import-paths.test.ts.",
+  "aegis": {
+    "version": 1,
+    "header": { "slots": null, "params": null },
+    "db": {
+      "version": 3,
+      "entries": [
+        { "type": "totp", "uuid": "3ae6f1ad-2e65-4ed2-a953-1ec0dff2386d", "name": "alice@example.com", "issuer": "GitHub", "note": "", "favorite": false, "icon": null, "info": { "secret": "GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ", "algo": "SHA1", "digits": 8, "period": 30 }, "groups": ["9a8d4f0e-4b1c-4b6e-8a4e-3f1f2b0c7d11"] },
+        { "type": "totp", "uuid": "0c7a3a1c-5c1e-4a3b-9a3f-6d7f0c1b2e33", "name": "bob@example.com", "issuer": "Bank", "note": "", "favorite": true, "icon": null, "info": { "secret": "GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQGEZA", "algo": "SHA256", "digits": 8, "period": 30 }, "groups": [] },
+        { "type": "totp", "uuid": "5f1d7c2a-0b3e-4c8d-9e1f-2a3b4c5d6e7f", "name": "ops", "issuer": "AWS", "note": "", "favorite": false, "icon": null, "info": { "secret": "GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQGEZDGNA", "algo": "SHA512", "digits": 8, "period": 30 }, "groups": [] },
+        { "type": "hotp", "uuid": "7b2c1d0e-9f8a-4b3c-8d2e-1f0a9b8c7d6e", "name": "vpn", "issuer": "Corp", "note": "", "favorite": false, "icon": null, "info": { "secret": "JBSWY3DPEHPK3PXP", "algo": "SHA1", "digits": 6, "counter": 12 }, "groups": [] },
+        { "type": "steam", "uuid": "1e2d3c4b-5a69-4788-9900-aabbccddeeff", "name": "gamer", "issuer": "Steam", "note": "", "favorite": false, "icon": null, "info": { "secret": "KRSXG5CTMVRXEZLU", "algo": "SHA1", "digits": 5, "period": 30 }, "groups": [] }
+      ],
+      "groups": [{ "uuid": "9a8d4f0e-4b1c-4b6e-8a4e-3f1f2b0c7d11", "name": "Work" }]
+    }
+  },
+  "aegisEncrypted": {
+    "version": 1,
+    "header": {
+      "slots": [{ "type": 1, "uuid": "a0b1c2d3-e4f5-4a6b-8c7d-9e0f1a2b3c4d", "key": "491d44550430ce4bd2d4cd4d7d7a0f1d4d3a2b1c0d9e8f7a6b5c4d3e2f1a0b9c", "key_params": { "nonce": "095fd13dee336fc56d2ad4f5", "tag": "5db2e8a4b0f1c2d3e4f5a6b7c8d9e0f1" }, "n": 32768, "r": 8, "p": 1, "salt": "27ea9ae53fa2f08a8dcd201615a8229422647b3058f9f36b08f9457e62888be1", "repaired": true }],
+      "params": { "nonce": "e9705513ba4951fa7a0608d2", "tag": "931237af257b83c693ddb8f9a7eddaf0" }
+    },
+    "db": "RkFLRSBDSVBIRVJURVhUIC0tIGFuIGVuY3J5cHRlZCBBZWdpcyB2YXVsdCBwdXRzIGl0cyBkYiBoZXJl"
+  },
+  "twoFas": {
+    "services": [
+      { "name": "GitHub", "secret": "GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ", "updatedAt": 1700000000000, "otp": { "label": "GitHub:alice@example.com", "account": "alice@example.com", "issuer": "GitHub", "digits": 8, "period": 30, "algorithm": "SHA1", "tokenType": "TOTP", "source": "Link" }, "order": { "position": 0 }, "icon": { "selected": "Label", "label": { "text": "GI", "backgroundColor": "Orange" } }, "groupId": "g-work" },
+      { "name": "Bank", "secret": "GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQGEZA", "updatedAt": 1700000000000, "otp": { "account": "bob@example.com", "digits": 8, "period": 30, "algorithm": "SHA256", "tokenType": "TOTP", "source": "Manual" }, "order": { "position": 1 } },
+      { "name": "Corp VPN", "secret": "JBSWY3DPEHPK3PXP", "updatedAt": 1700000000000, "otp": { "account": "carol", "digits": 6, "counter": 3, "algorithm": "SHA1", "tokenType": "HOTP", "source": "Manual" }, "order": { "position": 2 } },
+      { "name": "Steam", "secret": "KRSXG5CTMVRXEZLU", "updatedAt": 1700000000000, "otp": { "account": "gamer", "digits": 5, "period": 30, "algorithm": "SHA1", "tokenType": "STEAM", "source": "Manual" }, "order": { "position": 3 } }
+    ],
+    "groups": [{ "id": "g-work", "name": "Work", "isExpanded": true }],
+    "updatedAt": 1700000000000,
+    "schemaVersion": 4,
+    "appVersionCode": 5000000,
+    "appVersionName": "5.0.0",
+    "appOrigin": "android"
+  },
+  "twoFasEncrypted": {
+    "services": [],
+    "groups": [],
+    "updatedAt": 1700000000000,
+    "schemaVersion": 4,
+    "appVersionCode": 5000000,
+    "appVersionName": "5.0.0",
+    "appOrigin": "ios",
+    "servicesEncrypted": "RkFLRUNJUEhFUlRFWFQ=:RkFLRVNBTFQ=:RkFLRUlW",
+    "reference": "RkFLRVJFRkVSRU5DRQ=="
+  },
+  "bitwarden": {
+    "encrypted": false,
+    "folders": [],
+    "items": [
+      { "id": "4c1e2a3b-0000-4000-8000-000000000001", "organizationId": null, "folderId": null, "type": 1, "reprompt": 0, "name": "GitHub", "notes": null, "favorite": false, "login": { "uris": [{ "match": null, "uri": "https://github.com" }], "username": "alice@example.com", "password": "not-a-real-password", "totp": "otpauth://totp/GitHub:alice%40example.com?secret=GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ&issuer=GitHub&digits=8&period=30" }, "collectionIds": null },
+      { "id": "4c1e2a3b-0000-4000-8000-000000000002", "organizationId": null, "folderId": null, "type": 1, "reprompt": 0, "name": "Bank", "notes": null, "favorite": false, "login": { "uris": [], "username": "bob@example.com", "password": "not-a-real-password", "totp": "GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQGEZA" }, "collectionIds": null },
+      { "id": "4c1e2a3b-0000-4000-8000-000000000003", "organizationId": null, "folderId": null, "type": 1, "reprompt": 0, "name": "Forum", "notes": null, "favorite": false, "login": { "uris": [], "username": "carol", "password": "not-a-real-password", "totp": null }, "collectionIds": null },
+      { "id": "4c1e2a3b-0000-4000-8000-000000000004", "organizationId": null, "folderId": null, "type": 2, "reprompt": 0, "name": "A secure note", "notes": "no login here", "favorite": false, "secureNote": { "type": 0 }, "collectionIds": null },
+      { "id": "4c1e2a3b-0000-4000-8000-000000000005", "organizationId": null, "folderId": null, "type": 1, "reprompt": 0, "name": "Steam", "notes": null, "favorite": false, "login": { "uris": [], "username": "gamer", "password": "not-a-real-password", "totp": "steam://KRSXG5CTMVRXEZLU" }, "collectionIds": null }
+    ]
+  },
+  "bitwardenEncrypted": {
+    "encrypted": true,
+    "passwordProtected": true,
+    "salt": "RkFLRVNBTFQ=",
+    "kdfType": 0,
+    "kdfIterations": 600000,
+    "encKeyValidation_DO_NOT_EDIT": "2.RkFLRQ==|RkFLRQ==|RkFLRQ==",
+    "data": "2.RkFLRQ==|RkFLRQ==|RkFLRQ=="
+  },
+  "freeOtpPlus": {
+    "tokenOrder": ["GitHub:alice@example.com", "Example:signed"],
+    "tokens": [
+      { "algo": "SHA1", "counter": 0, "digits": 8, "issuerExt": "GitHub", "issuerInt": "GitHub", "label": "alice@example.com", "period": 30, "secret": [49, 50, 51, 52, 53, 54, 55, 56, 57, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 48], "type": "TOTP" },
+      { "algo": "SHA1", "counter": 0, "digits": 6, "issuerExt": "Example", "label": "signed", "period": 30, "secret": [72, 101, 108, 108, 111, 33, -34, -83, -66, -17], "type": "TOTP" },
+      { "algo": "SHA1", "counter": 7, "digits": 6, "issuerExt": "Corp", "label": "vpn", "period": 30, "secret": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "type": "HOTP" }
+    ]
+  },
+  "andOtp": [
+    { "secret": "GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ", "issuer": "GitHub", "label": "alice@example.com", "digits": 8, "type": "TOTP", "algorithm": "SHA1", "thumbnail": "Default", "last_used": 1700000000000, "used_frequency": 3, "period": 30, "tags": ["Work"] },
+    { "secret": "KRSXG5CTMVRXEZLU", "issuer": "Bank", "label": "bob", "digits": 8, "type": "TOTP", "algorithm": "SHA256", "thumbnail": "Default", "last_used": 1700000000000, "used_frequency": 0, "period": 60, "tags": [] },
+    { "secret": "JBSWY3DPEHPK3PXP", "issuer": "Legacy", "label": "hotp-user", "digits": 6, "type": "HOTP", "algorithm": "SHA1", "counter": 5, "thumbnail": "Default", "last_used": 1700000000000, "used_frequency": 0, "tags": [] },
+    { "secret": "MFRGGZDFMZTWQ2LK", "issuer": "Steam", "label": "gamer", "digits": 5, "type": "STEAM", "algorithm": "SHA1", "period": 30, "thumbnail": "Steam", "last_used": 1700000000000, "used_frequency": 0, "tags": [] }
+  ],
+  "raivo": [
+    { "issuer": "GitHub", "account": "alice@example.com", "secret": "GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ", "algorithm": "SHA1", "digits": "8", "kind": "TOTP", "timer": "30", "counter": "0", "pinned": "false", "iconType": "", "iconValue": "" },
+    { "issuer": "Bank", "account": "bob", "secret": "KRSXG5CTMVRXEZLU", "algorithm": "SHA256", "digits": "8", "kind": "TOTP", "timer": "60", "counter": "0", "pinned": "false", "iconType": "raivo_repository", "iconValue": "bank/bank.png" },
+    { "issuer": "VPN", "account": "carol", "secret": "JBSWY3DPEHPK3PXP", "algorithm": "SHA1", "digits": "6", "kind": "HOTP", "timer": "30", "counter": "12", "pinned": "false", "iconType": "", "iconValue": "" }
+  ],
+  "authyDump": [
+    { "name": "GitHub", "uri": "otpauth://totp/GitHub:alice%40example.com?secret=GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ&digits=8&period=30" },
+    { "name": "Twitch", "uri": "otpauth://totp/Twitch?secret=KRSXG5CTMVRXEZLU&digits=7&period=10" },
+    { "name": "Old VPN", "uri": "otpauth://hotp/VPN:carol?secret=JBSWY3DPEHPK3PXP&counter=4" }
+  ],
+  "alibabaLike": {
+    "accounts": [
+      { "secret": "3132333435363738393031323334353637383930", "accountName": "alice@aliyun.example", "siteName": "Aliyun", "type": "totp" },
+      { "secret": "MTIzNDU2Nzg5MDEyMzQ1Njc4OTA=", "accountName": "ram-user", "siteName": "Alibaba Cloud RAM" }
+    ]
+  }
+}

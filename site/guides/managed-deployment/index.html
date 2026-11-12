@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; media-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>IT admin deployment guide — Popout Authenticator</title>
+<meta name="description" content="For IT admins: force-install Popout Authenticator and set its managed policy keys in Chrome, Edge and Firefox. Policy key names match the original Authenticator extension.">
+<link rel="canonical" href="https://elitekid.github.io/popout-authenticator/guides/managed-deployment/">
+<link rel="alternate" hreflang="en" href="https://elitekid.github.io/popout-authenticator/guides/managed-deployment/">
+<link rel="alternate" hreflang="ko" href="https://elitekid.github.io/popout-authenticator/ko/guides/managed-deployment/">
+<link rel="alternate" hreflang="x-default" href="https://elitekid.github.io/popout-authenticator/guides/managed-deployment/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Popout Authenticator">
+<meta property="og:title" content="IT admin deployment guide">
+<meta property="og:description" content="For IT admins: force-install Popout Authenticator and set its managed policy keys in Chrome, Edge and Firefox. Policy key names match the original Authenticator extension.">
+<meta property="og:url" content="https://elitekid.github.io/popout-authenticator/guides/managed-deployment/">
+<meta property="og:image" content="https://elitekid.github.io/popout-authenticator/img/en/03-window.png">
+<meta property="og:locale" content="en">
+<meta property="og:locale:alternate" content="ko">
+<link rel="icon" href="../../img/logo.png">
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/site.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="../../" data-keep-utm><img src="../../img/logo.png" width="36" height="36" alt="">Popout Authenticator</a>
+    <nav class="main" aria-label="Main">
+      <a href="../../" data-keep-utm>Home</a>
+      <a href="../" data-keep-utm>Guides</a>
+      <a href="https://github.com/elitekid/popout-authenticator">GitHub</a>
+      <a class="lang" href="../../ko/guides/managed-deployment/" data-keep-utm hreflang="ko" lang="ko">한국어</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="wrap guide">
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="../../" data-keep-utm>Home</a> › <a href="../" data-keep-utm>Guides</a></nav>
+  <h1>IT admin deployment guide</h1>
+  <p>This page is for administrators at a company or school who have deployed the original Authenticator extension (authenticator.cc) with managed policy, or plan to. Popout Authenticator reads the same policy key names. Check the table below for how each key behaves before you reuse existing values.</p>
+
+  <h2>Policy keys</h2>
+  <p>Popout reads these eight keys from the browser's managed storage (declared in <code>managed_schema.json</code>). The key names match the original extension's schema. The original's <code>disableInstallHelp</code> key is not accepted.</p>
+  <div class="table-wrap">
+    <table class="stack">
+      <thead><tr><th>Key</th><th>Type</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td data-label="Key"><code>storageArea</code></td><td data-label="Type">string: <code>sync</code> or <code>local</code></td><td data-label="What it does">Forces browser sync on (<code>sync</code>) or off (<code>local</code>). The main store stays local either way. The sync setting is locked for the user. Any other value is ignored.</td></tr>
+        <tr><td data-label="Key"><code>disableBackup</code></td><td data-label="Type">boolean</td><td data-label="What it does">Read and accepted, but the current code does not use it to hide anything yet.</td></tr>
+        <tr><td data-label="Key"><code>disableExport</code></td><td data-label="Type">boolean</td><td data-label="What it does">When <code>true</code>, the backup page shows a notice instead of the export option, the raw copy save is hidden, and the per-account export in the popup is hidden.</td></tr>
+        <tr><td data-label="Key"><code>enforcePassword</code></td><td data-label="Type">boolean</td><td data-label="What it does">When <code>true</code>, users who have no password lock are asked to set one. Adding accounts and importing a raw copy are held back until the lock is on, and the user cannot turn the lock off.</td></tr>
+        <tr><td data-label="Key"><code>enforceAutolock</code></td><td data-label="Type">number (minutes)</td><td data-label="What it does">Sets the auto-lock time and locks that setting for the user. Values of 0 or below are ignored; values above 1440 (24 hours) are capped at 1440.</td></tr>
+        <tr><td data-label="Key"><code>passwordPolicy</code></td><td data-label="Type">string (regular expression)</td><td data-label="What it does">A new password must match this expression. An empty value or an invalid expression is ignored.</td></tr>
+        <tr><td data-label="Key"><code>passwordPolicyHint</code></td><td data-label="Type">string</td><td data-label="What it does">Text shown when a password does not match <code>passwordPolicy</code>.</td></tr>
+        <tr><td data-label="Key"><code>feedbackURL</code></td><td data-label="Type">string (http or https URL)</td><td data-label="What it does">Replaces the address of the feedback link in Settings. Other schemes and invalid URLs are ignored.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Popout reads the policy once per page and reads it again when the policy changes. If the read takes more than one second or fails, it is treated as "no policy" for that read.</p>
+  <p>There is no policy for putting secret keys into an extension policy to roll out accounts in bulk.</p>
+
+  <h2>Force-install</h2>
+  <p>Only the extension ID changes between browsers:</p>
+  <ul>
+    <li>Chrome: <code>nakgmloofpboegibcjhainbpjjokmbgj</code></li>
+    <li>Edge: <code>edipphpgdmfabonchodjfnejlbjoknhh</code></li>
+    <li>Firefox: <code>popout-authenticator@elitekid</code></li>
+  </ul>
+  <ul>
+    <li>Chrome: in the Google Admin console, go to Apps &amp; extensions, add the extension by its store ID, and set the installation policy to Force install. See <a href="https://support.google.com/chrome/a/answer/6177447">Google's instructions</a>.</li>
+    <li>Edge: see <a href="https://learn.microsoft.com/en-us/deployedge/microsoft-edge-management-service-extensions">Microsoft's instructions for managing extensions</a>.</li>
+  </ul>
+
+  <h2>Passing policy values</h2>
+  <p>The values below are made-up examples. Replace <code>&lt;ID&gt;</code> with the extension ID for your browser.</p>
+  <h3>Windows registry (Chrome)</h3>
+  <p>Create a <code>policy</code> key under the path below, then add one value per policy key (strings as REG_SZ, numbers and booleans as REG_DWORD).</p>
+  <pre><code>HKLM\Software\Policies\Google\Chrome\3rdparty\extensions\&lt;ID&gt;\policy</code></pre>
+  <h3>macOS (Chrome)</h3>
+  <p>Use a property list whose name is <code>com.google.Chrome.extensions.&lt;ID&gt;</code>:</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;plist version="1.0"&gt;
+&lt;dict&gt;
+  &lt;key&gt;enforcePassword&lt;/key&gt;
+  &lt;true/&gt;
+  &lt;key&gt;enforceAutolock&lt;/key&gt;
+  &lt;integer&gt;15&lt;/integer&gt;
+  &lt;key&gt;passwordPolicy&lt;/key&gt;
+  &lt;string&gt;^.{12,}$&lt;/string&gt;
+&lt;/dict&gt;
+&lt;/plist&gt;</code></pre>
+  <h3>Firefox (<code>policies.json</code>)</h3>
+  <p>Popout's Firefox build declares the same managed schema and reads it through <code>storage.managed</code>.</p>
+  <pre><code>{
+  "policies": {
+    "3rdparty": {
+      "Extensions": {
+        "popout-authenticator@elitekid": {
+          "enforcePassword": true,
+          "enforceAutolock": 15,
+          "passwordPolicy": "^.{12,}$",
+          "passwordPolicyHint": "Use at least 12 characters."
+        }
+      }
+    }
+  }
+}</code></pre>
+
+  <h2>Moving users' accounts</h2>
+  <p>Users can bring their accounts over from the original extension with its backup file. See <a href="../from-authenticator-extension/" data-keep-utm>Moving from the original Authenticator extension</a>.</p>
+
+  <h2>Questions</h2>
+  <p>Open an issue on <a href="https://github.com/elitekid/popout-authenticator/issues">GitHub</a>.</p>
+
+  <nav class="guide-nav" aria-label="More guides"><a href="../" data-keep-utm>← All guides</a><a href="../from-authenticator-extension/" data-keep-utm>Moving from the original Authenticator extension →</a></nav>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <ul>
+      <li><a href="https://github.com/elitekid/popout-authenticator">GitHub</a></li>
+      <li><a href="https://github.com/elitekid/popout-authenticator/blob/main/PRIVACY.md">Privacy</a></li>
+      <li><a href="https://github.com/elitekid/popout-authenticator/issues">Issues</a></li>
+      <li>MIT License</li>
+    </ul>
+  </div>
+</footer>
+</body>
+</html>

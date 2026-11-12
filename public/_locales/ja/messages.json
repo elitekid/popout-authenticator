@@ -1,0 +1,41 @@
+{
+  "appName": { "message": "Popout Authenticator — 二段階認証コード" },
+  "appShortName": { "message": "Popout Authenticator" },
+  "appDesc": { "message": "オープンソースの 2FA 認証アプリ。ワンタイムコードをポップアップ・別ウィンドウ・サイドパネルで表示し、パスワードでロックできます。他のアプリのバックアップも読み込めます。" },
+  "cmdExecuteAction": { "message": "ポップアップを開く" },
+  "cmdQuickFill": { "message": "このページに 2FA コードを入力" },
+  "cmdScanQr": { "message": "画面上の QR コードをスキャン" },
+  "cmdAutofill": { "message": "最も一致するアカウントのコードを入力" },
+  "cmdHideCodes": { "message": "コードの表示/非表示を切り替え" },
+  "cmdOpenWindow": { "message": "別ウィンドウで開く" },
+  "menuOpenWindow": { "message": "別ウィンドウで開く" },
+  "menuQuickFill": { "message": "2FA コードを入力" },
+  "fillCopied": { "message": "コードをコピーしました。貼り付けてください。" },
+  "fillManual": {
+    "message": "コード: $CODE$",
+    "placeholders": { "code": { "content": "$1" } }
+  },
+  "cmdCopyPinned1": {
+    "message": "スター付きアカウント 1 のコードをコピー"
+  },
+  "cmdCopyPinned2": {
+    "message": "スター付きアカウント 2 のコードをコピー"
+  },
+  "cmdCopyPinned3": {
+    "message": "スター付きアカウント 3 のコードをコピー"
+  },
+  "shortcutCopied": {
+    "message": "コードをコピーしました。"
+  },
+  "shortcutLocked": {
+    "message": "先に Popout Authenticator のロックを解除してください。"
+  },
+  "shortcutMissing": {
+    "message": "このショートカットに対応するスター付きアカウントがありません。"
+  },
+  "shortcutFailed": {
+    "message": "コードをコピーできませんでした。"
+  },
+  "fillPickAccount": { "message": "アカウントを選択" },
+  "fieldFillButton": { "message": "コードを入力" }
+}

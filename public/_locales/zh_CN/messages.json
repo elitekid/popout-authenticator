@@ -1,0 +1,41 @@
+{
+  "appName": { "message": "Popout Authenticator — 2FA 身份验证器" },
+  "appShortName": { "message": "Popout Authenticator" },
+  "appDesc": { "message": "开源 2FA 验证器。在弹出窗口、独立窗口或侧边栏中显示一次性验证码，可用密码锁定，并可导入其他应用的备份。" },
+  "cmdExecuteAction": { "message": "打开弹出窗口" },
+  "cmdQuickFill": { "message": "在此页面填入 2FA 验证码" },
+  "cmdScanQr": { "message": "扫描屏幕上的二维码" },
+  "cmdAutofill": { "message": "填入最匹配账户的验证码" },
+  "cmdHideCodes": { "message": "隐藏或显示验证码" },
+  "cmdOpenWindow": { "message": "在独立窗口中打开" },
+  "menuOpenWindow": { "message": "在独立窗口中打开" },
+  "menuQuickFill": { "message": "填入 2FA 验证码" },
+  "fillCopied": { "message": "验证码已复制。请粘贴到网站中。" },
+  "fillManual": {
+    "message": "验证码：$CODE$",
+    "placeholders": { "code": { "content": "$1" } }
+  },
+  "cmdCopyPinned1": {
+    "message": "复制加星标账户 1 的验证码"
+  },
+  "cmdCopyPinned2": {
+    "message": "复制加星标账户 2 的验证码"
+  },
+  "cmdCopyPinned3": {
+    "message": "复制加星标账户 3 的验证码"
+  },
+  "shortcutCopied": {
+    "message": "已复制验证码。"
+  },
+  "shortcutLocked": {
+    "message": "请先解锁 Popout Authenticator。"
+  },
+  "shortcutMissing": {
+    "message": "此快捷键没有对应的加星标账户。"
+  },
+  "shortcutFailed": {
+    "message": "无法复制验证码。"
+  },
+  "fillPickAccount": { "message": "请选择账户" },
+  "fieldFillButton": { "message": "填入验证码" }
+}

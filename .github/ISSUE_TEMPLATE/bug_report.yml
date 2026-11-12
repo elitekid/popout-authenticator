@@ -1,0 +1,45 @@
+name: Bug report
+description: Something does not work as expected.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Never paste a real secret key, QR code, otpauth:// link, backup file, or one-time code here.** Issues are public.
+  - type: input
+    id: version
+    attributes:
+      label: Extension version
+      description: Shown on your browser's extensions page.
+      placeholder: 1.0.0
+    validations:
+      required: true
+  - type: dropdown
+    id: browser
+    attributes:
+      label: Browser
+      options: [Chrome, Edge, Firefox, Whale, Safari, Other]
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Browser version and operating system
+      placeholder: Chrome 141 on Windows 11
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open the popup
+        2. ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What happened, and what did you expect?
+    validations:
+      required: true

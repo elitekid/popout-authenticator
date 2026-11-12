@@ -1,0 +1,41 @@
+name: Code fill failed
+description: A code was not filled into a website's sign-in field.
+labels: [fill]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Never paste a one-time code, secret, or screenshot that shows codes.** Hide them before attaching images.
+  - type: input
+    id: version
+    attributes:
+      label: Extension version and browser
+      placeholder: 1.0.0 on Edge 141
+    validations:
+      required: true
+  - type: input
+    id: site
+    attributes:
+      label: Website
+      description: The page address where filling failed (leave out personal parts of the address).
+      placeholder: https://example.com/login
+    validations:
+      required: true
+  - type: dropdown
+    id: method
+    attributes:
+      label: How did you fill?
+      options:
+        - Fill button in the popup, window, or side panel
+        - Right-click menu
+        - Keyboard shortcut
+        - Button next to the code field
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: What happened?
+      description: Nothing, wrong field, partial code, error message, etc.
+    validations:
+      required: true

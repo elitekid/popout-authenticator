@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; media-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Need to share a 2FA code? Temporary links and their limits for small teams — Popout Authenticator</title>
+<meta name="description" content="When a teammate is away or several people must sign in to one account, choose between personal access, a shared vault, and a temporary code link, and learn what the link cannot do.">
+<link rel="canonical" href="https://elitekid.github.io/popout-authenticator/guides/temporary-2fa-sharing-for-teams/">
+<link rel="alternate" hreflang="en" href="https://elitekid.github.io/popout-authenticator/guides/temporary-2fa-sharing-for-teams/">
+<link rel="alternate" hreflang="ko" href="https://elitekid.github.io/popout-authenticator/ko/guides/temporary-2fa-sharing-for-teams/">
+<link rel="alternate" hreflang="x-default" href="https://elitekid.github.io/popout-authenticator/guides/temporary-2fa-sharing-for-teams/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Popout Authenticator">
+<meta property="og:title" content="Need to share a 2FA code? Temporary links and their limits for small teams">
+<meta property="og:description" content="When a teammate is away or several people must sign in to one account, choose between personal access, a shared vault, and a temporary code link, and learn what the link cannot do.">
+<meta property="og:url" content="https://elitekid.github.io/popout-authenticator/guides/temporary-2fa-sharing-for-teams/">
+<meta property="og:image" content="https://elitekid.github.io/popout-authenticator/img/en/03-window.png">
+<meta property="og:locale" content="en">
+<meta property="og:locale:alternate" content="ko">
+<link rel="icon" href="../../img/logo.png">
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/site.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="../../" data-keep-utm><img src="../../img/logo.png" width="36" height="36" alt="">Popout Authenticator</a>
+    <nav class="main" aria-label="Main">
+      <a href="../../" data-keep-utm>Home</a>
+      <a href="../" data-keep-utm>Guides</a>
+      <a href="https://github.com/elitekid/popout-authenticator">GitHub</a>
+      <a class="lang" href="../../ko/guides/temporary-2fa-sharing-for-teams/" data-keep-utm hreflang="ko" lang="ko">한국어</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="wrap guide">
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="../../" data-keep-utm>Home</a> › <a href="../" data-keep-utm>Guides</a></nav>
+  <h1>Need to share a 2FA code? Temporary links and their limits for small teams</h1>
+  <p class="lead">When a teammate is away or several people must sign in to one account, choose between personal access, a shared vault, and a temporary code link, and learn what the link cannot do.</p>
+
+  <nav class="toc card" aria-label="On this page">
+    <ol>
+      <li><a href="#situations">What situation are you in?</a></li>
+      <li><a href="#personal">First, check personal accounts and delegation</a></li>
+      <li><a href="#vault">For ongoing access, use a shared vault</a></li>
+      <li><a href="#link">For a one-time hand-off, use a Popout code link</a></li>
+      <li><a href="#limits">Limits you must know</a></li>
+      <li><a href="#related">Related guides</a></li>
+    </ol>
+  </nav>
+
+  <h2 id="situations">What situation are you in?</h2>
+  <p>These are common moments in a small team:</p>
+  <ul>
+    <li>The person who holds the 2FA codes is on vacation, and nobody else can sign in.</li>
+    <li>Several people need to sign in to the same account for a short time.</li>
+    <li>A client's account sends codes to one person, and work stops until someone passes the code on.</li>
+  </ul>
+  <p>The right tool depends on how long the access is needed and how many people need it. The sections below go from the first thing to check to the last.</p>
+
+  <h2 id="personal">First, check personal accounts and delegation</h2>
+  <p>If the service lets you add users or delegate access, use that. Each person then signs in with their own account and their own second factor, and the service can show who did what.</p>
+  <p>Google does not recommend sharing an account. See <a href="https://knowledge.workspace.google.com/admin/users/avoid-sharing-an-account-among-users">Google's guidance on shared accounts</a>. For a shared mailbox, many services have a separate feature for it. Look in the service's admin or help pages before you share a login.</p>
+
+  <h2 id="vault">For ongoing access, use a shared vault</h2>
+  <p>If several people need access again and again, and you must be able to remove a person's access when they leave, use a shared vault that has permission management, such as the organization feature of a password manager. Bitwarden's page on <a href="https://bitwarden.com/help/onboarding-and-succession/">onboarding and succession</a> is one example of how such a setup is planned.</p>
+  <p>Removing a person from a shared vault does not take back what they already copied, and it does not end sessions they are already signed in to. Bitwarden's page says the same and advises updating the credentials a member had access to. When someone leaves, change the password and the 2FA secret in the service itself and end their sessions there.</p>
+  <p>Popout does not manage users. It has no member list and no way to take access back from a person.</p>
+
+  <h2 id="link">For a one-time hand-off, use a Popout code link</h2>
+  <p>If someone needs a code once or for a short time, you can send a Popout code share link. What it contains and how it works:</p>
+  <ul>
+    <li>The link does not hold the secret key. It holds a bundle of codes that Popout calculated ahead of time, scrambled (encrypted) inside the link.</li>
+    <li>You choose how long the codes last: 5, 15, 30, or 60 minutes.</li>
+    <li>Time-based (TOTP) accounts can be shared. Other account types, such as HOTP, cannot.</li>
+    <li>The other person does not need to install the extension. The link opens a plain web page.</li>
+    <li>You can lock the link with a password. Send the password by a different route than the link, for example by phone while the link goes by chat.</li>
+  </ul>
+  <p>For the steps to create a link, see <a href="../share-codes/" data-keep-utm>Share a code with a link</a>.</p>
+  <div class="card note">
+    <p>The codes in a link are real codes. Anyone who can open the link can use them until the time ends. Pick the shortest time that works.</p>
+  </div>
+
+  <h2 id="limits">Limits you must know</h2>
+  <ul>
+    <li><strong>You cannot cancel a link.</strong> The codes are already inside it, and there is no server where you could switch it off.</li>
+    <li><strong>A link can be copied and forwarded.</strong> A password limits this, but a person who knows the password can pass it on too.</li>
+    <li><strong>A link is not tied to a person or a device.</strong> Anyone who has it can open it during the time.</li>
+    <li><strong>Popout keeps no record of links you made.</strong> You cannot look up later who received a link or who opened it.</li>
+    <li><strong>Expiry does not end a session.</strong> When the time is over, the page shows no more codes, but a person who already signed in stays signed in until the service ends that session.</li>
+    <li><strong>A link does not protect against phishing.</strong> A code that someone types into a fake page can be used by the attacker. See CISA's fact sheet on <a href="https://www.cisa.gov/sites/default/files/2023-01/fact-sheet-implementing-phishing-resistant-mfa-508c.pdf">phishing-resistant MFA</a>.</li>
+  </ul>
+  <p>Whether sharing an account fits a service's terms of use is for you to check with that service.</p>
+
+  <h2 id="related">Related guides</h2>
+  <ul>
+    <li><a href="../share-codes/" data-keep-utm>Share a code with a link</a>: the steps and options for creating a link.</li>
+    <li><a href="../from-authy-and-other-apps/" data-keep-utm>Moving from Authy Desktop and other apps</a>: if your team's codes are still in another app.</li>
+    <li><a href="../backup-and-sync/" data-keep-utm>Backup, export, and sync</a>: to keep your own accounts on more than one of your devices.</li>
+  </ul>
+
+  <aside class="review-ask" aria-label="Rate Popout Authenticator" hidden>
+    <p><strong>Rate Popout Authenticator.</strong> A short review in your browser's store helps other people find it.</p>
+    <div class="stores reviews" data-campaign="pa-review-guide"></div>
+  </aside>
+
+  <nav class="guide-nav" aria-label="More guides"><a href="../share-codes/" data-keep-utm>← Share a code with a link</a><a href="../from-authy-and-other-apps/" data-keep-utm>Moving from Authy Desktop and other apps →</a></nav>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <ul>
+      <li><a href="https://github.com/elitekid/popout-authenticator">GitHub</a></li>
+      <li><a href="https://github.com/elitekid/popout-authenticator/blob/main/PRIVACY.md">Privacy</a></li>
+      <li><a href="https://github.com/elitekid/popout-authenticator/issues">Issues</a></li>
+      <li>MIT License</li>
+    </ul>
+  </div>
+</footer>
+</body>
+</html>

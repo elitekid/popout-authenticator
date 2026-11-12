@@ -1,0 +1,49 @@
+# Popout Authenticator
+
+> A 2FA authenticator browser extension that makes TOTP/HOTP codes locally, keeps accounts in an encrypted vault on your device, and fills codes into the sign-in pages you allow. Open source (MIT).
+
+Popout Authenticator opens your codes in the toolbar popup, a separate window, or the side panel. It has no account limits, no sign-up, no analytics, no ads, and no developer server. Accounts are stored in a vault encrypted with AES-256-GCM; a password lock protects the vault key with Argon2id, and optional passkey unlock is available (not in Firefox). You can add accounts from QR codes, otpauth:// links, typed secrets, or imported backups, and back up or sync them with encrypted files and your browser's own sync. It builds on the MIT-licensed code of the original Authenticator extension. Current version: 1.0.4.
+
+Supported browsers: Chrome, Edge, Firefox, Whale, and Safari (macOS only, no iOS version).
+
+## Install
+
+- [Chrome Web Store](https://chromewebstore.google.com/detail/nakgmloofpboegibcjhainbpjjokmbgj): Chrome
+- [Microsoft Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/edipphpgdmfabonchodjfnejlbjoknhh): Edge
+- [Firefox Add-ons (AMO)](https://addons.mozilla.org/firefox/addon/popout-authenticator/): Firefox
+- [Naver Whale Store](https://store.whale.naver.com/detail/bcfobdldplagmohdgaiocjddlokiolgc): Whale
+- [Mac App Store](https://apps.apple.com/app/id6823010294): Safari on macOS
+
+## Overview
+
+- [Home](https://elitekid.github.io/popout-authenticator/): What it does, features, privacy, and limits
+- [All guides](https://elitekid.github.io/popout-authenticator/guides/): Index of step-by-step guides
+- [Source code and privacy policy](https://github.com/elitekid/popout-authenticator): Public repository (MIT license); PRIVACY.md holds the privacy policy
+
+## Guides
+
+- [Get started](https://elitekid.github.io/popout-authenticator/guides/getting-started/): Install and add your first account from a QR code, a link, or by typing the secret
+- [Popup, window, and side panel](https://elitekid.github.io/popout-authenticator/guides/open-and-organize/): Open codes in three views and keep a long list tidy with search, groups, and pins
+- [Fill codes into sign-in pages](https://elitekid.github.io/popout-authenticator/guides/fill-codes/): Fill a code with one click, the right-click menu, a shortcut, or a button next to the field
+- [Lock and protect your accounts](https://elitekid.github.io/popout-authenticator/guides/lock-and-protect/): Password lock, recovery code, passkey unlock, auto-lock, and hiding codes while sharing your screen
+- [Backup, export, and sync](https://elitekid.github.io/popout-authenticator/guides/backup-and-sync/): Encrypted backups, exports, recovery snapshots, the trash, and browser sync between devices
+- [Share a code with a link](https://elitekid.github.io/popout-authenticator/guides/share-codes/): A link that shows an account's codes for a limited time and never contains the secret
+- [Temporary 2FA sharing for small teams](https://elitekid.github.io/popout-authenticator/guides/temporary-2fa-sharing-for-teams/): Personal access, a shared vault, or a temporary code link, and what the link cannot do
+- [Troubleshooting](https://elitekid.github.io/popout-authenticator/guides/troubleshooting/): Rejected codes, filling that does not work, a vault that will not unlock, and failed imports
+- [IT admin deployment](https://elitekid.github.io/popout-authenticator/guides/managed-deployment/): Force-install and managed policy keys for Chrome, Edge, and Firefox
+
+## Moving from another app
+
+- [From the original Authenticator extension](https://elitekid.github.io/popout-authenticator/guides/from-authenticator-extension/): Import its backup file directly
+- [From Authy Desktop and other apps](https://elitekid.github.io/popout-authenticator/guides/from-authy-and-other-apps/): Bring accounts from Authy Desktop, Google Authenticator, and other authenticator apps
+- [Google Authenticator to your PC browser](https://elitekid.github.io/popout-authenticator/guides/google-authenticator-to-pc-browser/): Export QR codes on your phone and read them into Chrome, Edge, Firefox, or Whale
+- [Browser 2FA extensions compared](https://elitekid.github.io/popout-authenticator/guides/compare-browser-authenticators/): Popout Authenticator, Authenticator, 2FAS, and 2FA Authenticator side by side, checked October 18, 2026
+
+## Korean (한국어)
+
+- [홈](https://elitekid.github.io/popout-authenticator/ko/): Korean home page
+- [가이드 목록](https://elitekid.github.io/popout-authenticator/ko/guides/): Korean guide index; each English guide above has a Korean version under /ko/guides/
+
+## Optional
+
+- [Issues](https://github.com/elitekid/popout-authenticator/issues): Report a problem or ask a question
