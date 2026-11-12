@@ -374,6 +374,7 @@ export const messages: Record<string, string> = {
   'popup.whatsNew.v103.about': 'Pengaturan kini menampilkan versi, pemeriksaan pembaruan, dan riwayat pembaruan.',
   'popup.whatsNew.v103.icons': 'Ikon akun digambar ulang dan kini ada 18 pilihan. Ikon yang dipilih selalu tampil di popup.',
   'popup.whatsNew.v103.name': 'Salin nama akun dari menunya dan urutkan daftar menurut nama.',
+  'popup.whatsNew.v104.shortcuts': 'Pintasan untuk menyalin kode akun penting kini tidak memiliki tombol bawaan, sehingga aplikasi lain dapat memakai Ctrl+Shift+1–3 lagi. Untuk tetap memakainya, atur tombolnya di Pengaturan → Pengaturan pintasan.',
   'accounts.icon': 'Ikon',
   'accounts.icon.auto': 'Inisial',
   'accounts.icon.key': 'Kunci',

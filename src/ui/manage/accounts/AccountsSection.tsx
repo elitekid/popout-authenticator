@@ -587,6 +587,7 @@ function AccountEditor({ t, account, all, hideBack, onHistory, onLocked, onDone,
         <div class="muted" data-role="accounts-auto-field-hosts">
           <p>{t('accounts.fieldButton.autoHosts', { hosts: autoHosts.join(', ') })}</p>
           <a href="#settings" onClick={(event) => {
+            if (hasDraft) { event.preventDefault(); event.stopPropagation(); return; }
             if (navigate) { event.preventDefault(); navigate('settings'); }
           }}>{t('accounts.fieldButton.autoManage')}</a>
         </div>

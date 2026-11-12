@@ -41,6 +41,7 @@ export const popup = {
   'popup.whatsNew.v103.about': 'Settings now show the version, an update check and the update history.',
   'popup.whatsNew.v103.icons': 'Account icons have been redrawn, with 18 to choose from. Your chosen icon always shows in the popup.',
   'popup.whatsNew.v103.name': "Copy an account's name from its menu, and sort the list by name.",
+  'popup.whatsNew.v104.shortcuts': 'Shortcuts that copy the codes of important accounts no longer come with keys, so other apps can use Ctrl+Shift+1–3 again. To keep using them, set the keys in Settings → Shortcut settings.',
   'popup.group.fold': 'Collapse {name}',
   'popup.group.unfold': 'Expand {name}',
   'popup.sec.results': 'Results',

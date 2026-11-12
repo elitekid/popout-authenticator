@@ -372,6 +372,7 @@ export const messages: Record<string, string> = {
   'popup.whatsNew.v103.about': 'In den Einstellungen sehen Sie jetzt die Version, die Update-Prüfung und den Update-Verlauf.',
   'popup.whatsNew.v103.icons': 'Die Kontosymbole wurden neu gezeichnet, jetzt stehen 18 zur Auswahl. Das gewählte Symbol wird im Pop-up immer angezeigt.',
   'popup.whatsNew.v103.name': 'Kopieren Sie den Kontonamen über das Kontomenü und sortieren Sie die Liste nach Namen.',
+  'popup.whatsNew.v104.shortcuts': 'Die Tastenkürzel zum Kopieren der Codes wichtiger Konten haben keine voreingestellten Tasten mehr, damit andere Apps Strg+Umschalt+1–3 wieder nutzen können. Wenn Sie sie weiter nutzen möchten, legen Sie die Tasten unter Einstellungen → Tastenkürzel fest.',
   'accounts.icon': 'Symbol',
   'accounts.icon.auto': 'Initialen',
   'accounts.icon.key': 'Schlüssel',

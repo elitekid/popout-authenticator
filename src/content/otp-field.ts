@@ -26,8 +26,8 @@ import type { FieldCheckMessage, FieldCheckReply, FieldFillMessage } from '../st
   let timer = 0;
   let fullScan = false;
   const dirty = new Set<HTMLInputElement>();
-  // looksLikeOtp 와 단추 묶음 판별이 읽는 속성만 본다.
-  const WATCHED = ['type', 'autocomplete', 'name', 'id', 'placeholder', 'aria-label', 'disabled', 'readonly', 'maxlength'];
+  // looksLikeOtp 와 단추 묶음 판별·표시 여부에 걸리는 속성만 본다.
+  const WATCHED = ['type', 'autocomplete', 'name', 'id', 'placeholder', 'aria-label', 'disabled', 'readonly', 'maxlength', 'class', 'style', 'hidden'];
 
   function visible(el: HTMLElement): boolean {
     const rect = el.getBoundingClientRect();
@@ -210,6 +210,7 @@ import type { FieldCheckMessage, FieldCheckReply, FieldFillMessage } from '../st
     for (const record of records) {
       if (record.type === 'childList') fullScan = true;
       else if (record.target instanceof HTMLInputElement) dirty.add(record.target);
+      else if (!fullScan && record.target instanceof Element && record.target.querySelector('input') !== null) fullScan = true;
     }
     if (fullScan || dirty.size > 0) scheduleScan();
   }

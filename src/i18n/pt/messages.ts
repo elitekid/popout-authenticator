@@ -372,6 +372,7 @@ export const messages: Record<string, string> = {
   'popup.whatsNew.v103.about': 'As configurações agora mostram a versão, a verificação de atualizações e o histórico de atualizações.',
   'popup.whatsNew.v103.icons': 'Os ícones de conta foram redesenhados e agora são 18. O ícone escolhido sempre aparece no pop-up.',
   'popup.whatsNew.v103.name': 'Copie o nome de uma conta pelo menu dela e ordene a lista por nome.',
+  'popup.whatsNew.v104.shortcuts': 'Os atalhos que copiam os códigos das contas importantes não têm mais teclas padrão, então outros apps podem usar Ctrl+Shift+1–3 de novo. Para continuar usando, defina as teclas em Configurações → Configurar atalhos.',
   'accounts.icon': 'Ícone',
   'accounts.icon.auto': 'Iniciais',
   'accounts.icon.key': 'Chave',

@@ -55,10 +55,12 @@ function whiteOut(image: Rgba, corners: { x: number; y: number }[]): void {
   }
 }
 
-function scan(image: Rgba, maxCodes: number): string[] {
+// jsQR 을 부르기 직전마다 yield 한다(비동기 쪽이 그때 화면에 양보한다).
+function* scan(image: Rgba, maxCodes: number): Generator<void, string[]> {
   const work: Rgba = { data: image.data.slice(), width: image.width, height: image.height };
   const found: string[] = [];
   for (let attempt = 0; attempt < maxCodes; attempt++) {
+    yield;
     const hit = jsQR(work.data, work.width, work.height, { inversionAttempts: 'attemptBoth' });
     if (!hit) break;
     if (hit.data !== '') {
@@ -84,8 +86,8 @@ function crop(image: Rgba, left: number, top: number, width: number, height: num
 // 그래서 통째로 한 번 본 뒤, 가로·세로로 나눈 칸을 반 칸씩 겹쳐 옮기며 잘라 본다.
 const GRIDS: [number, number][] = [[2, 1], [1, 2], [2, 2], [3, 1], [1, 3], [3, 3]];
 
-function scanTiles(image: Rgba, maxCodes: number): string[] {
-  const found = scan(image, maxCodes);
+function* scanTiles(image: Rgba, maxCodes: number): Generator<void, string[]> {
+  const found = yield* scan(image, maxCodes);
   // 통째로 하나라도 읽혔으면 나머지는 덮어 가며 찾았으니 자르지 않는다(흔한 한 장짜리를 빠르게).
   if (found.length > 0) return found;
   for (const [cols, rows] of GRIDS) {
@@ -96,7 +98,7 @@ function scanTiles(image: Rgba, maxCodes: number): string[] {
       for (let tx = 0; tx <= 2 * (cols - 1); tx++) {
         const left = Math.min(image.width - w, Math.round((tx * w) / 2));
         const top = Math.min(image.height - h, Math.round((ty * h) / 2));
-        for (const text of scan(crop(image, left, top, w, h), maxCodes)) {
+        for (const text of yield* scan(crop(image, left, top, w, h), maxCodes)) {
           if (!found.includes(text)) found.push(text);
           if (found.length >= maxCodes) return found;
         }
@@ -106,8 +108,8 @@ function scanTiles(image: Rgba, maxCodes: number): string[] {
   return found;
 }
 
-export function decodeQrAll(image: Rgba, maxCodes = 10): string[] {
-  const direct = scanTiles(image, maxCodes);
+function* decodeQrAllSteps(image: Rgba, maxCodes: number): Generator<void, string[]> {
+  const direct = yield* scanTiles(image, maxCodes);
   if (direct.length > 0) return direct;
 
   const longSide = Math.max(image.width, image.height);
@@ -119,8 +121,26 @@ export function decodeQrAll(image: Rgba, maxCodes = 10): string[] {
       Math.max(1, Math.round(image.width * ratio)),
       Math.max(1, Math.round(image.height * ratio)),
     );
-    const found = scanTiles(small, maxCodes);
+    const found = yield* scanTiles(small, maxCodes);
     if (found.length > 0) return found;
   }
   return [];
+}
+
+export function decodeQrAll(image: Rgba, maxCodes = 10): string[] {
+  const steps = decodeQrAllSteps(image, maxCodes);
+  for (;;) {
+    const next = steps.next();
+    if (next.done) return next.value;
+  }
+}
+
+// 단계마다 한 틱 양보해 긴 해석 중에도 화면 갱신·입력이 처리되게 한다.
+export async function decodeQrAllAsync(image: Rgba, maxCodes = 10): Promise<string[]> {
+  const steps = decodeQrAllSteps(image, maxCodes);
+  for (;;) {
+    const next = steps.next();
+    if (next.done) return next.value;
+    await new Promise((r) => setTimeout(r, 0));
+  }
 }

@@ -37,7 +37,7 @@ function browserManifest(target: BrowserTarget): Plugin {
           permission !== 'offscreen' && permission !== 'sidePanel');
         manifest.background = { scripts: ['bg/sw.js'], type: 'module' };
         // 전역 단축키 코드 복사는 offscreen 문서가 필요한 크롬 계열 전용이다.
-        for (const name of ['copy-pinned-1', 'copy-pinned-2', 'copy-pinned-3']) delete manifest.commands[name];
+        for (const name of ['copy-important-1', 'copy-important-2', 'copy-important-3']) delete manifest.commands[name];
       }
       if (target === 'firefox') {
         manifest.sidebar_action = {

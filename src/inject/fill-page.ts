@@ -173,9 +173,10 @@ export async function quickFillInPage(args: QuickFillPageArgs): Promise<QuickFil
       );
       // A group shorter than the code would fill silently and truncate, which
       // looks like success and submits a wrong code. Refuse and let the
-      // clipboard fallback take it.
-      if (boxes.length >= CODE.length && boxes.indexOf(el) !== -1) return boxes;
-      if (boxes.length >= 2 && boxes.length < CODE.length) return null;
+      // clipboard fallback take it. A longer group is refused too: there is no
+      // telling which box the code should start from.
+      if (boxes.length === CODE.length && boxes.indexOf(el) !== -1) return boxes;
+      if (boxes.length >= 2 && boxes.length !== CODE.length) return null;
       container = container.parentElement;
     }
     return null;

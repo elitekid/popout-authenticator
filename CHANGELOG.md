@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.0.4
+
+- The shortcuts that copy the codes of your first three important accounts no longer come with keys. In 1.0.2 and 1.0.3 they took Ctrl+Shift+1–3 for the whole system, so other apps could not use those keys while the browser was open. After this update those keys are released. To keep using the shortcuts, set the keys again in Settings → "Shortcut settings".
+- The screen QR capture tab no longer gets stuck on "Loading…" on large screens without a QR code: the picture is shown first and the QR codes are read in steps.
+- Sync no longer resets the counter of a counter-based (HOTP) account that was added separately on two devices: the higher counter is kept.
+- When another device removes the lock or the passkey, sync now also turns off "Verify with your device before filling codes" on this device, so codes can be filled again.
+- The fill button now appears next to a code field that was hidden when the page loaded and is shown later.
+- Filling a code into one-box-per-digit fields no longer writes into the wrong boxes when the page has more such boxes than the code has digits; the code is copied instead.
+- Hiding codes while a QR code or its password check is open no longer freezes the countdown in the list.
+- Small task windows now fit the window height when the zoom is not 100%.
+- The "Manage automatic recognition in Settings" link in the account editor no longer leaves the editor while there are unsaved changes.
+
 ## 1.0.3
 
 - New: Settings has an "About" card with the version, a "Check for updates" button (Chrome, Edge and Whale check right away and can update now; Firefox and Safari open the store page) and the update history.

@@ -17,7 +17,7 @@ import { SyncPanel } from './SyncPanel';
 
 const DEFAULT_FEEDBACK_URL = 'https://github.com/elitekid/popout-authenticator/issues';
 
-const SHORTCUT_COMMANDS = ['copy-pinned-1', 'copy-pinned-2', 'copy-pinned-3'];
+const SHORTCUT_COMMANDS = ['copy-important-1', 'copy-important-2', 'copy-important-3'];
 
 // 전역 단축키 안내: 지금 실제로 붙은 키를 보여 주고 브라우저 단축키 화면을 연다.
 function ShortcutsBlock({ t }: { t: ReturnType<typeof useT> }) {

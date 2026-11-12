@@ -208,9 +208,13 @@ export function mergeAccounts(local: Account[], remote: Account[], tombs: Tombst
     if (a.deletedAt !== undefined) continue;
     const k = duplicateKey(a);
     const w = winners.get(k);
-    if (!w || a.createdAt < w.createdAt || (a.createdAt === w.createdAt && a.id < w.id)) winners.set(k, a);
+    if (!w) winners.set(k, a);
+    else if (a.createdAt < w.createdAt || (a.createdAt === w.createdAt && a.id < w.id)) winners.set(k, withMaxCounter(a, w));
+    else winners.set(k, withMaxCounter(w, a));
   }
-  return alive.filter((a) => a.deletedAt !== undefined || winners.get(duplicateKey(a)) === a);
+  return alive
+    .filter((a) => a.deletedAt !== undefined || winners.get(duplicateKey(a))?.id === a.id)
+    .map((a) => (a.deletedAt !== undefined ? a : (winners.get(duplicateKey(a)) ?? a)));
 }
 
 function accountSig(accounts: { id: string; updatedAt: number }[]): string {
@@ -399,12 +403,18 @@ async function runSync(now: number): Promise<SyncStatus> {
 
   const merged = mergeAccounts(local, remote.accounts, tombs);
   let current = file;
+  let acceptedRemoteLock = false;
   if (meta.lockChangedAt > (file.lockChangedAt ?? 0)) {
+    acceptedRemoteLock = true;
     // 다른 기기에서 잠금 설정을 바꿨다. 마스터 키가 같으니 메타만 받아들이고 세션 키는 건드리지 않는다.
     current = { ...file, lock: meta.lock, wrappedKeys: meta.wrappedKeys, lockChangedAt: meta.lockChangedAt };
   }
   if (current !== file || accountSig(merged) !== accountSig(local) || counterSig(merged) !== counterSig(local)) {
     current = await commitAccounts(current, key, merged);
+  }
+  if (acceptedRemoteLock && (current.lock === 'none' || !current.wrappedKeys.some((k) => k.kind === 'prf'))) {
+    await chrome.storage.local.set({ codeProtection: false });
+    await chrome.storage.session.remove('codeAccessRequests');
   }
 
   // lock·lockChangedAt 이 같으면 wrappedKeys 는 같다고 본다(서로 덮어쓰는 반복 방지).

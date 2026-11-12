@@ -9,7 +9,9 @@ import { loadAccounts } from '../store/vault';
 import { fillActiveTab } from './fill';
 import { scheduleClipboardClear, writeClipboardViaOffscreen } from './clipboard';
 
-const PINNED_COMMAND = /^copy-pinned-([1-3])$/;
+// 1.0.2~1.0.3 의 copy-pinned-1~3 은 Ctrl+Shift+1~3 전역 기본값이 다른 앱의 키를 막았다. 크롬은 업데이트로 저장된
+// 전역 키를 풀지 않고 명령 이름이 없어질 때만 등록을 멈추므로 이름을 바꾸고 기본 키를 두지 않는다.
+const PINNED_COMMAND = /^copy-important-([1-3])$/;
 
 export type PinnedPick = { kind: 'ok'; account: Account } | { kind: 'missing' } | { kind: 'hotp' };
 

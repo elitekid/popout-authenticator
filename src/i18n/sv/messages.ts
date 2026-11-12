@@ -374,6 +374,7 @@ export const messages: Record<string, string> = {
   'popup.whatsNew.v103.about': 'Inställningarna visar nu version, uppdateringskontroll och uppdateringshistorik.',
   'popup.whatsNew.v103.icons': 'Kontoikonerna har ritats om och nu finns 18 att välja mellan. Den valda ikonen visas alltid i popup-fönstret.',
   'popup.whatsNew.v103.name': 'Kopiera ett kontos namn från dess meny och sortera listan efter namn.',
+  'popup.whatsNew.v104.shortcuts': 'Kortkommandona som kopierar koder för viktiga konton har inte längre några förvalda tangenter, så andra appar kan använda Ctrl+Skift+1–3 igen. Om du vill fortsätta använda dem anger du tangenterna under Inställningar → Kortkommandon.',
   'accounts.icon': 'Ikon',
   'accounts.icon.auto': 'Initialer',
   'accounts.icon.key': 'Nyckel',

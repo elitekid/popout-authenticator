@@ -257,6 +257,7 @@ export function whatsNewFor(target: BrowserTarget = BROWSER_TARGET): Record<stri
   return {
     '1.0.2': ['popup.whatsNew.v102.organize', 'popup.whatsNew.v102.capture', ...copy],
     '1.0.3': ['popup.whatsNew.v103.about', 'popup.whatsNew.v103.icons', 'popup.whatsNew.v103.name'],
+    ...(copy.length ? { '1.0.4': ['popup.whatsNew.v104.shortcuts'] } : {}),
   };
 }
 export const WHATS_NEW: Record<string, string[]> = whatsNewFor();

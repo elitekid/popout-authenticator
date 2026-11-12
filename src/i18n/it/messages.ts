@@ -372,6 +372,7 @@ export const messages: Record<string, string> = {
   'popup.whatsNew.v103.about': 'Ora le impostazioni mostrano la versione, il controllo aggiornamenti e la cronologia degli aggiornamenti.',
   'popup.whatsNew.v103.icons': 'Le icone degli account sono state ridisegnate, ora sono 18. L’icona scelta è sempre visibile nel popup.',
   'popup.whatsNew.v103.name': "Copia il nome di un account dal suo menu e ordina l'elenco per nome.",
+  'popup.whatsNew.v104.shortcuts': 'Le scorciatoie che copiano i codici degli account importanti non hanno più tasti predefiniti, così le altre app possono di nuovo usare Ctrl+Maiusc+1–3. Per continuare a usarle, imposta i tasti in Impostazioni → Impostazioni scorciatoie.',
   'accounts.icon': 'Icona',
   'accounts.icon.auto': 'Iniziali',
   'accounts.icon.key': 'Chiave',

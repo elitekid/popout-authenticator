@@ -53,7 +53,7 @@ export function App() {
   }, []);
   const [stack, setStack] = useState<PopupRoute[]>(initialStack);
   if (new URLSearchParams(location.search).get('compact') === '1') {
-    return <div class="popup" data-app="manage" data-open-name="window" style={{ zoom: zoom / 100 }}>
+    return <div class="popup" data-app="manage" data-open-name="window" style={{ zoom: zoom / 100, '--popup-zoom': zoom / 100 }}>
       {stack.map((route, index) => {
         const active = index === stack.length - 1;
         const keep = route.section === 'settings' || route.section === 'display'

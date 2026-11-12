@@ -283,6 +283,13 @@ describe('whatsNewFor', () => {
       ]);
     }
   });
+
+  it('1.0.4 는 크롬 계열에만 있고 firefox·safari 에는 키가 없음', () => {
+    expect(whatsNewFor('chrome')['1.0.4']).toEqual(['popup.whatsNew.v104.shortcuts']);
+    expect(whatsNewFor('edge')['1.0.4']).toEqual(['popup.whatsNew.v104.shortcuts']);
+    expect(whatsNewFor('firefox')).not.toHaveProperty('1.0.4');
+    expect(whatsNewFor('safari')).not.toHaveProperty('1.0.4');
+  });
 });
 
 describe('sortByName', () => {

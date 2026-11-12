@@ -374,6 +374,7 @@ export const messages: Record<string, string> = {
   'popup.whatsNew.v103.about': 'Instellingen tonen nu de versie, een updatecontrole en de updategeschiedenis.',
   'popup.whatsNew.v103.icons': 'Accountpictogrammen zijn opnieuw getekend, er zijn er nu 18. Het gekozen pictogram is altijd zichtbaar in de pop-up.',
   'popup.whatsNew.v103.name': 'Kopieer de naam van een account via het menu en sorteer de lijst op naam.',
+  'popup.whatsNew.v104.shortcuts': 'De sneltoetsen die codes van belangrijke accounts kopiëren hebben geen standaardtoetsen meer, zodat andere apps Ctrl+Shift+1–3 weer kunnen gebruiken. Wilt u ze blijven gebruiken, stel de toetsen dan in via Instellingen → Sneltoetsinstellingen.',
   'accounts.icon': 'Pictogram',
   'accounts.icon.auto': 'Initialen',
   'accounts.icon.key': 'Sleutel',

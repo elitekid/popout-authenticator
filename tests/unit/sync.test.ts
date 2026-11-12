@@ -328,6 +328,16 @@ describe('mergeAccounts', () => {
     expect(mergeAccounts([tieB], [tieA], {}).map((v) => v.id)).toEqual(['aaa']);
   });
 
+  it('keeps the larger hotp counter when the same secret was added under different ids', () => {
+    const older = { ...account(1), type: 'hotp' as const, id: 'a', createdAt: 1, counter: 0 };
+    const newer = { ...account(1), type: 'hotp' as const, id: 'b', createdAt: 2, counter: 100 };
+    for (const merged of [mergeAccounts([older], [newer], {}), mergeAccounts([newer], [older], {})]) {
+      expect(merged).toHaveLength(1);
+      expect(merged[0].id).toBe('a');
+      expect(merged[0].counter).toBe(100);
+    }
+  });
+
   it('does not treat trashed copies as duplicates', () => {
     const live = { ...account(1), id: 'a1' };
     const trashed = { ...account(1), id: 'a2', deletedAt: T0 + 1, updatedAt: T0 + 1 };

@@ -372,6 +372,7 @@ export const messages: Record<string, string> = {
   'popup.whatsNew.v103.about': 'Phần cài đặt giờ hiển thị phiên bản, kiểm tra cập nhật và lịch sử cập nhật.',
   'popup.whatsNew.v103.icons': 'Biểu tượng tài khoản đã được vẽ lại, nay có 18 biểu tượng. Biểu tượng bạn chọn luôn hiện trong cửa sổ bật lên.',
   'popup.whatsNew.v103.name': 'Sao chép tên tài khoản từ menu của tài khoản và sắp xếp danh sách theo tên.',
+  'popup.whatsNew.v104.shortcuts': 'Phím tắt sao chép mã của các tài khoản quan trọng không còn phím mặc định, nên ứng dụng khác có thể dùng lại Ctrl+Shift+1–3. Để tiếp tục dùng, hãy đặt phím trong Cài đặt → Cài đặt phím tắt.',
   'accounts.icon': 'Biểu tượng',
   'accounts.icon.auto': 'Chữ cái đầu',
   'accounts.icon.key': 'Khóa',

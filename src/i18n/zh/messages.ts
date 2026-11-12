@@ -372,6 +372,7 @@ export const messages: Record<string, string> = {
   'popup.whatsNew.v103.about': '现在可以在设置中查看版本、检查更新和更新记录。',
   'popup.whatsNew.v103.icons': '账户图标已重新绘制，增加到 18 个。所选图标会始终显示在弹出窗口中。',
   'popup.whatsNew.v103.name': '可在账户菜单中复制账户名，并按名称排序列表。',
+  'popup.whatsNew.v104.shortcuts': '复制重要账户验证码的快捷键不再自带按键，其他应用可以重新使用 Ctrl+Shift+1–3。如需继续使用，请在 设置 → 快捷键设置 中重新设置按键。',
   'accounts.icon': '图标',
   'accounts.icon.auto': '首字母',
   'accounts.icon.key': '钥匙',

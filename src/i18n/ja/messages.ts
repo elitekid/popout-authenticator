@@ -372,6 +372,7 @@ export const messages: Record<string, string> = {
   'popup.whatsNew.v103.about': '設定でバージョン、アップデートの確認、更新履歴を見られるようになりました。',
   'popup.whatsNew.v103.icons': 'アカウントアイコンを描き直し、18種類に増やしました。選んだアイコンはポップアップに常に表示されます。',
   'popup.whatsNew.v103.name': 'アカウントのメニューからアカウント名をコピーでき、一覧を名前順に並べられます。',
+  'popup.whatsNew.v104.shortcuts': '重要なアカウントのコードをコピーするショートカットに既定のキーがなくなり、ほかのアプリで Ctrl+Shift+1～3 が使えるようになりました。引き続き使う場合は、設定 → ショートカット設定でキーを設定してください。',
   'accounts.icon': 'アイコン',
   'accounts.icon.auto': 'イニシャル',
   'accounts.icon.key': 'カギ',

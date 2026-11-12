@@ -41,6 +41,7 @@ export const popup = {
   'popup.whatsNew.v103.about': '설정에서 버전, 업데이트 확인, 업데이트 내역을 볼 수 있습니다.',
   'popup.whatsNew.v103.icons': '계정 아이콘을 새로 그리고 18개로 늘렸습니다. 고른 아이콘은 팝업에 항상 보입니다.',
   'popup.whatsNew.v103.name': '계정 메뉴에서 계정 이름을 복사하고, 목록을 이름순으로 볼 수 있습니다.',
+  'popup.whatsNew.v104.shortcuts': '중요 계정 코드 복사 단축키에 기본 키가 없어져 다른 앱이 Ctrl+Shift+1~3을 다시 쓸 수 있습니다. 계속 쓰려면 설정 → 단축키 설정에서 키를 다시 정하세요.',
   'popup.group.fold': '{name} 접기',
   'popup.group.unfold': '{name} 펼치기',
   'popup.sec.results': '검색 결과',

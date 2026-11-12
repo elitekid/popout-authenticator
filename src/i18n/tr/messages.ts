@@ -372,6 +372,7 @@ export const messages: Record<string, string> = {
   'popup.whatsNew.v103.about': 'Ayarlarda artık sürüm, güncelleme denetimi ve güncelleme geçmişi görünüyor.',
   'popup.whatsNew.v103.icons': 'Hesap simgeleri yeniden çizildi ve 18’e çıkarıldı. Seçtiğiniz simge açılır pencerede her zaman görünür.',
   'popup.whatsNew.v103.name': 'Hesap adını menüsünden kopyalayın ve listeyi ada göre sıralayın.',
+  'popup.whatsNew.v104.shortcuts': 'Önemli hesapların kodlarını kopyalayan kısayolların artık varsayılan tuşu yok; böylece diğer uygulamalar Ctrl+Shift+1–3’ü yeniden kullanabilir. Kullanmaya devam etmek için tuşları Ayarlar → Kısayol ayarları’ndan belirleyin.',
   'accounts.icon': 'Simge',
   'accounts.icon.auto': 'Baş harfler',
   'accounts.icon.key': 'Anahtar',

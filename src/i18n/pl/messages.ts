@@ -374,6 +374,7 @@ export const messages: Record<string, string> = {
   'popup.whatsNew.v103.about': 'Ustawienia pokazują teraz wersję, sprawdzanie aktualizacji i historię aktualizacji.',
   'popup.whatsNew.v103.icons': 'Ikony kont zostały narysowane od nowa, jest ich teraz 18. Wybrana ikona jest zawsze widoczna w oknie podręcznym.',
   'popup.whatsNew.v103.name': 'Skopiuj nazwę konta z jego menu i sortuj listę według nazwy.',
+  'popup.whatsNew.v104.shortcuts': 'Skróty kopiujące kody ważnych kont nie mają już domyślnych klawiszy, więc inne aplikacje znów mogą używać Ctrl+Shift+1–3. Aby dalej z nich korzystać, ustaw klawisze w Ustawienia → Ustawienia skrótów.',
   'accounts.icon': 'Ikona',
   'accounts.icon.auto': 'Inicjały',
   'accounts.icon.key': 'Klucz',

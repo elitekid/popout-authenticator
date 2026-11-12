@@ -372,6 +372,7 @@ export const messages: Record<string, string> = {
   'popup.whatsNew.v103.about': "Les paramètres affichent désormais la version, la recherche de mises à jour et l'historique des mises à jour.",
   'popup.whatsNew.v103.icons': 'Les icônes de compte ont été redessinées, avec 18 au choix. L’icône choisie s’affiche toujours dans la fenêtre contextuelle.',
   'popup.whatsNew.v103.name': "Copiez le nom d'un compte depuis son menu et triez la liste par nom.",
+  'popup.whatsNew.v104.shortcuts': 'Les raccourcis qui copient les codes des comptes importants n’ont plus de touches par défaut ; les autres applications peuvent de nouveau utiliser Ctrl+Maj+1–3. Pour continuer à les utiliser, définissez les touches dans Paramètres → Raccourcis clavier.',
   'accounts.icon': 'Icône',
   'accounts.icon.auto': 'Initiales',
   'accounts.icon.key': 'Clé',

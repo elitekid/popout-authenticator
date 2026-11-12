@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 import type { AccountDraft } from '../../core/account';
-import { decodeQrAll } from '../../core/qr';
+import { decodeQrAll, decodeQrAllAsync } from '../../core/qr';
 import { parseLinks } from '../../core/uri';
 import { LockedError } from '../../store/errors';
 import { redeemOneTimeKey } from '../../store/lock';
@@ -33,6 +33,8 @@ export function App() {
   const otkRef = useRef<string | null>(null);
   const keyRef = useRef<Uint8Array | null>(null);
   const saving = useRef(false);
+  // 영역 선택으로 이미 저장했으면 뒤늦게 끝난 자동 해석이 다시 저장하지 않게 한다.
+  const settled = useRef(false);
   const [picking, setPicking] = useState(false);
   const [displayError, setDisplayError] = useState<string | null>(null);
   const params = new URLSearchParams(location.search);
@@ -103,6 +105,7 @@ export function App() {
       keyRef.current = null;
       setLocked(null);
       setSaveError(false);
+      settled.current = true;
       setResult({ added, duplicates, failed: failed.length });
       setPhase('done');
       setSrc('');
@@ -148,11 +151,12 @@ export function App() {
     }
     setSrc(url);
     setPhase('pick');
-    // 먼저 그림 전체에서 찾는다.
+    // 그림이 먼저 그려지도록 한 번 양보한 뒤 전체에서 찾는다.
+    await new Promise((r) => setTimeout(r, 0));
     try {
-      const found = accountsFrom(
-        decodeQrAll(sourceToRgba(img, img.naturalWidth, img.naturalHeight)),
-      );
+      const texts = await decodeQrAllAsync(sourceToRgba(img, img.naturalWidth, img.naturalHeight));
+      if (settled.current) return;
+      const found = accountsFrom(texts);
       // 저장할 계정이 있을 때만 바로 저장한다. 실패 줄뿐이면 영역 선택을 남긴다.
       if (found && found.drafts.length > 0) await save(found.drafts, found.failed);
       else setMissed(true);

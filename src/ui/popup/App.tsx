@@ -883,11 +883,12 @@ export function App() {
     };
   }, [deleteAsk]);
 
-  // 코드를 가리면 공유 창과 공유 재확인을 닫는다.
+  // 코드를 가리면 공유 창, QR 보기·재확인을 닫는다.
   useEffect(() => {
     if (!codesHidden) return;
     setShareAccount(null);
-    if (qrAsk?.kind === 'share') closeQrAsk();
+    setQrView(null);
+    if (qrAsk) closeQrAsk();
   }, [codesHidden]);
 
   useEffect(() => {
