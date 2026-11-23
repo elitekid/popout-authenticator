@@ -39,7 +39,7 @@ Supported browsers: Chrome, Edge, Firefox, Whale, and Safari (macOS only, no iOS
 - [From the original Authenticator extension](https://elitekid.github.io/popout-authenticator/guides/from-authenticator-extension/): Import its backup file directly
 - [From Authy Desktop and other apps](https://elitekid.github.io/popout-authenticator/guides/from-authy-and-other-apps/): Bring accounts from Authy Desktop, Google Authenticator, and other authenticator apps
 - [Google Authenticator to your PC browser](https://elitekid.github.io/popout-authenticator/guides/google-authenticator-to-pc-browser/): Export QR codes on your phone and read them into Chrome, Edge, Firefox, or Whale
-- [Browser 2FA extensions compared](https://elitekid.github.io/popout-authenticator/guides/compare-browser-authenticators/): Popout Authenticator, Authenticator, 2FAS, and 2FA Authenticator side by side, checked October 18, 2026
+- [Browser 2FA extensions compared](https://elitekid.github.io/popout-authenticator/guides/compare-browser-authenticators/): Popout Authenticator, Authenticator, 2FAS, and 2FA Authenticator side by side, checked November 23, 2026
 
 ## Korean (한국어)
 
