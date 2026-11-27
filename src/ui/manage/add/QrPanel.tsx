@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 import type { AccountDraft } from '../../../core/account';
 import type { ImportFailure, ImportMeta } from '../../../core/import';
-import { decodeQrAll } from '../../../core/qr';
+import { decodeQrAll, isAuthenticatorQr, isMicrosoftQr } from '../../../core/qr';
 import { parseLinks } from '../../../core/uri';
 import { CameraScanner } from '../../shared/CameraScanner';
 import { fileToRgba } from '../../shared/qr-image';
@@ -16,8 +16,6 @@ type Props = {
   onCameraStart: () => void;
   onCameraStop: () => void;
 };
-
-const isOtpLink = (text: string) => /^\s*otpauth(-migration)?:\/\//i.test(text);
 
 // QR 칸: 그림 붙여넣기·끌어 놓기·파일 고르기, 그리고 카메라.
 export function QrPanel({ t, busy, onBatch, onScanned, onCameraStart, onCameraStop }: Props) {
@@ -39,11 +37,11 @@ export function QrPanel({ t, busy, onBatch, onScanned, onCameraStart, onCameraSt
       for (const file of images) {
         try {
           const found = decodeQrAll(await fileToRgba(file));
-          if (found.some(isOtpLink)) texts.push(...found);
+          if (found.some(isAuthenticatorQr)) texts.push(...found);
           else {
             failed.push({
               source: file.name,
-              reason: t(found.length === 0 ? 'add.qr.notFound' : 'add.qr.notOtp'),
+              reason: t(found.length === 0 ? 'add.qr.notFound' : found.some(isMicrosoftQr) ? 'add.qr.microsoft' : 'add.qr.notOtp'),
             });
           }
         } catch {

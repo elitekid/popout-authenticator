@@ -114,8 +114,10 @@ function readRecords(area: SyncArea, keys: string[]): SyncRecord[] {
   return out;
 }
 
+// 계정 그림은 이 기기에만 둔다(동기화 칸 크기 한도도 넘지 않게).
 async function encryptRecord(account: Account, key: Uint8Array): Promise<SyncRecord> {
-  const stored = { ...account, secret: toBase64(account.secret) };
+  const { iconImage: _image, ...rest } = account;
+  const stored = { ...rest, secret: toBase64(account.secret) };
   const { iv, ciphertext } = await aesGcmEncrypt(key, utf8Encode(JSON.stringify(stored)));
   return { id: account.id, u: account.updatedAt, iv: toBase64(iv), d: toBase64(ciphertext) };
 }
@@ -126,7 +128,8 @@ async function decryptRecord(record: SyncRecord, key: Uint8Array): Promise<Accou
   if (raw.id !== record.id || raw.updatedAt !== record.u || typeof raw.secret !== 'string') {
     throw new Error('bad sync record');
   }
-  return { ...raw, secret: fromBase64(raw.secret) } as Account;
+  const { iconImage: _image, ...rest } = raw;
+  return { ...rest, secret: fromBase64(raw.secret) } as Account;
 }
 
 // 카운터가 합쳐서 바뀐 계정은 옛 기록을 재사용하지 않게 카운터도 키에 넣는다.
@@ -189,6 +192,12 @@ function withMaxCounter(win: Account, other: Account): Account {
   return (other.counter ?? 0) > (win.counter ?? 0) ? { ...win, counter: other.counter } : win;
 }
 
+// 동기화 기록에는 그림이 없으니, 이긴 쪽에 그림이 없으면 진 쪽(이 기기)의 그림을 이어 둔다.
+function combine(win: Account, other: Account): Account {
+  const out = withMaxCounter(win, other);
+  return out.iconImage === undefined && other.iconImage !== undefined ? { ...out, iconImage: other.iconImage } : out;
+}
+
 // local 순서를 유지하고 remote 에만 있던 것은 뒤에 붙인다.
 export function mergeAccounts(local: Account[], remote: Account[], tombs: Tombstones): Account[] {
   const byId = new Map<string, Account>();
@@ -196,7 +205,7 @@ export function mergeAccounts(local: Account[], remote: Account[], tombs: Tombst
   for (const r of remote) {
     const cur = byId.get(r.id);
     if (!cur) byId.set(r.id, r);
-    else byId.set(r.id, r.updatedAt > cur.updatedAt ? withMaxCounter(r, cur) : withMaxCounter(cur, r));
+    else byId.set(r.id, r.updatedAt > cur.updatedAt ? combine(r, cur) : combine(cur, r));
   }
   const alive = [...byId.values()].filter((a) => {
     const t = tombs[a.id];
@@ -209,8 +218,8 @@ export function mergeAccounts(local: Account[], remote: Account[], tombs: Tombst
     const k = duplicateKey(a);
     const w = winners.get(k);
     if (!w) winners.set(k, a);
-    else if (a.createdAt < w.createdAt || (a.createdAt === w.createdAt && a.id < w.id)) winners.set(k, withMaxCounter(a, w));
-    else winners.set(k, withMaxCounter(w, a));
+    else if (a.createdAt < w.createdAt || (a.createdAt === w.createdAt && a.id < w.id)) winners.set(k, combine(a, w));
+    else winners.set(k, combine(w, a));
   }
   return alive
     .filter((a) => a.deletedAt !== undefined || winners.get(duplicateKey(a))?.id === a.id)

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 import type { AccountDraft } from '../../core/account';
 import { decodeMigration } from '../../core/migration';
-import { decodeQrAll } from '../../core/qr';
+import { decodeQrAll, isAuthenticatorQr, isMicrosoftQr } from '../../core/qr';
 import { parseLinks } from '../../core/uri';
 import { sourceToRgba } from './qr-image';
 import { useT } from './use-t';
@@ -34,13 +34,28 @@ export function CameraScanner(props: {
   const [problem, setProblem] = useState<Problem | null>(null);
   const [running, setRunning] = useState(false);
   const [progress, setProgress] = useState<{ seen: number; total: number } | null>(null);
+  // 다시 비춰도 결과가 같은 QR(Microsoft 전용·손상된 인증 QR)을 읽으면 카메라를 멈추고 이유를 보인다.
+  const [halt, setHalt] = useState<'microsoft' | 'damaged' | null>(null);
+  const halted = useRef(false);
+
+  const stopWith = (why: 'microsoft' | 'damaged') => {
+    halted.current = true;
+    setHalt(why);
+  };
 
   const handle = (text: string) => {
-    if (handled.current.has(text)) return;
+    if (halted.current || handled.current.has(text)) return;
     handled.current.add(text);
     const { drafts, failed } = parseLinks(text);
-    if (drafts.length === 0 && failed.length === 0) return;
-    if (/^\s*otpauth-migration:\/\//i.test(text)) {
+    if (drafts.length === 0 && failed.length === 0) {
+      // 인증 QR 이 아닌 코드는 지나친다. Microsoft 전용 QR 만 따로 알린다.
+      if (isMicrosoftQr(text)) stopWith('microsoft');
+      return;
+    }
+    const migration = /^\s*otpauth-migration:\/\//i.test(text);
+    // 여러 장짜리 Google 내보내기는 한 장이 못 읽혀도 나머지 장을 계속 읽는다.
+    if (drafts.length === 0 && !migration && isAuthenticatorQr(text)) stopWith('damaged');
+    if (migration) {
       try {
         const { batch } = decodeMigration(text);
         const known = batches.current.get(batch.id) ?? { size: batch.size, seen: new Set<number>() };
@@ -57,6 +72,7 @@ export function CameraScanner(props: {
   };
 
   useEffect(() => {
+    if (halt) return;
     let alive = true;
     let stream: MediaStream | undefined;
     let timer: ReturnType<typeof setInterval> | undefined;
@@ -129,7 +145,31 @@ export function CameraScanner(props: {
       stop();
       setRunning(false);
     };
-  }, [deviceId]);
+  }, [deviceId, halt]);
+
+  const again = () => {
+    handled.current.clear();
+    halted.current = false;
+    setHalt(null);
+  };
+
+  if (halt) {
+    return (
+      <div class="camera" data-role="camera" data-halt={halt}>
+        <p class="error" role="alert" data-role="camera-halt">
+          {t(halt === 'microsoft' ? 'add.qr.microsoft' : 'add.qr.damaged')}
+        </p>
+        <div class="camera-halt-actions">
+          <button type="button" class="primary" data-role="camera-again" onClick={again}>
+            {t('qr.camera.again')}
+          </button>
+          <button type="button" data-role="camera-stop" onClick={props.onClose}>
+            {t('qr.camera.stop')}
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div class="camera" data-role="camera">

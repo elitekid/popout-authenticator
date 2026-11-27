@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'preact/hooks';
-import { currentLang, isLoaded, loadLang, makeT, type Lang } from '../../i18n';
+import { currentLang, isLoaded, isRtl, loadLang, makeT, type Lang } from '../../i18n';
 import { loadSettings, onSettingsChanged } from '../../store/settings';
 
 // 인자 없는 훅이 같이 쓰는 언어 값. 저장소 구독은 페이지당 하나만 두고, 마지막 구독자가 빠지면 푼다.
@@ -58,7 +58,7 @@ export function useT(languageSetting?: string) {
   const lang = currentLang(languageSetting ?? stored);
   useEffect(() => {
     document.documentElement.lang = lang;
-    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+    document.documentElement.dir = isRtl(lang) ? 'rtl' : 'ltr';
   }, [lang]);
   // en·ko 밖의 언어는 처음 쓸 때 불러오고, 다 불러오면 다시 그린다.
   // 다른 훅이 렌더와 effect 사이에 사전을 읽어도 해당 언어로 한 번 다시 그린다.

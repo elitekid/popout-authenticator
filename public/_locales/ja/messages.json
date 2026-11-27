@@ -10,6 +10,7 @@
   "cmdOpenWindow": { "message": "別ウィンドウで開く" },
   "menuOpenWindow": { "message": "別ウィンドウで開く" },
   "menuQuickFill": { "message": "2FA コードを入力" },
+  "menuQuickCopy": { "message": "このサイトの 2FA コードをコピー" },
   "fillCopied": { "message": "コードをコピーしました。貼り付けてください。" },
   "fillManual": {
     "message": "コード: $CODE$",
@@ -32,6 +33,9 @@
   },
   "shortcutMissing": {
     "message": "このショートカットに対応するスター付きアカウントがありません。"
+  },
+  "shortcutSiteWarn": {
+    "message": "コピーしませんでした。このページのアドレスはアカウントのサイトをまねたものに見えます。本物だと確信できる場合は、拡張機能のウィンドウからコピーしてください。"
   },
   "shortcutFailed": {
     "message": "コードをコピーできませんでした。"

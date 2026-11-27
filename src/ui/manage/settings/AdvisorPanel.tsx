@@ -61,6 +61,7 @@ async function compute(): Promise<View> {
     id: 'sync', level: 'info',
     ...(settings.syncEnabled ? { messageKey: 'settings.sync.status.needs-lock', link: '#lock' } : {}),
   });
+  if (!settings.siteWarnEnabled) found.push({ id: 'siteWarn', level: 'warning' });
   if (!settings.suggestionsEnabled) found.push({ id: 'suggestions', level: 'info' });
 
   return { items: found.filter((item) => !ignored.includes(item.id)), hasIgnored: ignored.length > 0 };

@@ -10,6 +10,7 @@
   "cmdOpenWindow": { "message": "In eigenem Fenster öffnen" },
   "menuOpenWindow": { "message": "In eigenem Fenster öffnen" },
   "menuQuickFill": { "message": "2FA-Code einfügen" },
+  "menuQuickCopy": { "message": "2FA-Code für diese Website kopieren" },
   "fillCopied": { "message": "Code kopiert. Fügen Sie ihn ein." },
   "fillManual": {
     "message": "Code: $CODE$",
@@ -32,6 +33,9 @@
   },
   "shortcutMissing": {
     "message": "Für dieses Tastenkürzel gibt es kein Konto mit Stern."
+  },
+  "shortcutSiteWarn": {
+    "message": "Nicht kopiert: Die Adresse dieser Seite wirkt wie eine Fälschung der Website des Kontos. Wenn Sie sicher sind, dass sie echt ist, kopieren Sie den Code im Fenster der Erweiterung."
   },
   "shortcutFailed": {
     "message": "Der Code konnte nicht kopiert werden."

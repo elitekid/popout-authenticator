@@ -1,0 +1,29 @@
+{
+  "appName": { "message": "Popout Authenticator — 2FA ও OTP কোড" },
+  "appShortName": { "message": "Popout Authenticator" },
+  "appDesc": { "message": "ওপেন সোর্স 2FA অথেন্টিকেটর। পপআপ, উইন্ডো বা সাইড প্যানেলে এককালীন কোড, সাথে পাসওয়ার্ড লক ও ব্যাকআপ ইমপোর্ট।" },
+  "cmdExecuteAction": { "message": "পপআপ খুলুন" },
+  "cmdQuickFill": { "message": "এই পেজে 2FA কোড পূরণ করুন" },
+  "cmdScanQr": { "message": "স্ক্রিনের QR কোড স্ক্যান করুন" },
+  "cmdAutofill": { "message": "সবচেয়ে ভালো মেলা অ্যাকাউন্টের কোড পূরণ করুন" },
+  "cmdHideCodes": { "message": "কোড লুকান বা দেখান" },
+  "cmdOpenWindow": { "message": "আলাদা উইন্ডোতে খুলুন" },
+  "menuOpenWindow": { "message": "আলাদা উইন্ডোতে খুলুন" },
+  "menuQuickFill": { "message": "2FA কোড পূরণ করুন" },
+  "menuQuickCopy": { "message": "এই সাইটের 2FA কোড কপি করুন" },
+  "fillCopied": { "message": "কোড কপি হয়েছে। ইনপুট ঘরে পেস্ট করুন।" },
+  "fillManual": {
+    "message": "কোড: $CODE$",
+    "placeholders": { "code": { "content": "$1" } }
+  },
+  "cmdCopyPinned1": { "message": "গুরুত্বপূর্ণ অ্যাকাউন্ট 1-এর কোড কপি করুন" },
+  "cmdCopyPinned2": { "message": "গুরুত্বপূর্ণ অ্যাকাউন্ট 2-এর কোড কপি করুন" },
+  "cmdCopyPinned3": { "message": "গুরুত্বপূর্ণ অ্যাকাউন্ট 3-এর কোড কপি করুন" },
+  "shortcutCopied": { "message": "কোড কপি হয়েছে।" },
+  "shortcutLocked": { "message": "আগে Popout Authenticator আনলক করুন।" },
+  "shortcutMissing": { "message": "এই শর্টকাটের জন্য কোনো গুরুত্বপূর্ণ অ্যাকাউন্ট নেই।" },
+  "shortcutSiteWarn": { "message": "কপি করা হয়নি: এই পেজের ঠিকানা অ্যাকাউন্টের সাইটের নকলের মতো দেখায়। এটি আসল বলে নিশ্চিত হলে এক্সটেনশনের উইন্ডো থেকে কপি করুন।" },
+  "shortcutFailed": { "message": "কোড কপি করা যায়নি।" },
+  "fillPickAccount": { "message": "একটি অ্যাকাউন্ট বেছে নিন।" },
+  "fieldFillButton": { "message": "কোড পূরণ করুন" }
+}

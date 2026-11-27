@@ -157,11 +157,8 @@ describe('other apps', () => {
     expect(find(out.drafts, 'VPN').counter).toBe(4);
   });
 
-  it.each([
-    ['aegisEncrypted', 'Aegis'],
-    ['twoFasEncrypted', '2FAS'],
-    ['bitwardenEncrypted', 'Bitwarden'],
-  ])('refuses encrypted %s', async (key, app) => {
+  // 비밀번호 건 Aegis·2FAS 는 import-more.test.ts 에서 연다.
+  it.each([['bitwardenEncrypted', 'Bitwarden']])('refuses encrypted %s', async (key, app) => {
     const err = await importText(text(key)).catch((e: unknown) => e);
     expect(err).toBeInstanceOf(ImportRejectedError);
     expect((err as ImportRejectedError).reason).toBe('encrypted');

@@ -18,7 +18,7 @@ import { reset as koReset } from './ko/reset';
 import { share as enShare } from './en/share';
 import { share as koShare } from './ko/share';
 
-// 기준 확장과 같은 20개 언어. 화면 이름은 그 언어로 적는다.
+// 기준 확장의 20개 언어 + 1.0.5 의 23개(총 43개). 화면 이름은 그 언어로 적는다.
 export const LANGS = [
   ['en', 'English'],
   ['ko', '한국어'],
@@ -40,6 +40,30 @@ export const LANGS = [
   ['th', 'ไทย'],
   ['uk', 'Українська'],
   ['sv', 'Svenska'],
+  // 1.0.5 에 더한 23개 언어
+  ['zh-TW', '繁體中文'],
+  ['bn', 'বাংলা'],
+  ['fa', 'فارسی'],
+  ['fil', 'Filipino'],
+  ['ms', 'Bahasa Melayu'],
+  ['ur', 'اردو'],
+  ['cs', 'Čeština'],
+  ['ro', 'Română'],
+  ['hu', 'Magyar'],
+  ['el', 'Ελληνικά'],
+  ['he', 'עברית'],
+  ['da', 'Dansk'],
+  ['fi', 'Suomi'],
+  ['no', 'Norsk'],
+  ['bg', 'Български'],
+  ['sr', 'Српски'],
+  ['hr', 'Hrvatski'],
+  ['ca', 'Català'],
+  ['lt', 'Lietuvių'],
+  ['lv', 'Latviešu'],
+  ['et', 'Eesti'],
+  ['sk', 'Slovenčina'],
+  ['sl', 'Slovenščina'],
 ] as const;
 
 export type Lang = (typeof LANGS)[number][0];
@@ -67,10 +91,28 @@ export async function loadLang(lang: Lang): Promise<void> {
   messages[lang] = (await load()).messages;
 }
 
+// 오른쪽에서 왼쪽으로 쓰는 언어
+const RTL = new Set<string>(['ar', 'fa', 'he', 'ur']);
+export function isRtl(lang: Lang): boolean {
+  return RTL.has(lang);
+}
+
+// 브라우저가 주는 다른 이름(옛 코드·지역 변형)을 우리 코드로 옮긴다.
+const ALIASES: Record<string, Lang> = { iw: 'he', nb: 'no', nn: 'no', tl: 'fil' };
+// 번체를 쓰는 지역·문자 표시
+const TRADITIONAL = new Set(['tw', 'hk', 'mo', 'hant']);
+
 export function pickLanguage(setting: string, navigatorLanguage?: string): Lang {
   const wanted = setting === 'auto' ? navigatorLanguage : setting;
-  const base = (wanted ?? '').toLowerCase().split('-')[0] ?? '';
-  return CODES.has(base) ? (base as Lang) : 'en';
+  const parts = (wanted ?? '').toLowerCase().replace(/_/g, '-').split('-');
+  const base = parts[0] ?? '';
+  if (base === 'zh') {
+    // zh-Hans-HK 처럼 간체가 적혀 있으면 간체를 쓴다.
+    if (parts.includes('hans')) return 'zh';
+    return parts.slice(1).some((p) => TRADITIONAL.has(p)) ? 'zh-TW' : 'zh';
+  }
+  const code = ALIASES[base] ?? base;
+  return CODES.has(code) ? (code as Lang) : 'en';
 }
 
 // 아직 불러오지 않은 언어는 영어로 보인다(useT 가 불러온 뒤 다시 그린다).

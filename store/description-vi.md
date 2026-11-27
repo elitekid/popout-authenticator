@@ -1,7 +1,7 @@
 # Trang cửa hàng — Tiếng Việt
 
 ## Tên (manifest appName, 1.0.1)
-Popout Authenticator
+Popout Authenticator — xác thực 2FA
 
 ## Tóm tắt (manifest appDesc, tối đa 132 ký tự)
 Ứng dụng xác thực 2FA cho trình duyệt của bạn. Tạo mã dùng một lần, mở trong cửa sổ bật lên hoặc cửa sổ riêng.
@@ -15,15 +15,16 @@ Popout Authenticator hiển thị mã dùng một lần cho xác thực hai yế
 - Nhập tệp sao lưu của tiện ích Authenticator (authenticator.cc), kể cả bản sao lưu có mật khẩu.
 - Tương thích với mã QR xuất từ Google Authenticator™.
 - Nhập bản sao lưu dạng văn bản thuần từ các ứng dụng xác thực khác, cùng tệp theo chuẩn Credential Exchange (CXF). Các ứng dụng được hỗ trợ (tiếng Anh): https://elitekid.github.io/popout-authenticator/guides/from-authy-and-other-apps/
-- Bản sao lưu mã hóa của một số ứng dụng không mở được ở đây. Khi đó, hãy xuất bản sao lưu dạng văn bản thuần từ ứng dụng đó trước.
+- Mở bản sao lưu có mật khẩu của một số ứng dụng bằng mật khẩu của chúng. Với ứng dụng có bản sao lưu mã hóa không mở được ở đây, hãy xuất bản sao lưu dạng văn bản thuần từ ứng dụng đó trước.
 
 **Mở ở nơi bạn cần**
 - Dùng cửa sổ bật lên trên thanh công cụ, cửa sổ riêng hoặc bảng bên (thanh bên trong Firefox).
 - Tìm theo trường hoặc nhiều từ, sắp xếp A–Z, nhóm, tài khoản được ghim, biểu tượng và chế độ xem gọn giúp danh sách dài luôn ngăn nắp.
-- Xem tài khoản nào thuộc trang web đang mở và điền mã của nó bằng một cú nhấp, nhấp chuột phải hoặc phím tắt.
+- Xem tài khoản nào thuộc trang web đang mở và điền mã của nó bằng một cú nhấp, nhấp chuột phải hoặc phím tắt. Nhấp chuột phải vào bất kỳ đâu trên trang để sao chép mã của trang web đó.
 - Phím tắt toàn cục sao chép mã của ba tài khoản quan trọng đầu tiên, kể cả khi trình duyệt đang chạy nền (Chrome, Edge, Whale).
 - Nút tùy chọn cạnh ô nhập mã trên các trang web bạn chọn.
-- Chọn nhiều tài khoản để chuyển cùng lúc vào thùng rác, đổi tên hoặc bỏ nhóm cả một nhóm trong một lần, và sao chép tên tài khoản.
+- Chọn nhiều tài khoản để chuyển cùng lúc sang nhóm khác hoặc vào thùng rác, và hoàn tác ngay. Đổi tên hoặc bỏ nhóm cả một nhóm trong một lần, và sao chép tên tài khoản.
+- Dùng ảnh của riêng bạn làm biểu tượng tài khoản. Ảnh chỉ nằm trên thiết bị này.
 
 **Thêm tài khoản theo cách của bạn**
 - Quét mã QR từ thẻ hiện tại, cửa sổ của ứng dụng khác, camera, hình ảnh hoặc bộ nhớ tạm.
@@ -34,6 +35,7 @@ Popout Authenticator hiển thị mã dùng một lần cho xác thực hai yế
 - Tài khoản được lưu trên thiết bị của bạn trong kho được mã hóa bằng AES-256-GCM. Hãy đặt mật khẩu để bảo vệ khóa của kho: nếu không có mật khẩu, khóa được lưu trên thiết bị cạnh dữ liệu.
 - Khóa bằng mật khẩu (Argon2id), mã khôi phục và tùy chọn mở khóa bằng khóa truy cập (không có trong Firefox). Chọn thời điểm tự động khóa.
 - Có thể yêu cầu xác minh thiết bị trước khi dùng mã (không có trong Firefox), và ẩn mã bằng phím tắt do bạn đặt.
+- Nhận cảnh báo trước khi dùng mã trên trang web có địa chỉ chỉ trông giống trang của tài khoản.
 - Mã đã sao chép có thể được xóa khỏi bộ nhớ tạm sau 30 giây, 1, 2 hoặc 5 phút (không có trong Safari).
 - Không phân tích, không quảng cáo, không có máy chủ của nhà phát triển. Mã nguồn được công khai.
 
@@ -50,7 +52,7 @@ Popout Authenticator hiển thị mã dùng một lần cho xác thực hai yế
 - Nhà phát triển không vận hành dịch vụ sao lưu đám mây. Bản sao lưu là tệp do bạn tự giữ; đồng bộ đi qua trình duyệt.
 - Mở khóa bằng khóa truy cập và xác minh thiết bị không có trong Firefox. Phiên bản Safari chỉ dành cho macOS.
 
-Có 20 ngôn ngữ. Hỗ trợ chính sách được quản lý cho tổ chức.
+Có 43 ngôn ngữ. Hỗ trợ chính sách được quản lý cho tổ chức.
 
 Popout Authenticator do một nhà phát triển độc lập làm ra. Tiện ích dựa trên mã nguồn và bản dịch theo giấy phép MIT của tiện ích Authenticator (authenticator.cc) và không liên kết với các tác giả của tiện ích đó.
 

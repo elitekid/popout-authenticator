@@ -47,15 +47,20 @@ export interface QuickFillPageArgs {
   noticeText: string;
   expiresAt?: number;
   documentUrl?: string;
+  /** Copy only: the page must still be on this origin (a same-site hash or path change is fine). */
+  origin?: string;
   /** The document and field were pinned earlier under this id; use that field, not the current focus. */
   pinId?: string;
   autoSubmit?: boolean;
+  /** '이 사이트 코드 복사' 메뉴: 입력칸에 넣지 않고 클립보드에만 둔다. */
+  copyOnly?: boolean;
 }
 
 export async function quickFillInPage(args: QuickFillPageArgs): Promise<QuickFillOutcome> {
   const CODE = args.code || '';
   const expired = () => (args.expiresAt !== undefined && Date.now() >= args.expiresAt)
-    || (args.documentUrl !== undefined && location.href !== args.documentUrl);
+    || (args.documentUrl !== undefined && location.href !== args.documentUrl)
+    || (args.origin !== undefined && location.origin !== args.origin);
 
   if (expired()) return 'expired';
 
@@ -422,7 +427,9 @@ export async function quickFillInPage(args: QuickFillPageArgs): Promise<QuickFil
   // 문서를 먼저 고정한 넣기는 그때 기억한 칸만 쓴다. 기다리는 사이 옮겨 간 포커스는 따르지 않는다.
   // 고정했던 칸이 사라졌으면 다른 칸을 추측하지 않는다(엉뚱한 폼에 넣고 제출하지 않게).
   let target: HTMLElement | null;
-  if (args.pinId !== undefined) {
+  if (args.copyOnly) {
+    target = null;
+  } else if (args.pinId !== undefined) {
     const pins = (globalThis as { __popoutPinnedFields?: Map<string, WeakRef<Element> | null> }).__popoutPinnedFields;
     const pin = pins?.get(args.pinId);
     pins?.delete(args.pinId);

@@ -1,0 +1,29 @@
+{
+  "appName": { "message": "Popout Authenticator — 2FA- ja OTP-koodid" },
+  "appShortName": { "message": "Popout Authenticator" },
+  "appDesc": { "message": "Avatud lähtekoodiga 2FA-autentija. Ühekordsed koodid hüpikaknas, aknas või külgpaneelil, salasõnalukk ja varukoopiate import." },
+  "cmdExecuteAction": { "message": "Ava hüpikaken" },
+  "cmdQuickFill": { "message": "Täida sellel lehel 2FA-kood" },
+  "cmdScanQr": { "message": "Skanni ekraanil olev QR-kood" },
+  "cmdAutofill": { "message": "Täida kõige paremini sobiva konto kood" },
+  "cmdHideCodes": { "message": "Peida või näita koode" },
+  "cmdOpenWindow": { "message": "Ava eraldi aknas" },
+  "menuOpenWindow": { "message": "Ava eraldi aknas" },
+  "menuQuickFill": { "message": "Täida 2FA-kood" },
+  "menuQuickCopy": { "message": "Kopeeri selle saidi 2FA-kood" },
+  "fillCopied": { "message": "Kood kopeeriti. Kleepige see sisestusvälja." },
+  "fillManual": {
+    "message": "Kood: $CODE$",
+    "placeholders": { "code": { "content": "$1" } }
+  },
+  "cmdCopyPinned1": { "message": "Kopeeri olulise konto 1 kood" },
+  "cmdCopyPinned2": { "message": "Kopeeri olulise konto 2 kood" },
+  "cmdCopyPinned3": { "message": "Kopeeri olulise konto 3 kood" },
+  "shortcutCopied": { "message": "Kood kopeeriti." },
+  "shortcutLocked": { "message": "Avage esmalt Popout Authenticatori lukk." },
+  "shortcutMissing": { "message": "Sellel otseteel pole olulist kontot." },
+  "shortcutSiteWarn": { "message": "Ei kopeeritud: selle lehe aadress näib olevat konto saidi võltsing. Kui olete kindel, et see on õige, kopeerige laienduse aknast." },
+  "shortcutFailed": { "message": "Koodi ei saanud kopeerida." },
+  "fillPickAccount": { "message": "Valige konto." },
+  "fieldFillButton": { "message": "Täida kood" }
+}

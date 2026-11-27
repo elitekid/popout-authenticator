@@ -1,7 +1,7 @@
 # Winkelvermelding — Nederlands
 
 ## Naam (manifest appName, 1.0.1)
-Popout Authenticator
+Popout Authenticator — 2FA-authenticator
 
 ## Samenvatting (manifest appDesc, maximaal 132 tekens)
 2FA-authenticator voor je browser. Genereert eenmalige codes en opent als pop-up of apart venster.
@@ -15,15 +15,16 @@ Popout Authenticator toont je eenmalige codes voor tweestapsverificatie (2FA) di
 - Importeer het back-upbestand van de extensie Authenticator (authenticator.cc), ook back-ups met een wachtwoord.
 - Compatibel met export-QR-codes van Google Authenticator™.
 - Importeer onversleutelde back-ups van andere authenticator-apps en bestanden in het standaardformaat Credential Exchange (CXF). Ondersteunde apps (Engels): https://elitekid.github.io/popout-authenticator/guides/from-authy-and-other-apps/
-- Versleutelde back-ups van sommige apps kunnen hier niet worden geopend. Exporteer in dat geval eerst een onversleutelde back-up uit die app.
+- Open met een wachtwoord beveiligde back-ups van sommige apps met hun wachtwoord. Voor apps waarvan de versleutelde back-ups hier niet kunnen worden geopend, exporteer je eerst een onversleutelde back-up uit die app.
 
 **Open het waar je het nodig hebt**
 - Gebruik de pop-up van de werkbalk, een apart venster of het zijpaneel (zijbalk in Firefox).
 - Zoeken per veld of op meerdere woorden, sorteren van A tot Z, groepen, vastgezette accounts, pictogrammen en een compacte weergave houden lange lijsten overzichtelijk.
-- Zie welk account bij de geopende website hoort en vul de code in met één klik, een rechtermuisklik of een sneltoets.
+- Zie welk account bij de geopende website hoort en vul de code in met één klik, een rechtermuisklik of een sneltoets. Klik met rechts ergens op een pagina om de code van die site te kopiëren.
 - Globale sneltoetsen kopiëren de codes van je eerste drie belangrijke accounts, ook als de browser op de achtergrond staat (Chrome, Edge, Whale).
 - Optionele knoppen naast codevelden op websites die je kiest.
-- Selecteer meerdere accounts om ze samen naar de prullenbak te verplaatsen, hernoem of ontbind een hele groep in één keer en kopieer de naam van een account.
+- Selecteer meerdere accounts om ze samen naar een andere groep of naar de prullenbak te verplaatsen, en maak dat meteen ongedaan als je wilt. Hernoem of ontbind een hele groep in één keer en kopieer de naam van een account.
+- Gebruik je eigen afbeelding als pictogram van een account. Die blijft op dit apparaat.
 
 **Accounts toevoegen zoals jij wilt**
 - Scan een QR-code uit het huidige tabblad, uit het venster van een andere app, met je camera, uit een afbeelding of van het klembord.
@@ -34,6 +35,7 @@ Popout Authenticator toont je eenmalige codes voor tweestapsverificatie (2FA) di
 - Accounts worden op je apparaat bewaard in een kluis die is versleuteld met AES-256-GCM. Stel een wachtwoord in om de sleutel te beschermen: zonder wachtwoord staat de sleutel op het apparaat naast de gegevens.
 - Gebruik wachtwoordvergrendeling (Argon2id), een herstelcode en optionele ontgrendeling met een passkey (niet in Firefox). Kies wanneer het automatisch vergrendelt.
 - Vraag optioneel om apparaatverificatie voordat een code wordt gebruikt (niet in Firefox), en verberg codes met een sneltoets naar keuze.
+- Krijg een waarschuwing voordat een code wordt gebruikt op een site waarvan het adres alleen lijkt op de site van het account.
 - Gekopieerde codes kunnen na 30 seconden, 1, 2 of 5 minuten van het klembord worden gewist (niet in Safari).
 - Geen analytics, geen advertenties, geen server van de ontwikkelaar. De broncode is openbaar.
 
@@ -50,7 +52,7 @@ Popout Authenticator toont je eenmalige codes voor tweestapsverificatie (2FA) di
 - Er is geen cloudback-up van de ontwikkelaar. Back-ups zijn bestanden die je zelf bewaart; synchronisatie loopt via je browser.
 - Ontgrendelen met een passkey en apparaatverificatie zijn niet beschikbaar in Firefox. De Safari-versie is alleen voor macOS.
 
-Beschikbaar in 20 talen. Ondersteunt beheerde beleidsregels voor organisaties.
+Beschikbaar in 43 talen. Ondersteunt beheerde beleidsregels voor organisaties.
 
 Popout Authenticator is gemaakt door een onafhankelijke ontwikkelaar. Het bouwt voort op de MIT-gelicentieerde code en vertalingen van de extensie Authenticator (authenticator.cc) en is niet verbonden aan de makers daarvan.
 

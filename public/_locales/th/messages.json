@@ -10,6 +10,7 @@
   "cmdOpenWindow": { "message": "เปิดในหน้าต่างแยก" },
   "menuOpenWindow": { "message": "เปิดในหน้าต่างแยก" },
   "menuQuickFill": { "message": "กรอกรหัส 2FA" },
+  "menuQuickCopy": { "message": "คัดลอกรหัส 2FA ของเว็บไซต์นี้" },
   "fillCopied": { "message": "คัดลอกรหัสแล้ว โปรดวางรหัสบนเว็บไซต์" },
   "fillManual": {
     "message": "รหัส: $CODE$",
@@ -32,6 +33,9 @@
   },
   "shortcutMissing": {
     "message": "ไม่มีบัญชีที่ติดดาวสำหรับทางลัดนี้"
+  },
+  "shortcutSiteWarn": {
+    "message": "ไม่ได้คัดลอก: ที่อยู่ของหน้านี้ดูเหมือนเลียนแบบเว็บไซต์ของบัญชี หากแน่ใจว่าเป็นของจริง ให้คัดลอกจากหน้าต่างส่วนขยาย"
   },
   "shortcutFailed": {
     "message": "คัดลอกโค้ดไม่ได้"

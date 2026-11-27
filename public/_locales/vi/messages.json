@@ -10,6 +10,7 @@
   "cmdOpenWindow": { "message": "Mở trong cửa sổ riêng" },
   "menuOpenWindow": { "message": "Mở trong cửa sổ riêng" },
   "menuQuickFill": { "message": "Điền mã 2FA" },
+  "menuQuickCopy": { "message": "Sao chép mã 2FA của trang này" },
   "fillCopied": { "message": "Đã sao chép mã. Hãy dán mã vào trang web." },
   "fillManual": {
     "message": "Mã: $CODE$",
@@ -32,6 +33,9 @@
   },
   "shortcutMissing": {
     "message": "Không có tài khoản gắn sao cho phím tắt này."
+  },
+  "shortcutSiteWarn": {
+    "message": "Chưa sao chép: địa chỉ trang này có vẻ giả mạo trang của tài khoản. Nếu bạn chắc đây là trang thật, hãy sao chép từ cửa sổ tiện ích."
   },
   "shortcutFailed": {
     "message": "Không thể sao chép mã."

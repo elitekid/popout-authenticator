@@ -179,6 +179,7 @@ export async function addDrafts(
         if (m.note !== undefined) account.note = m.note;
         if (m.matchHosts !== undefined) account.matchHosts = m.matchHosts;
         if (m.iconId !== undefined) account.iconId = m.iconId;
+        if (m.iconImage !== undefined) account.iconImage = m.iconImage;
       }
       added.push(account);
     });

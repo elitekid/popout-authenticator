@@ -1,7 +1,7 @@
 # Wpis w sklepie — Polski
 
 ## Nazwa (manifest appName, 1.0.1)
-Popout Authenticator
+Popout Authenticator — uwierzytelniacz 2FA
 
 ## Podsumowanie (manifest appDesc, maksymalnie 132 znaki)
 Uwierzytelniacz 2FA w przeglądarce. Generuje kody jednorazowe, otwiera się jako okienko lub osobne okno.
@@ -15,15 +15,16 @@ Popout Authenticator wyświetla jednorazowe kody uwierzytelniania dwuskładnikow
 - Importuj plik kopii zapasowej rozszerzenia Authenticator (authenticator.cc), także kopie chronione hasłem.
 - Zgodny z kodami QR eksportu z Google Authenticator™.
 - Importuj niezaszyfrowane kopie zapasowe z innych aplikacji uwierzytelniających oraz pliki w standardowym formacie Credential Exchange (CXF). Obsługiwane aplikacje (po angielsku): https://elitekid.github.io/popout-authenticator/guides/from-authy-and-other-apps/
-- Zaszyfrowanych kopii niektórych aplikacji nie da się tu otworzyć. W takim przypadku najpierw wyeksportuj z tej aplikacji niezaszyfrowaną kopię.
+- Chronione hasłem kopie niektórych aplikacji otworzysz, podając ich hasło. Jeśli zaszyfrowanej kopii danej aplikacji nie da się tu otworzyć, najpierw wyeksportuj z niej niezaszyfrowaną kopię.
 
 **Otwieraj tam, gdzie potrzebujesz**
 - Korzystaj z okienka na pasku narzędzi, osobnego okna lub panelu bocznego (pasek boczny w Firefoksie).
 - Wyszukiwanie według pola lub kilku słów, sortowanie od A do Z, grupy, przypięte konta, ikony i widok kompaktowy porządkują nawet długie listy.
-- Widać, które konto pasuje do otwartej strony, a jego kod wpiszesz jednym kliknięciem, prawym przyciskiem myszy lub skrótem klawiszowym.
+- Widać, które konto pasuje do otwartej strony, a jego kod wpiszesz jednym kliknięciem, prawym przyciskiem myszy lub skrótem klawiszowym. Kliknij prawym przyciskiem myszy w dowolnym miejscu strony, aby skopiować kod tej strony.
 - Globalne skróty kopiują kody trzech pierwszych ważnych kont, nawet gdy przeglądarka działa w tle (Chrome, Edge, Whale).
 - Opcjonalne przyciski obok pól na kod na wybranych przez Ciebie stronach.
-- Zaznacz kilka kont, aby razem przenieść je do kosza, zmień nazwę całej grupy lub rozgrupuj ją za jednym razem i skopiuj nazwę konta.
+- Zaznacz kilka kont, aby razem przenieść je do innej grupy lub do kosza, i od razu to cofnij. Zmień nazwę całej grupy lub rozgrupuj ją za jednym razem i skopiuj nazwę konta.
+- Ustaw własny obraz jako ikonę konta. Zostaje on na tym urządzeniu.
 
 **Dodawaj konta po swojemu**
 - Skanuj kod QR z bieżącej karty, z okna innej aplikacji, aparatem, z obrazu lub ze schowka.
@@ -34,6 +35,7 @@ Popout Authenticator wyświetla jednorazowe kody uwierzytelniania dwuskładnikow
 - Konta są przechowywane na Twoim urządzeniu w sejfie szyfrowanym AES-256-GCM. Ustaw hasło, aby chronić jego klucz: bez hasła klucz leży na urządzeniu obok danych.
 - Blokada hasłem (Argon2id), kod odzyskiwania i opcjonalne odblokowanie kluczem dostępu (niedostępne w Firefoksie). Wybierz, kiedy ma się blokować automatycznie.
 - Opcjonalnie wymagaj weryfikacji urządzenia przed użyciem kodu (niedostępne w Firefoksie) i ukrywaj kody wybranym skrótem klawiszowym.
+- Ostrzeżenie, zanim kod zostanie użyty na stronie, której adres tylko przypomina stronę konta.
 - Skopiowane kody mogą być usuwane ze schowka po 30 sekundach, 1, 2 lub 5 minutach (niedostępne w Safari).
 - Bez analityki, bez reklam, bez serwera dewelopera. Kod źródłowy jest publiczny.
 
@@ -50,7 +52,7 @@ Popout Authenticator wyświetla jednorazowe kody uwierzytelniania dwuskładnikow
 - Deweloper nie prowadzi kopii zapasowej w chmurze. Kopie zapasowe to pliki, które przechowujesz samodzielnie; synchronizacja odbywa się przez przeglądarkę.
 - Odblokowanie kluczem dostępu i weryfikacja urządzenia nie są dostępne w Firefoksie. Wersja dla Safari jest tylko na macOS.
 
-Dostępny w 20 językach. Obsługuje zasady zarządzane dla organizacji.
+Dostępny w 43 językach. Obsługuje zasady zarządzane dla organizacji.
 
 Popout Authenticator tworzy niezależny deweloper. Bazuje na kodzie i tłumaczeniach rozszerzenia Authenticator (authenticator.cc) na licencji MIT i nie jest powiązany z jego autorami.
 

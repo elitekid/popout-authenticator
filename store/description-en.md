@@ -15,15 +15,16 @@ Popout Authenticator shows your two-factor (2FA) one-time codes right in your br
 - Import the backup file of the Authenticator extension (authenticator.cc), including password-protected backups.
 - Compatible with Google Authenticator™ export QR codes.
 - Import plain-text backups from other authenticator apps, plus standard credential exchange (CXF) files. Supported apps: https://elitekid.github.io/popout-authenticator/guides/from-authy-and-other-apps/
-- Some apps' encrypted backups cannot be opened here. For those, export a plain-text backup in that app first.
+- Open some apps' password-protected backups with their password. For apps whose encrypted backups cannot be opened here, export a plain-text backup in that app first.
 
 **Open it where you need it**
 - Use the toolbar popup, a separate window, or the side panel (sidebar in Firefox).
 - Search by field or with several words, sort A–Z, and use groups, pinned accounts, icons, and a compact view to keep long lists tidy.
-- See which account belongs to the site you are on, and fill its code with one click, a right-click, or a keyboard shortcut.
+- See which account belongs to the site you are on, and fill its code with one click, a right-click, or a keyboard shortcut. Right-click anywhere on a page to copy that site's code.
 - Global shortcuts copy the codes of your first three important accounts, even while the browser is in the background (Chrome, Edge, Whale).
 - Optional buttons next to code fields on the sites you choose.
-- Select several accounts to move them to the trash together, rename or ungroup a whole group at once, and copy an account's name.
+- Select several accounts to move them to another group or to the trash together, and undo it right away. Rename or ungroup a whole group at once, and copy an account's name.
+- Use your own image as an account's icon. It stays on this device.
 
 **Add accounts your way**
 - Scan a QR code from the current tab, another app's window, your camera, an image, or the clipboard.
@@ -34,6 +35,7 @@ Popout Authenticator shows your two-factor (2FA) one-time codes right in your br
 - Accounts are stored on your device in a vault encrypted with AES-256-GCM. Set a password to protect its key: without one, the key is kept on the device next to the data.
 - Lock it with a password (Argon2id), a recovery code, and optional passkey unlock (not available in Firefox). Choose when it locks automatically.
 - Optionally require device verification before a code is used (not available in Firefox), and hide codes with a keyboard shortcut you assign.
+- Get a warning before a code is used on a site whose address only looks like the account's site.
 - Copied codes can be cleared from the clipboard after 30 seconds, 1, 2, or 5 minutes (not in Safari).
 - No analytics, no ads, no developer server. The source code is public.
 
@@ -50,7 +52,7 @@ Popout Authenticator shows your two-factor (2FA) one-time codes right in your br
 - There is no cloud backup run by the developer. Backups are files you keep; sync goes through your browser's own sync.
 - Passkey unlock and device verification are not available in Firefox. The Safari version is for macOS only.
 
-Available in 20 languages. Supports managed policies for organizations.
+Available in 43 languages. Supports managed policies for organizations.
 
 Popout Authenticator is made by an independent developer. It builds on the MIT-licensed code and translations of the Authenticator extension (authenticator.cc) and is not affiliated with its authors.
 

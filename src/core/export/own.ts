@@ -13,7 +13,7 @@ import {
   WrongSecretError,
   type Argon2Params,
 } from '../crypto';
-import type { Account, AccountType, Algorithm } from '../types';
+import { isIconImage, type Account, type AccountType, type Algorithm } from '../types';
 
 export const BACKUP_FORMAT = 'popout-authenticator-backup';
 const SALT_BYTES = 16;
@@ -33,6 +33,7 @@ type StoredAccount = {
   pinned: boolean;
   matchHosts: string[];
   iconId?: string;
+  iconImage?: string;
   lastUsedAt?: number;
   createdAt: number;
   updatedAt: number;
@@ -64,6 +65,7 @@ function store(a: Account): StoredAccount {
     pinned: a.pinned,
     matchHosts: [...a.matchHosts],
     ...(a.iconId !== undefined ? { iconId: a.iconId } : {}),
+    ...(isIconImage(a.iconImage) ? { iconImage: a.iconImage } : {}),
     ...(a.lastUsedAt !== undefined ? { lastUsedAt: a.lastUsedAt } : {}),
     createdAt: a.createdAt,
     updatedAt: a.updatedAt,
@@ -170,6 +172,8 @@ function restore(raw: unknown): Account {
     pinned: o.pinned === true,
     matchHosts: o.matchHosts as string[],
     ...(typeof o.iconId === 'string' && o.iconId !== '' && o.iconId.length <= 64 ? { iconId: o.iconId } : {}),
+    // 모양이 틀린 그림은 계정을 버리지 않고 그림만 뺀다.
+    ...(isIconImage(o.iconImage) ? { iconImage: o.iconImage } : {}),
     ...(o.lastUsedAt !== undefined ? { lastUsedAt: num(o.lastUsedAt) } : {}),
     createdAt: num(o.createdAt),
     updatedAt: num(o.updatedAt),

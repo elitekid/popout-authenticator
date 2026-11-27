@@ -69,6 +69,8 @@ export const settings = {
   'settings.clipboard.denied': 'Permission was not granted, so this stays off.',
   'settings.autofillOnCopy': 'Also fill the input field when copying',
   'settings.suggestions': 'Suggest accounts for sites (turning off clears site usage history)',
+  'settings.siteWarn': 'Warn about look-alike sites',
+  'settings.siteWarn.desc': 'Asks before a code goes to a page whose address imitates the account’s site, like githuh.com or github-login.com. Checked on this device only; nothing is sent.',
 
   'settings.about.version': 'Version {version}',
   'settings.about.help': 'Help',

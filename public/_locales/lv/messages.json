@@ -1,0 +1,79 @@
+{
+  "appName": {
+    "message": "Popout Authenticator — 2FA un OTP kodi"
+  },
+  "appShortName": {
+    "message": "Popout Authenticator"
+  },
+  "appDesc": {
+    "message": "Atvērtā koda 2FA autentifikators. Vienreizēji kodi uznirstošajā logā, logā vai sānu panelī, ar paroles bloķēšanu un kopiju importu."
+  },
+  "cmdExecuteAction": {
+    "message": "Atvērt uznirstošo logu"
+  },
+  "cmdQuickFill": {
+    "message": "Aizpildīt 2FA kodu šajā lapā"
+  },
+  "cmdScanQr": {
+    "message": "Skenēt QR kodu ekrānā"
+  },
+  "cmdAutofill": {
+    "message": "Aizpildīt vispiemērotākā konta kodu"
+  },
+  "cmdHideCodes": {
+    "message": "Paslēpt vai rādīt kodus"
+  },
+  "cmdOpenWindow": {
+    "message": "Atvērt atsevišķā logā"
+  },
+  "menuOpenWindow": {
+    "message": "Atvērt atsevišķā logā"
+  },
+  "menuQuickFill": {
+    "message": "Aizpildīt 2FA kodu"
+  },
+  "menuQuickCopy": {
+    "message": "Kopēt šīs vietnes 2FA kodu"
+  },
+  "fillCopied": {
+    "message": "Kods nokopēts. Ielīmējiet to ievades laukā."
+  },
+  "fillManual": {
+    "message": "Kods: $CODE$",
+    "placeholders": {
+      "code": {
+        "content": "$1"
+      }
+    }
+  },
+  "cmdCopyPinned1": {
+    "message": "Kopēt 1. svarīgā konta kodu"
+  },
+  "cmdCopyPinned2": {
+    "message": "Kopēt 2. svarīgā konta kodu"
+  },
+  "cmdCopyPinned3": {
+    "message": "Kopēt 3. svarīgā konta kodu"
+  },
+  "shortcutCopied": {
+    "message": "Kods nokopēts."
+  },
+  "shortcutLocked": {
+    "message": "Vispirms atbloķējiet Popout Authenticator."
+  },
+  "shortcutMissing": {
+    "message": "Šim īsinājumtaustiņam nav svarīgā konta."
+  },
+  "shortcutSiteWarn": {
+    "message": "Nav nokopēts: šīs lapas adrese izskatās pēc konta vietnes viltojuma. Ja vietne noteikti ir īsta, kopējiet paplašinājuma logā."
+  },
+  "shortcutFailed": {
+    "message": "Neizdevās nokopēt kodu."
+  },
+  "fillPickAccount": {
+    "message": "Izvēlieties kontu."
+  },
+  "fieldFillButton": {
+    "message": "Aizpildīt kodu"
+  }
+}

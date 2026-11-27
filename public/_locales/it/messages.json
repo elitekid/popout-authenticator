@@ -10,6 +10,7 @@
   "cmdOpenWindow": { "message": "Apri in una finestra separata" },
   "menuOpenWindow": { "message": "Apri in una finestra separata" },
   "menuQuickFill": { "message": "Inserisci il codice 2FA" },
+  "menuQuickCopy": { "message": "Copia il codice 2FA di questo sito" },
   "fillCopied": { "message": "Codice copiato. Incollalo." },
   "fillManual": {
     "message": "Codice: $CODE$",
@@ -32,6 +33,9 @@
   },
   "shortcutMissing": {
     "message": "Nessun account con stella per questa scorciatoia."
+  },
+  "shortcutSiteWarn": {
+    "message": "Codice non copiato: l’indirizzo di questa pagina sembra un’imitazione del sito dell’account. Se sei sicuro che sia quello vero, copia il codice dalla finestra dell’estensione."
   },
   "shortcutFailed": {
     "message": "Impossibile copiare il codice."

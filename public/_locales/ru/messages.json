@@ -10,6 +10,7 @@
   "cmdOpenWindow": { "message": "Открыть в отдельном окне" },
   "menuOpenWindow": { "message": "Открыть в отдельном окне" },
   "menuQuickFill": { "message": "Ввести 2FA-код" },
+  "menuQuickCopy": { "message": "Копировать 2FA-код для этого сайта" },
   "fillCopied": { "message": "Код скопирован. Вставьте его на сайте." },
   "fillManual": {
     "message": "Код: $CODE$",
@@ -32,6 +33,9 @@
   },
   "shortcutMissing": {
     "message": "Для этого сочетания нет аккаунта со звездой."
+  },
+  "shortcutSiteWarn": {
+    "message": "Не скопировано: адрес этой страницы похож на подделку сайта аккаунта. Если вы уверены, что сайт настоящий, скопируйте код в окне расширения."
   },
   "shortcutFailed": {
     "message": "Не удалось скопировать код."

@@ -32,6 +32,9 @@
   "menuQuickFill": {
     "message": "인증 코드 넣기"
   },
+  "menuQuickCopy": {
+    "message": "이 사이트 인증 코드 복사"
+  },
   "fillCopied": {
     "message": "코드를 복사했습니다. 입력칸에 붙여 넣어 주세요."
   },
@@ -60,6 +63,9 @@
   },
   "shortcutMissing": {
     "message": "이 단축키에 맞는 중요 표시 계정이 없습니다."
+  },
+  "shortcutSiteWarn": {
+    "message": "복사하지 않았습니다. 이 페이지 주소가 계정 사이트를 흉내 낸 것처럼 보입니다. 진짜가 확실하면 확장 창에서 복사하세요."
   },
   "shortcutFailed": {
     "message": "코드를 복사하지 못했습니다."

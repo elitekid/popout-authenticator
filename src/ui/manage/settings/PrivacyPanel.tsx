@@ -114,6 +114,16 @@ export function PrivacyPanel({ t, settings, save }: PanelProps) {
         />
         <span>{t('settings.suggestions')}</span>
       </label>
+      <label class="check switch">
+        <input
+          type="checkbox"
+          data-role="settings-site-warn"
+          checked={settings.siteWarnEnabled}
+          onChange={(e) => save({ siteWarnEnabled: e.currentTarget.checked })}
+        />
+        <span>{t('settings.siteWarn')}</span>
+      </label>
+      <p class="muted indent">{t('settings.siteWarn.desc')}</p>
       {actionFailed && <p class="error" role="alert" data-role="settings-privacy-error">{t('common.actionError')}</p>}
     </section>
   );

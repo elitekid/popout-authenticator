@@ -1,0 +1,29 @@
+{
+  "appName": { "message": "Popout Authenticator — 2FA 與 OTP 驗證碼" },
+  "appShortName": { "message": "Popout Authenticator" },
+  "appDesc": { "message": "開放原始碼的 2FA 驗證器。在彈出式視窗、獨立視窗或側邊面板中顯示一次性驗證碼，支援密碼鎖定，並可匯入其他應用程式的備份。" },
+  "cmdExecuteAction": { "message": "開啟彈出式視窗" },
+  "cmdQuickFill": { "message": "在此頁面填入 2FA 驗證碼" },
+  "cmdScanQr": { "message": "掃描螢幕上的 QR 圖碼" },
+  "cmdAutofill": { "message": "填入最相符帳戶的驗證碼" },
+  "cmdHideCodes": { "message": "隱藏或顯示驗證碼" },
+  "cmdOpenWindow": { "message": "在獨立視窗中開啟" },
+  "menuOpenWindow": { "message": "在獨立視窗中開啟" },
+  "menuQuickFill": { "message": "填入 2FA 驗證碼" },
+  "menuQuickCopy": { "message": "複製此網站的 2FA 驗證碼" },
+  "fillCopied": { "message": "已複製驗證碼。請貼到輸入欄位中。" },
+  "fillManual": {
+    "message": "驗證碼：$CODE$",
+    "placeholders": { "code": { "content": "$1" } }
+  },
+  "cmdCopyPinned1": { "message": "複製重要帳戶 1 的驗證碼" },
+  "cmdCopyPinned2": { "message": "複製重要帳戶 2 的驗證碼" },
+  "cmdCopyPinned3": { "message": "複製重要帳戶 3 的驗證碼" },
+  "shortcutCopied": { "message": "已複製驗證碼。" },
+  "shortcutLocked": { "message": "請先解鎖 Popout Authenticator。" },
+  "shortcutMissing": { "message": "這個快速鍵沒有對應的重要帳戶。" },
+  "shortcutSiteWarn": { "message": "未複製：此頁面的網址看起來是仿冒帳戶網站。如果確定是真正的網站，請從擴充功能視窗複製。" },
+  "shortcutFailed": { "message": "無法複製驗證碼。" },
+  "fillPickAccount": { "message": "請選擇帳戶。" },
+  "fieldFillButton": { "message": "填入驗證碼" }
+}

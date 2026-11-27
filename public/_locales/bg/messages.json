@@ -1,0 +1,29 @@
+{
+  "appName": { "message": "Popout Authenticator — Кодове за 2FA и OTP" },
+  "appShortName": { "message": "Popout Authenticator" },
+  "appDesc": { "message": "Удостоверител за 2FA с отворен код. Кодове в изскачащ или отделен прозорец и страничен панел, заключване с парола и импорт на копия." },
+  "cmdExecuteAction": { "message": "Отваряне на изскачащия прозорец" },
+  "cmdQuickFill": { "message": "Попълване на 2FA кода в тази страница" },
+  "cmdScanQr": { "message": "Сканиране на QR код на екрана" },
+  "cmdAutofill": { "message": "Попълване на кода на най-подходящия профил" },
+  "cmdHideCodes": { "message": "Скриване или показване на кодовете" },
+  "cmdOpenWindow": { "message": "Отваряне в отделен прозорец" },
+  "menuOpenWindow": { "message": "Отваряне в отделен прозорец" },
+  "menuQuickFill": { "message": "Попълване на 2FA код" },
+  "menuQuickCopy": { "message": "Копиране на 2FA кода за този сайт" },
+  "fillCopied": { "message": "Кодът е копиран. Поставете го в полето за въвеждане." },
+  "fillManual": {
+    "message": "Код: $CODE$",
+    "placeholders": { "code": { "content": "$1" } }
+  },
+  "cmdCopyPinned1": { "message": "Копиране на кода на важен профил 1" },
+  "cmdCopyPinned2": { "message": "Копиране на кода на важен профил 2" },
+  "cmdCopyPinned3": { "message": "Копиране на кода на важен профил 3" },
+  "shortcutCopied": { "message": "Кодът е копиран." },
+  "shortcutLocked": { "message": "Първо отключете Popout Authenticator." },
+  "shortcutMissing": { "message": "Няма важен профил за тази клавишна комбинация." },
+  "shortcutSiteWarn": { "message": "Не е копирано: адресът на тази страница изглежда като фалшификат на сайта на профила. Ако сте сигурни, че е истински, копирайте от прозореца на разширението." },
+  "shortcutFailed": { "message": "Кодът не можа да бъде копиран." },
+  "fillPickAccount": { "message": "Изберете профил." },
+  "fieldFillButton": { "message": "Попълване на кода" }
+}

@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.0.5
+
+- New: open password-protected Aegis and 2FAS backups with their password. A wrong password and a damaged file are reported separately.
+- New: import from Proton Authenticator backups, Steam Guard `.maFile` files and Steam shared secrets, FreeOTP 1 settings files and password-protected FreeOTP 2 backups.
+- Backups from 2FA Authenticator (authenticator.sh) now keep Steam accounts, pinned accounts and linked sites.
+- Microsoft Authenticator work or school QR codes (`phonefactor://`) now show a note that they cannot be added to other apps, and the camera stops scanning the same unusable QR code again and again.
+- New: a warning before a code is copied or filled on a site whose address only looks like the account's site (for example a swapped letter or look-alike characters). The check runs only on your device. If you confirm it is the real site, it is remembered for that account; the warning can be turned off in Settings.
+- Site matching now prefers the most specific address, and an account linked to other sites is no longer suggested by name for a site it is not linked to.
+- New: right-click anywhere on a web page and choose "Copy this site's code". It works only on secure (https or this device) pages; if the tab has moved to another site in the meantime, the popup opens instead of copying.
+- New: move selected accounts to another group or out of their group at once, with Undo. Moving accounts to the trash also shows Undo.
+- New: use your own image as an account icon. The image is redrawn small, kept only on this device and in Popout backups, and is not synced.
+- New: 23 more languages, 43 in total: Traditional Chinese, Bengali, Persian, Filipino, Malay, Urdu, Czech, Romanian, Hungarian, Greek, Hebrew, Danish, Finnish, Norwegian, Bulgarian, Serbian, Croatian, Catalan, Lithuanian, Latvian, Estonian, Slovak and Slovenian. Hebrew, Persian and Urdu are shown right to left. Many translations build on the original Authenticator extension's community translations.
+- The backup reminder in the popup can now use two lines, so longer languages are not cut off.
+- When you add several backup files at once and cancel the password of an encrypted one, the other files are now still added; the skipped file is listed in the result.
+
 ## 1.0.4
 
 - The shortcuts that copy the codes of your first three important accounts no longer come with keys. In 1.0.2 and 1.0.3 they took Ctrl+Shift+1–3 for the whole system, so other apps could not use those keys while the browser was open. After this update those keys are released. To keep using the shortcuts, set the keys again in Settings → "Shortcut settings".

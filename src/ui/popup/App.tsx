@@ -5,10 +5,12 @@ import { supportsPasskeys } from '../../core/browser';
 import { generateCode } from '../../core/otp';
 import { buildOtpauth } from '../../core/uri';
 import { fillCandidate, hostOf, matchesSite, suggestAccountIds } from '../../core/suggest';
-import { DEFAULT_SETTINGS, accountIcon, type Account, type Settings } from '../../core/types';
+import { DEFAULT_SETTINGS, accountIcon, accountImage, type Account, type Settings } from '../../core/types';
 import { AccountIconSvg } from '../shared/AccountIcon';
 import { readSiteUsage, recordSiteUse } from '../../store/site-usage';
-import { moveToTrash } from '../../store/trash';
+import { checkSite, trustSite } from '../../store/site-warn';
+import type { Lookalike } from '../../core/site-check';
+import { RestoreDuplicateError, moveToTrash, restoreFromTrash } from '../../store/trash';
 import { lastNormalWindow } from '../../store/browser-window';
 import { LockedError } from '../../store/errors';
 import {
@@ -52,6 +54,8 @@ import {
   moveActive,
   normalizeGroupName,
   pruneFolded,
+  regroup,
+  restorePlacements,
   STORE_REVIEW_URL,
   shouldShowBackupReminder,
   shouldShowReview,
@@ -62,6 +66,7 @@ import {
   WHATS_NEW,
   type SearchScope,
   type BackupInfo,
+  type GroupPlacement,
 } from './logic';
 import { openDetachedWindow, openPasskeyUnlock } from './open-actions';
 import { currentOpenName, type OpenName } from './open-name';
@@ -83,9 +88,41 @@ type FillFeedback = {
   permission?: FillPermission & { host: string; onceHost?: string };
 };
 
+// 코드를 계정 사이트를 흉내 낸 페이지로 넘기기 전의 경고. 기본(첫 포커스)은 넘기지 않는 쪽이다.
+function SiteWarnNote(props: {
+  t: T;
+  host: string;
+  warning: Lookalike;
+  cancel: string;
+  onCancel: () => void;
+  onConfirm: () => void;
+}) {
+  const { t, host, warning } = props;
+  const cancelRef = useRef<HTMLButtonElement>(null);
+  const boxRef = useRef<HTMLDivElement>(null);
+  // 목록 칸이 좁으면(업데이트 안내가 아래를 차지할 때) 경고가 보이는 곳 밖에 생기므로 목록 안에서 보이게 옮긴다.
+  useLayoutEffect(() => {
+    cancelRef.current?.focus({ preventScroll: true });
+    boxRef.current?.scrollIntoView({ block: 'nearest' });
+  }, []);
+  return (
+    <div class="note site-warn" role="alert" data-role="site-warn" data-kind={warning.kind} ref={boxRef}>
+      <p class="title">{t('popup.siteWarn.title')}</p>
+      <p>{t(warning.basis === 'site' ? 'popup.siteWarn.bodySite' : 'popup.siteWarn.bodyIssuer', { host, like: warning.like })}</p>
+      <p>{t('popup.siteWarn.warning')}</p>
+      <div class="actions">
+        <button type="button" data-role="site-warn-confirm" onClick={props.onConfirm}>{t('popup.siteWarn.confirm')}</button>
+        <button type="button" class="primary" data-role="site-warn-cancel" ref={cancelRef} onClick={props.onCancel}>{props.cancel}</button>
+      </div>
+    </div>
+  );
+}
+
 const MASKED = '••• •••';
 const WARN_SECONDS = 5;
 const COPIED_MS = 1500;
+// 되돌리기 알림이 보이는 시간.
+const UNDO_MS = 8000;
 const NO_CODE_ACCOUNTS: Account[] = [];
 
 // 24×24 선 아이콘.
@@ -373,6 +410,14 @@ export function App() {
   const [pickBusy, setPickBusy] = useState(false);
   const [pickError, setPickError] = useState(false);
   const picking = useRef(false);
+  // 선택 모드 그룹 옮기기 패널: 'list' 는 그룹 고르기, 'new' 는 새 그룹 이름 입력.
+  const [pickGroup, setPickGroup] = useState<'list' | 'new' | null>(null);
+  const [pickGroupDraft, setPickGroupDraft] = useState('');
+  const [pickGroupInvalid, setPickGroupInvalid] = useState(false);
+  // 되돌리기 알림: 그룹 옮기기·휴지통 보내기 직후 잠깐 보인다. run 은 최신 목록을 돌려준다.
+  const [undo, setUndo] = useState<{ key: string; params: Record<string, string | number>; run: () => Promise<Account[]> } | null>(null);
+  const undoTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const undoing = useRef(false);
   // 그룹 이름 변경 중인 그룹(draft 는 입력 중인 새 이름).
   const [renaming, setRenaming] = useState<{ name: string; draft: string; invalid: boolean } | null>(null);
   const deleteReturnId = useRef<string | null>(null);
@@ -426,7 +471,10 @@ export function App() {
   const dragClick = useRef<string | null>(null);
   const [remember, setRemember] = useState<{ id: string; host: string } | null>(null);
   // 지정 사이트가 아닌 곳에 넣으려 할 때 계정 줄에 띄우는 확인.
-  const [mismatch, setMismatch] = useState<{ id: string; host: string; close: boolean } | null>(null);
+  // warning: 그 주소가 계정 사이트를 흉내 내면 먼저 경고하고, '진짜 사이트'를 고른 뒤에야 평소 확인을 띄운다.
+  const [mismatch, setMismatch] = useState<{ id: string; host: string; close: boolean; warning?: Lookalike } | null>(null);
+  // 복사하기 전에 지금 페이지가 계정 사이트를 흉내 내는지 본 결과. 확인 전에는 클립보드에 쓰지 않는다.
+  const [siteWarn, setSiteWarn] = useState<{ id: string; host: string; warning: Lookalike; step: number } | null>(null);
   // QR 보기·코드 공유: 잠금이 켜져 있으면 비밀번호를 다시 확인한 뒤 연다.
   const [qrAsk, setQrAsk] = useState<{ id: string; kind: 'qr' | 'share' } | null>(null);
   const [qrView, setQrView] = useState<{ text: string; name: string } | null>(null);
@@ -582,8 +630,10 @@ export function App() {
           setShareAccount(null);
           setDeleteAsk(null);
           setDeleteError(false);
+          setUndo(null);
           setFillFeedback(null);
           setMismatch(null);
+          setSiteWarn(null);
           setMenu(null);
           setAccounts([]);
           setPhase((prev) => (prev === 'list' ? 'locked' : prev));
@@ -823,6 +873,7 @@ export function App() {
     () => () => {
       clearTimeout(copiedTimer.current);
       clearTimeout(toastTimer.current);
+      clearTimeout(undoTimer.current);
     },
     [],
   );
@@ -934,7 +985,7 @@ export function App() {
   groupedRef.current = grouped;
   // 이니셜 타일이 꺼져 있어도 아이콘 계정이 하나라도 보이면 나머지 행에 타일 자리를 둔다(목록마다 한 번 계산).
   const iconGap = useMemo(
-    () => !settings.avatars && visible.some((a) => accountIcon(a.iconId) !== undefined),
+    () => !settings.avatars && visible.some((a) => accountIcon(a.iconId) !== undefined || accountImage(a) !== undefined),
     [settings.avatars, visible],
   );
   // 검색·잠금·다른 창의 계정 변경 때도 떠 있는 줄을 남기지 않는다.
@@ -951,6 +1002,13 @@ export function App() {
       setPickError(false);
     }
   }, [phase, screens.length]);
+  // 고른 계정이 없어지면(잠금·모두 해제·목록 변경) 숨은 그룹 칸과 입력도 걷는다.
+  useLayoutEffect(() => {
+    if (picked.size > 0) return;
+    setPickGroup(null);
+    setPickGroupDraft('');
+    setPickGroupInvalid(false);
+  }, [picked]);
   // 검색어·목록이 바뀌어 안 보이게 된 선택은 지운다.
   useLayoutEffect(() => {
     setPicked((prev) => {
@@ -1094,6 +1152,7 @@ export function App() {
       const lockedAt = lockSeq.current;
       setMenu(null);
       setMismatch(null);
+      setSiteWarn(null);
       setFillFeedback({ kind: 'pending', message: 'popup.fillPending' });
       try {
         if (permission) {
@@ -1120,7 +1179,14 @@ export function App() {
         if (reply?.mismatch) {
           // 복사할 때 넣기는 이미 복사했으니 조용히 넘어간다.
           setFillFeedback(null);
-          if (close) setMismatch({ id, host: reply.mismatch.host, close });
+          if (!close) return;
+          const host = reply.mismatch.host;
+          const account = activeRef.current.find((a) => a.id === id);
+          const warning = account
+            ? await checkSite(host, account, activeRef.current, { siteWarnEnabled: settings.siteWarnEnabled, suggestionsEnabled: settings.suggestionsEnabled })
+            : null;
+          if (lockedAt !== lockSeq.current) return;
+          setMismatch({ id, host, close, ...(warning ? { warning } : {}) });
           return;
         }
         if (reply?.ok !== true || reply.outcome === 'expired') {
@@ -1154,8 +1220,39 @@ export function App() {
         filling.current = false;
       }
     },
-    [openName],
+    [openName, settings.siteWarnEnabled, settings.suggestionsEnabled],
   );
+
+  const offerUndo = useCallback(
+    (key: string, params: Record<string, string | number>, run: () => Promise<Account[]>) => {
+      setUndo({ key, params, run });
+      clearTimeout(undoTimer.current);
+      undoTimer.current = setTimeout(() => setUndo(null), UNDO_MS);
+    },
+    [],
+  );
+
+  const runUndo = async () => {
+    if (!undo || undoing.current) return;
+    const { run } = undo;
+    const lockedAt = lockSeq.current;
+    undoing.current = true;
+    clearTimeout(undoTimer.current);
+    setUndo(null);
+    try {
+      const next = await run();
+      if (lockedAt === lockSeq.current) setAccounts(next);
+    } catch (error) {
+      if (error instanceof LockedError) {
+        setAccounts([]);
+        setPhase('locked');
+      } else if (lockedAt === lockSeq.current) {
+        setCodeAccessError(error instanceof RestoreDuplicateError ? 'accounts.error.duplicate' : 'common.actionError');
+      }
+    } finally {
+      undoing.current = false;
+    }
+  };
 
   const showToast = useCallback((text: string) => {
     setToastName(text);
@@ -1163,7 +1260,23 @@ export function App() {
     toastTimer.current = setTimeout(() => setToastName(null), COPIED_MS);
   }, []);
 
-  const copy = useCallback(async (account: Account, step: number, codeAt?: number) => {
+  // checked: 가짜 사이트 경고에서 사용자가 '진짜 사이트'를 고른 뒤라 다시 보지 않는다.
+  const copy = useCallback(async (account: Account, step: number, codeAt?: number, checked = false) => {
+    const lockedAt = lockSeq.current;
+    setSiteWarn(null);
+    // 코드를 클립보드에 쓰기 전에 지금 페이지가 이 계정 사이트를 흉내 내는지 본다(기기 안에서만).
+    const host = hostOf(await currentSiteUrl(openName));
+    if (!checked && host !== undefined && settings.siteWarnEnabled) {
+      const warning = await checkSite(host, account, activeRef.current, settings);
+      if (lockedAt !== lockSeq.current) return;
+      if (warning) {
+        setRemember(null);
+        setMismatch(null);
+        setSiteWarn({ id: account.id, host, warning, step });
+        return;
+      }
+    }
+    if (lockedAt !== lockSeq.current) return;
     let code: string;
     try {
       code = await generateCode(account, codeAt ?? Date.now() + correction, 0, step);
@@ -1176,7 +1289,6 @@ export function App() {
     if (settings.clipboardClearAfterCopy) {
       void chrome.runtime.sendMessage({ type: 'clipboard-copied', code }).catch(() => undefined);
     }
-    const host = hostOf(await currentSiteUrl(openName));
     if (host !== undefined) {
       try {
         await recordSiteUse(host, account.id, 'copy');
@@ -1199,7 +1311,34 @@ export function App() {
     clearTimeout(copiedTimer.current);
     copiedTimer.current = setTimeout(() => setCopiedId(null), COPIED_MS);
     showToast(`${account.issuer !== '' ? account.issuer : account.label} ${t('popup.copied')}`);
-  }, [openName, settings.suggestionsEnabled, settings.clipboardClearAfterCopy, settings.autofillOnCopy, suggested, fill, correction, showToast, t]);
+  }, [openName, settings.suggestionsEnabled, settings.siteWarnEnabled, settings.clipboardClearAfterCopy, settings.autofillOnCopy, suggested, fill, correction, showToast, t]);
+
+  // 가짜 사이트 경고의 대답. '진짜 사이트'면 이 계정·도메인을 기억하고 지금 시각의 코드를 복사한다.
+  const answerSiteWarn = async (real: boolean) => {
+    const current = siteWarn;
+    setSiteWarn(null);
+    if (!current || !real) return;
+    const account = activeRef.current.find((a) => a.id === current.id);
+    if (!account) return;
+    try {
+      await trustSite(current.host, current.id);
+    } catch {
+      // 기억하지 못해도 이번 복사는 사용자가 확인했다.
+    }
+    await copy(account, current.step, undefined, true);
+  };
+
+  // 넣기 확인 앞의 경고에서 '진짜 사이트'를 고르면 기억한 뒤 평소 확인(기억·이번만·취소)으로 넘어간다.
+  const confirmMismatchSite = async () => {
+    const current = mismatch;
+    if (!current?.warning) return;
+    try {
+      await trustSite(current.host, current.id);
+    } catch {
+      // 기억하지 못해도 다음 확인은 이어 간다.
+    }
+    setMismatch((prev) => (prev === current ? { id: current.id, host: current.host, close: current.close } : prev));
+  };
 
   // 계정 이름은 코드가 아니므로 클립보드 자동 지우기를 예약하지 않는다.
   const copyName = useCallback(async (account: Account) => {
@@ -1314,16 +1453,26 @@ export function App() {
   // 이미 있는 다른 그룹 이름이면 합쳐진다. 접힘 기록은 새 이름으로 옮기거나 지운다.
   const changeGroup = useCallback(async (from: string, to: string | null) => {
     const merging = to !== null && activeRef.current.some((a) => a.group === to);
+    const lockedAt = lockSeq.current;
     try {
       const at = Date.now();
-      const next = await updateAccounts((list) =>
-        list.map((a) => {
-          if (a.deletedAt !== undefined || a.group !== from) return a;
-          const { group: _group, ...rest } = a;
-          return to === null ? { ...rest, updatedAt: at } : { ...rest, group: to, updatedAt: at };
-        }),
-      );
+      const movedTo = to ?? undefined;
+      let before: GroupPlacement[] = [];
+      const next = await updateAccounts((list) => {
+        const result = regroup(list, (a) => a.group === from, movedTo, at);
+        before = result.before;
+        return result.next;
+      });
+      // 저장하는 사이 잠겼으면 지운 목록을 되살리거나 되돌리기를 띄우지 않는다.
+      if (lockedAt !== lockSeq.current) return;
       setAccounts(next);
+      if (before.length > 0) {
+        offerUndo(
+          movedTo === undefined ? 'popup.undo.ungrouped' : 'popup.undo.moved',
+          { n: before.length, group: movedTo ?? '' },
+          () => updateAccounts((list) => restorePlacements(list, before, movedTo, Date.now())),
+        );
+      }
       const current = foldedRef.current;
       let folded = current.filter((x) => x !== from);
       if (to !== null && !merging && current.includes(from)) folded = [...folded, to];
@@ -1332,6 +1481,7 @@ export function App() {
       setFoldedGroups(folded);
       void chrome.storage.local.set({ popupFoldedGroups: folded }).catch(() => undefined);
     } catch (error) {
+      if (lockedAt !== lockSeq.current) return;
       if (error instanceof LockedError) {
         setAccounts([]);
         setPhase('locked');
@@ -1339,7 +1489,7 @@ export function App() {
         setCodeAccessError('common.actionError');
       }
     }
-  }, []);
+  }, [offerUndo]);
 
   const submitRename = () => {
     if (!renaming) return;
@@ -1355,6 +1505,9 @@ export function App() {
     setPicked(new Set());
     setPickAsk(false);
     setPickError(false);
+    setPickGroup(null);
+    setPickGroupDraft('');
+    setPickGroupInvalid(false);
   };
   const togglePick = useCallback((id: string) => {
     setPicked((prev) => {
@@ -1371,16 +1524,63 @@ export function App() {
     setPickBusy(true);
     setPickError(false);
     try {
-      const next = await moveToTrash([...picked]);
+      const ids = [...picked];
+      const next = await moveToTrash(ids);
       if (lockedAt !== lockSeq.current) return;
       setAccounts(next);
       endSelect();
+      offerUndo('popup.undo.trashed', { n: ids.length }, () => restoreFromTrash(ids));
     } catch {
       if (lockedAt === lockSeq.current) setPickError(true);
     } finally {
       picking.current = false;
       setPickBusy(false);
     }
+  };
+
+  // 선택한 계정을 group(undefined 면 그룹 없음)으로 한 번에 옮긴다. 이미 그 그룹인 계정은 그대로.
+  const movePicked = async (group: string | undefined) => {
+    if (picked.size === 0 || picking.current) return;
+    const ids = new Set(picked);
+    const lockedAt = lockSeq.current;
+    picking.current = true;
+    setPickBusy(true);
+    setPickError(false);
+    try {
+      const at = Date.now();
+      let before: GroupPlacement[] = [];
+      const next = await updateAccounts((list) => {
+        const result = regroup(list, (a) => ids.has(a.id), group, at);
+        before = result.before;
+        return result.next;
+      });
+      if (lockedAt !== lockSeq.current) return;
+      setAccounts(next);
+      endSelect();
+      if (before.length > 0) {
+        offerUndo(
+          group === undefined ? 'popup.undo.ungrouped' : 'popup.undo.moved',
+          { n: before.length, group: group ?? '' },
+          () => updateAccounts((list) => restorePlacements(list, before, group, Date.now())),
+        );
+      }
+    } catch (error) {
+      if (error instanceof LockedError) {
+        setAccounts([]);
+        setPhase('locked');
+      } else if (lockedAt === lockSeq.current) {
+        setPickError(true);
+      }
+    } finally {
+      picking.current = false;
+      setPickBusy(false);
+    }
+  };
+  const submitPickGroup = (event: Event) => {
+    event.preventDefault();
+    const name = normalizeGroupName(pickGroupDraft);
+    if (name === null) { setPickGroupInvalid(true); return; }
+    void movePicked(name);
   };
 
   // to 는 지금 화면(옮길 계정을 뺀 목록)의 자리. 저장 때 다른 창이 목록을 바꿔도 맞게 이웃 id 로 바꿔 넘긴다.
@@ -1432,7 +1632,7 @@ export function App() {
       if (phase !== 'list' || e.isComposing || deleteAsk !== null) return;
       // QR 보기·비밀번호 칸에서 친 글자를 검색칸이 가져가지 않게 한다.
       // 줄 메뉴의 새 그룹 이름 칸도 같다.
-      if ((e.target as HTMLElement | null)?.closest('.popup-qr, .popup-delete, .menu input, .group-rename input, select')) return;
+      if ((e.target as HTMLElement | null)?.closest('.popup-qr, .popup-delete, .menu input, .group-rename input, .sel-group input, select')) return;
       const hoveredIndex = visible.findIndex((a) => a.id === hoveredId.current);
       const currentIndex = hoveredIndex >= 0 ? hoveredIndex : selectedIndex;
       if (e.key === 'ContextMenu' || (e.shiftKey && e.key === 'F10')) {
@@ -1499,6 +1699,9 @@ export function App() {
         } else if (pickAsk) {
           e.preventDefault();
           setPickAsk(false);
+        } else if (pickGroup !== null) {
+          e.preventDefault();
+          setPickGroup(null);
         } else if (selecting) {
           e.preventDefault();
           endSelect();
@@ -1521,7 +1724,7 @@ export function App() {
       document.removeEventListener('keydown', onKey);
       document.removeEventListener('pointerdown', onPointer);
     };
-  }, [phase, visible, selectedIndex, query, copy, reorder, menu, screens.length, listOnly, clearDrag, deleteAsk, grouped, selecting, pickAsk, renaming, togglePick, settings.sortByName]);
+  }, [phase, visible, selectedIndex, query, copy, reorder, menu, screens.length, listOnly, clearDrag, deleteAsk, grouped, selecting, pickAsk, pickGroup, renaming, togglePick, settings.sortByName]);
 
   const unlockPasskey = async () => {
     if (passkeyAbort.current) return;
@@ -1796,10 +1999,12 @@ export function App() {
     setDeleteBusy(true);
     setDeleteError(false);
     try {
+      const name = deleteAsk.name;
       const next = await moveToTrash([id]);
       if (lockedAt !== lockSeq.current) return;
       setAccounts(next);
       setDeleteAsk(null);
+      offerUndo('popup.undo.trashedOne', { name }, () => restoreFromTrash([id]));
     } catch {
       if (lockedAt === lockSeq.current) setDeleteError(true);
     } finally {
@@ -1986,7 +2191,27 @@ export function App() {
           </button>
         </div>
       )}
-      {mismatch?.id === account.id && (
+      {siteWarn?.id === account.id && (
+        <SiteWarnNote
+          t={t}
+          host={siteWarn.host}
+          warning={siteWarn.warning}
+          cancel={t('popup.siteWarn.cancelCopy')}
+          onCancel={() => void answerSiteWarn(false)}
+          onConfirm={() => void answerSiteWarn(true)}
+        />
+      )}
+      {mismatch?.id === account.id && mismatch.warning && (
+        <SiteWarnNote
+          t={t}
+          host={mismatch.host}
+          warning={mismatch.warning}
+          cancel={t('popup.siteWarn.cancelFill')}
+          onCancel={() => void answerMismatch('cancel')}
+          onConfirm={() => void confirmMismatchSite()}
+        />
+      )}
+      {mismatch?.id === account.id && !mismatch.warning && (
         <div class="note" data-role="mismatch">
           <span>{t('popup.mismatch.text', { host: mismatch.host })}</span>
           <button type="button" data-role="mismatch-remember" onClick={() => void answerMismatch('remember')}>
@@ -2357,8 +2582,18 @@ export function App() {
               <button type="button" data-role="select-all" onClick={() => setPicked(new Set(visible.map((a) => a.id)))}>
                 {t('popup.selection.all')}
               </button>
+              <button type="button" data-role="select-group" disabled={picked.size === 0 || pickBusy}
+                aria-expanded={pickGroup !== null}
+                onClick={() => {
+                  setPickError(false);
+                  setPickAsk(false);
+                  setPickGroupInvalid(false);
+                  setPickGroup(pickGroup === null ? 'list' : null);
+                }}>
+                {t('popup.selection.group')}
+              </button>
               <button type="button" class="danger" data-role="select-trash" disabled={picked.size === 0 || pickBusy}
-                onClick={() => { setPickError(false); setPickAsk(true); }}>
+                onClick={() => { setPickError(false); setPickGroup(null); setPickAsk(true); }}>
                 {t('popup.selection.trash')}
               </button>
               <button type="button" data-role="select-done" onClick={endSelect}>{t('add.done')}</button>
@@ -2369,6 +2604,49 @@ export function App() {
                     onClick={() => void trashPicked()}>{t('accounts.delete.yes')}</button>{' '}
                   <button type="button" data-role="select-confirm-cancel" disabled={pickBusy}
                     onClick={() => setPickAsk(false)}>{t('accounts.cancel')}</button>
+                </div>
+              )}
+              {pickGroup !== null && picked.size > 0 && (
+                <div class="sel-confirm sel-group" role="group" data-role="select-group-panel"
+                  aria-label={t('popup.selection.group')}>
+                  {pickGroup === 'list' ? (
+                    <>
+                      {groupNames.map((name) => (
+                        <button key={name} type="button" data-role="select-group-pick" disabled={pickBusy}
+                          onClick={() => void movePicked(name)}>{name}</button>
+                      ))}
+                      <button type="button" data-role="select-group-new" disabled={pickBusy}
+                        onClick={() => { setPickGroupDraft(''); setPickGroupInvalid(false); setPickGroup('new'); }}>
+                        + {t('popup.group.new')}
+                      </button>
+                      {groupNames.length > 0 && (
+                        <button type="button" data-role="select-group-remove" disabled={pickBusy}
+                          onClick={() => void movePicked(undefined)}>{t('popup.group.remove')}</button>
+                      )}
+                    </>
+                  ) : (
+                    <form class="sel-group-new" onSubmit={submitPickGroup}>
+                      <input
+                        type="text"
+                        class="field"
+                        data-role="select-group-input"
+                        aria-label={t('popup.group.name')}
+                        placeholder={t('popup.group.name')}
+                        aria-invalid={pickGroupInvalid}
+                        autoComplete="off"
+                        autoFocus
+                        maxLength={128}
+                        value={pickGroupDraft}
+                        onInput={(e) => { setPickGroupDraft(e.currentTarget.value); setPickGroupInvalid(false); }}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); setPickGroup('list'); }
+                        }}
+                      />
+                      <button type="submit" data-role="select-group-save" disabled={pickBusy}>
+                        {t('popup.selection.move')}
+                      </button>
+                    </form>
+                  )}
                 </div>
               )}
               {pickError && <p class="error sel-confirm" role="alert">{t('common.actionError')}</p>}
@@ -2408,7 +2686,7 @@ export function App() {
       {!listOnly && showBackup && (
         <div class="note line" data-role="backup-reminder">
           <Icon name="backup" />
-          <span>{t('popup.backup.text')}</span>
+          <span title={t('popup.backup.text')}>{t('popup.backup.text')}</span>
           <button type="button" onClick={() => void openManage('backup')}>
             {t('popup.backup.now')}
           </button>
@@ -2723,8 +3001,14 @@ export function App() {
         </p>
       )}
       {toastName !== null && (
-        <div class="toast" role="status">
+        <div class={undo !== null ? 'toast raised' : 'toast'} role="status">
           {toastName}
+        </div>
+      )}
+      {undo !== null && (
+        <div class="toast undo" role="status" data-role="undo-notice">
+          <span class="undo-text">{t(undo.key, undo.params)}</span>
+          <button type="button" data-role="undo" onClick={() => void runUndo()}>{t('popup.undo.action')}</button>
         </div>
       )}
       {deleteAsk !== null && (
@@ -2884,7 +3168,8 @@ function Row(p: RowProps) {
   const nextText = hidden ? MASKED : pair ? formatCode(pair.next) : '';
   const params = { issuer: account.issuer, label: account.label };
   const icon = accountIcon(account.iconId);
-  const showTile = p.avatars || icon !== undefined;
+  const image = accountImage(account);
+  const showTile = p.avatars || icon !== undefined || image !== undefined;
   const rowClass = [
     'row',
     view === 'compact' && 'row-compact',
@@ -3029,7 +3314,9 @@ function Row(p: RowProps) {
         />
       )}
       {showTile ? (
-        icon ? (
+        image ? (
+          <div class="tile img-tile" aria-hidden="true"><img src={image} alt="" /></div>
+        ) : icon ? (
           <div class="tile ai-tile" style={`--ih:${icon.hue}`} aria-hidden="true">
             <AccountIconSvg icon={icon} />
           </div>

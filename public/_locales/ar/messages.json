@@ -10,6 +10,7 @@
   "cmdOpenWindow": { "message": "فتح في نافذة منفصلة" },
   "menuOpenWindow": { "message": "فتح في نافذة منفصلة" },
   "menuQuickFill": { "message": "إدخال رمز 2FA" },
+  "menuQuickCopy": { "message": "نسخ رمز 2FA لهذا الموقع" },
   "fillCopied": { "message": "تم نسخ الرمز. الصقه في الموقع." },
   "fillManual": {
     "message": "الرمز: $CODE$",
@@ -32,6 +33,9 @@
   },
   "shortcutMissing": {
     "message": "لا يوجد حساب مميّز لهذا الاختصار."
+  },
+  "shortcutSiteWarn": {
+    "message": "لم يتم النسخ: يبدو عنوان هذه الصفحة تقليدًا لموقع الحساب. إذا كنت متأكدًا من أنه حقيقي، فانسخ الرمز من نافذة الإضافة."
   },
   "shortcutFailed": {
     "message": "تعذّر نسخ الرمز."

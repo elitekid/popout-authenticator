@@ -1,0 +1,29 @@
+{
+  "appName": { "message": "Popout Authenticator — کدهای 2FA و OTP" },
+  "appShortName": { "message": "Popout Authenticator" },
+  "appDesc": { "message": "افزونه احراز هویت 2FA متن‌باز. کدهای یک‌بارمصرف در پنجره بازشو، پنجره جداگانه یا پنل کناری، با قفل گذرواژه و وارد کردن پشتیبان." },
+  "cmdExecuteAction": { "message": "باز کردن پنجره بازشو" },
+  "cmdQuickFill": { "message": "پر کردن کد 2FA در این صفحه" },
+  "cmdScanQr": { "message": "اسکن کد QR روی صفحه" },
+  "cmdAutofill": { "message": "پر کردن کد حسابی که بیشترین تطابق را دارد" },
+  "cmdHideCodes": { "message": "پنهان یا نمایان کردن کدها" },
+  "cmdOpenWindow": { "message": "باز کردن در پنجره جداگانه" },
+  "menuOpenWindow": { "message": "باز کردن در پنجره جداگانه" },
+  "menuQuickFill": { "message": "پر کردن کد 2FA" },
+  "menuQuickCopy": { "message": "کپی کد 2FA این سایت" },
+  "fillCopied": { "message": "کد کپی شد. آن را در کادر ورودی جای‌گذاری کنید." },
+  "fillManual": {
+    "message": "کد: $CODE$",
+    "placeholders": { "code": { "content": "$1" } }
+  },
+  "cmdCopyPinned1": { "message": "کپی کد حساب مهم 1" },
+  "cmdCopyPinned2": { "message": "کپی کد حساب مهم 2" },
+  "cmdCopyPinned3": { "message": "کپی کد حساب مهم 3" },
+  "shortcutCopied": { "message": "کد کپی شد." },
+  "shortcutLocked": { "message": "ابتدا قفل Popout Authenticator را باز کنید." },
+  "shortcutMissing": { "message": "برای این میان‌بر حساب مهمی وجود ندارد." },
+  "shortcutSiteWarn": { "message": "کپی نشد: نشانی این صفحه شبیه تقلیدی از سایت حساب است. اگر مطمئن هستید واقعی است، از پنجره افزونه کپی کنید." },
+  "shortcutFailed": { "message": "کد کپی نشد." },
+  "fillPickAccount": { "message": "یک حساب انتخاب کنید." },
+  "fieldFillButton": { "message": "پر کردن کد" }
+}

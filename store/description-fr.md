@@ -15,15 +15,16 @@ Popout Authenticator affiche vos codes à usage unique d’authentification à d
 - Importe le fichier de sauvegarde de l’extension Authenticator (authenticator.cc), y compris les sauvegardes protégées par mot de passe.
 - Compatible avec les codes QR d’exportation de Google Authenticator™.
 - Importe les sauvegardes en clair d’autres applications d’authentification, ainsi que les fichiers au format standard d’échange d’identifiants (CXF). Applications prises en charge (en anglais) : https://elitekid.github.io/popout-authenticator/guides/from-authy-and-other-apps/
-- Les sauvegardes chiffrées de certaines applications ne peuvent pas être ouvertes ici. Dans ce cas, exportez d’abord une sauvegarde en clair depuis cette application.
+- Ouvre les sauvegardes protégées par mot de passe de certaines applications avec leur mot de passe. Pour les applications dont les sauvegardes chiffrées ne peuvent pas être ouvertes ici, exportez d’abord une sauvegarde en clair depuis cette application.
 
 **Ouvrez-le là où vous en avez besoin**
 - Utilisez-le dans le pop-up de la barre d’outils, dans une fenêtre séparée ou dans le panneau latéral (barre latérale dans Firefox).
 - Recherche par champ ou avec plusieurs mots, tri de A à Z, groupes, comptes épinglés, icônes et affichage compact gardent les longues listes en ordre.
-- Le compte du site ouvert est proposé en premier ; son code se remplit d’un clic, par clic droit ou avec un raccourci clavier.
+- Le compte du site ouvert est proposé en premier ; son code se remplit d’un clic, par clic droit ou avec un raccourci clavier. Faites un clic droit n’importe où sur une page pour copier le code de ce site.
 - Des raccourcis globaux copient les codes de vos trois premiers comptes importants, même quand le navigateur est en arrière-plan (Chrome, Edge, Whale).
 - Boutons facultatifs à côté des champs de code sur les sites que vous choisissez.
-- Sélectionnez plusieurs comptes pour les placer ensemble dans la corbeille, renommez ou dissolvez un groupe entier en une fois et copiez le nom d’un compte.
+- Sélectionnez plusieurs comptes pour les déplacer ensemble vers un autre groupe ou dans la corbeille, et annulez aussitôt si besoin. Renommez ou dissolvez un groupe entier en une fois et copiez le nom d’un compte.
+- Utilisez votre propre image comme icône d’un compte. Elle reste sur cet appareil.
 
 **Ajoutez des comptes comme vous voulez**
 - Scannez un code QR depuis l’onglet actuel, la fenêtre d’une autre application, la caméra, une image ou le presse-papiers.
@@ -34,6 +35,7 @@ Popout Authenticator affiche vos codes à usage unique d’authentification à d
 - Les comptes sont stockés sur votre appareil dans un coffre chiffré avec AES-256-GCM. Définissez un mot de passe pour protéger sa clé : sans mot de passe, la clé est conservée sur l’appareil à côté des données.
 - Verrouillez-le avec un mot de passe (Argon2id), un code de récupération et, si vous le souhaitez, un déverrouillage par clé d’accès (indisponible dans Firefox). Choisissez quand il se verrouille automatiquement.
 - Vous pouvez exiger une vérification de l’appareil avant l’utilisation d’un code (indisponible dans Firefox) et masquer les codes avec un raccourci que vous définissez.
+- Un avertissement s’affiche avant qu’un code soit utilisé sur un site dont l’adresse ressemble seulement à celle du site du compte.
 - Les codes copiés peuvent être effacés du presse-papiers après 30 secondes, 1, 2 ou 5 minutes (indisponible dans Safari).
 - Pas d’analyse, pas de publicité, pas de serveur du développeur. Le code source est public.
 
@@ -50,7 +52,7 @@ Popout Authenticator affiche vos codes à usage unique d’authentification à d
 - Il n’y a pas de sauvegarde dans le cloud gérée par le développeur. Les sauvegardes sont des fichiers que vous conservez ; la synchronisation passe par celle du navigateur.
 - Le déverrouillage par clé d’accès et la vérification de l’appareil ne sont pas disponibles dans Firefox. La version Safari est réservée à macOS.
 
-Disponible en 20 langues. Prend en charge les stratégies gérées pour les organisations.
+Disponible en 43 langues. Prend en charge les stratégies gérées pour les organisations.
 
 Popout Authenticator est réalisé par un développeur indépendant. Il s’appuie sur le code et les traductions sous licence MIT de l’extension Authenticator (authenticator.cc) et n’a aucun lien avec ses auteurs.
 

@@ -32,6 +32,9 @@
   "menuQuickFill": {
     "message": "Fill 2FA code"
   },
+  "menuQuickCopy": {
+    "message": "Copy 2FA code for this site"
+  },
   "fillCopied": {
     "message": "Code copied. Paste it into the input field."
   },
@@ -60,6 +63,9 @@
   },
   "shortcutMissing": {
     "message": "No pinned account for this shortcut."
+  },
+  "shortcutSiteWarn": {
+    "message": "Not copied: this page’s address looks like a fake of the account’s site. If you’re sure it’s real, copy from the extension window."
   },
   "shortcutFailed": {
     "message": "Could not copy the code."

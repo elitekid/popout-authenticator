@@ -1,0 +1,29 @@
+{
+  "appName": { "message": "Popout Authenticator — קודי 2FA ו-OTP" },
+  "appShortName": { "message": "Popout Authenticator" },
+  "appDesc": { "message": "אפליקציית אימות דו-שלבי (2FA) בקוד פתוח. קודים חד-פעמיים בחלון קופץ, בחלון נפרד או בחלונית צד, עם נעילה בסיסמה וייבוא גיבויים." },
+  "cmdExecuteAction": { "message": "פתיחת החלון הקופץ" },
+  "cmdQuickFill": { "message": "מילוי קוד 2FA בדף הזה" },
+  "cmdScanQr": { "message": "סריקת קוד QR במסך" },
+  "cmdAutofill": { "message": "מילוי הקוד של החשבון המתאים ביותר" },
+  "cmdHideCodes": { "message": "הסתרה או הצגה של קודים" },
+  "cmdOpenWindow": { "message": "פתיחה בחלון נפרד" },
+  "menuOpenWindow": { "message": "פתיחה בחלון נפרד" },
+  "menuQuickFill": { "message": "מילוי קוד 2FA" },
+  "menuQuickCopy": { "message": "העתקת קוד 2FA לאתר הזה" },
+  "fillCopied": { "message": "הקוד הועתק. יש להדביק אותו בשדה הקלט." },
+  "fillManual": {
+    "message": "קוד: $CODE$",
+    "placeholders": { "code": { "content": "$1" } }
+  },
+  "cmdCopyPinned1": { "message": "העתקת הקוד של חשבון חשוב 1" },
+  "cmdCopyPinned2": { "message": "העתקת הקוד של חשבון חשוב 2" },
+  "cmdCopyPinned3": { "message": "העתקת הקוד של חשבון חשוב 3" },
+  "shortcutCopied": { "message": "הקוד הועתק." },
+  "shortcutLocked": { "message": "יש לבטל קודם את הנעילה של Popout Authenticator." },
+  "shortcutMissing": { "message": "אין חשבון חשוב לקיצור הדרך הזה." },
+  "shortcutSiteWarn": { "message": "לא הועתק: הכתובת של הדף הזה נראית כמו זיוף של האתר של החשבון. אם יש לך ודאות שהוא אמיתי, אפשר להעתיק מחלון התוסף." },
+  "shortcutFailed": { "message": "לא ניתן היה להעתיק את הקוד." },
+  "fillPickAccount": { "message": "יש לבחור חשבון." },
+  "fieldFillButton": { "message": "מילוי קוד" }
+}

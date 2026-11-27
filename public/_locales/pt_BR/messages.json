@@ -10,6 +10,7 @@
   "cmdOpenWindow": { "message": "Abrir em uma janela separada" },
   "menuOpenWindow": { "message": "Abrir em uma janela separada" },
   "menuQuickFill": { "message": "Preencher código 2FA" },
+  "menuQuickCopy": { "message": "Copiar código 2FA deste site" },
   "fillCopied": { "message": "Código copiado. Cole-o." },
   "fillManual": {
     "message": "Código: $CODE$",
@@ -32,6 +33,9 @@
   },
   "shortcutMissing": {
     "message": "Não há conta com estrela para este atalho."
+  },
+  "shortcutSiteWarn": {
+    "message": "Não copiado: o endereço desta página parece imitar o site da conta. Se tiver certeza de que é o verdadeiro, copie pela janela da extensão."
   },
   "shortcutFailed": {
     "message": "Não foi possível copiar o código."

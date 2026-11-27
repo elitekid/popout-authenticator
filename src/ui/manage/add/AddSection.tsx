@@ -7,7 +7,8 @@ import { WrongSecretError } from '../../../core/crypto/errors';
 import {
   ImportRejectedError,
   NeedsPasswordError,
-  importText,
+  importFile,
+  parseSteamSecret,
   type ImportFailure,
   type ImportMeta,
 } from '../../../core/import';
@@ -33,7 +34,21 @@ import { QrPanel } from './QrPanel';
 type T = ReturnType<typeof useT>;
 type Tab = 'manual' | 'links' | 'file' | 'qr';
 type Batch = { drafts: AccountDraft[]; meta: ImportMeta[]; failed: ImportFailure[] };
-type Item = { name: string; text: string };
+type Item = { name: string; bytes: Uint8Array };
+
+function rejectedMessage(error: ImportRejectedError, t: T): string {
+  const app = error.app ?? '';
+  switch (error.reason) {
+    case 'encrypted':
+      return t('add.rejected.encrypted', { app });
+    case 'damaged':
+      return t('add.rejected.damaged', { app });
+    case 'steamManifest':
+      return t('add.rejected.steamManifest');
+    default:
+      return t('add.rejected.unknown');
+  }
+}
 type Ask = { queue: Item[]; batch: Batch; wrong: boolean };
 type Result = { added: number; duplicates: number; failed: ImportFailure[] };
 type Form = {
@@ -83,7 +98,7 @@ function formErrorKey(error: unknown): string {
 
 // 해석기의 내부 영문 오류는 UI에서 번역한다. QR 화면에서 이미 번역한 안내는 유지한다.
 function importFailureMessage(reason: string, t: T, fallback = 'add.error.link'): string {
-  for (const key of ['add.qr.notFound', 'add.qr.notOtp', 'add.qr.unreadable', 'add.links.truncated']) {
+  for (const key of ['add.qr.notFound', 'add.qr.notOtp', 'add.qr.microsoft', 'add.qr.unreadable', 'add.links.truncated']) {
     if (reason === t(key)) return reason;
   }
   if (/secret|base32|hex/i.test(reason)) return t('add.error.secret');
@@ -260,7 +275,8 @@ export function AddSection({ initialTab, onDone }: { initialTab?: Tab; onDone?: 
         type,
         issuer: form.issuer.trim(),
         label: form.label.trim(),
-        secret: parseSecret(split.rest),
+        // Steam 키는 Base32 로도, maFile 의 Base64 shared_secret 으로도 붙여 넣는다.
+        secret: type === 'steam' ? parseSteamSecret(split.rest) : parseSecret(split.rest),
         algorithm: form.algorithm,
         digits: Number(form.digits),
         ...(type === 'totp' ? { period: Number(form.period) } : {}),
@@ -296,7 +312,7 @@ export function AddSection({ initialTab, onDone }: { initialTab?: Tab; onDone?: 
       for (let i = 0; i < queue.length; i++) {
         const item = queue[i]!;
         try {
-          const out = await importText(item.text, i === 0 ? pw : undefined);
+          const out = await importFile(item.bytes, item.name, i === 0 ? pw : undefined);
           // 읽는 동안 잠겼으면 결과를 버린다.
           if (epoch !== privacyEpoch.current) return;
           batch.drafts.push(...out.drafts);
@@ -310,9 +326,7 @@ export function AddSection({ initialTab, onDone }: { initialTab?: Tab; onDone?: 
           }
           const reason =
             error instanceof ImportRejectedError
-              ? error.reason === 'encrypted'
-                ? t('add.rejected.encrypted', { app: error.app ?? '' })
-                : t('add.rejected.unknown')
+              ? rejectedMessage(error, t)
               : importFailureMessage(error instanceof Error ? error.message : String(error), t, 'add.file.unreadable');
           batch.failed.push({ source: item.name, reason });
         }
@@ -332,7 +346,7 @@ export function AddSection({ initialTab, onDone }: { initialTab?: Tab; onDone?: 
     const queue: Item[] = [];
     for (const f of files) {
       try {
-        queue.push({ name: f.name, text: await f.text() });
+        queue.push({ name: f.name, bytes: new Uint8Array(await f.arrayBuffer()) });
       } catch {
         batch.failed.push({ source: f.name, reason: t('add.file.unreadable') });
       }
@@ -361,6 +375,20 @@ export function AddSection({ initialTab, onDone }: { initialTab?: Tab; onDone?: 
     const pw = password;
     setPassword('');
     void processFiles(ask.queue, ask.batch, pw);
+  };
+
+  // 여러 파일 중 하나의 비밀번호를 건너뛰면 그 파일만 빼고 나머지를 마저 넣는다.
+  const cancelPassword = () => {
+    if (busy || !ask) return;
+    setPassword('');
+    const rest = ask.queue.slice(1);
+    const { batch } = ask;
+    if (rest.length === 0 && batch.drafts.length === 0 && batch.failed.length === 0) {
+      setAsk(null);
+      return;
+    }
+    batch.failed.push({ source: ask.queue[0]!.name, reason: t('add.password.needed') });
+    void processFiles(rest, batch);
   };
 
   if (loadFailed) return <p class="error" role="alert">{t('common.loadError')}</p>;
@@ -475,7 +503,7 @@ export function AddSection({ initialTab, onDone }: { initialTab?: Tab; onDone?: 
             }}>{t('add.file.label')}</button> : <input
               type="file"
               multiple
-              accept=".json,.txt,.2fas,application/json,text/plain"
+              accept=".json,.txt,.2fas,.xml,.mafile,.maFile,application/json,text/plain,text/xml"
               data-role="file-input"
               disabled={ask !== null || busy}
               onChange={(e) => void onFiles(e.currentTarget)}
@@ -502,7 +530,7 @@ export function AddSection({ initialTab, onDone }: { initialTab?: Tab; onDone?: 
               <button type="submit" class="primary" data-role="submit-password" disabled={busy}>
                 {t('add.password.submit')}
               </button>
-              <button type="button" data-role="cancel-password" disabled={busy} onClick={() => { setAsk(null); setPassword(''); }}>
+              <button type="button" data-role="cancel-password" disabled={busy} onClick={cancelPassword}>
                 {t('accounts.cancel')}
               </button>
             </form>

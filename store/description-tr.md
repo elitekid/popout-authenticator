@@ -1,7 +1,7 @@
 # Mağaza kaydı — Türkçe
 
 ## Ad (manifest appName, 1.0.1)
-Popout Authenticator
+Popout Authenticator — 2FA kimlik doğrulayıcı
 
 ## Özet (manifest appDesc, en fazla 132 karakter)
 Tarayıcınız için 2FA kimlik doğrulayıcı. Tek kullanımlık kodlar üretir; açılır pencere veya ayrı pencere olarak açılır.
@@ -15,15 +15,16 @@ Popout Authenticator, iki faktörlü kimlik doğrulama (2FA) için tek kullanım
 - Authenticator uzantısının (authenticator.cc) yedek dosyasını, parola korumalı yedekler dahil, içe aktarın.
 - Google Authenticator™ dışa aktarma QR kodlarıyla uyumludur.
 - Diğer kimlik doğrulama uygulamalarının şifrelenmemiş yedeklerini ve standart Credential Exchange (CXF) dosyalarını içe aktarın. Desteklenen uygulamalar (İngilizce): https://elitekid.github.io/popout-authenticator/guides/from-authy-and-other-apps/
-- Bazı uygulamaların şifreli yedekleri burada açılamaz. Bu durumda önce o uygulamadan şifrelenmemiş bir yedek dışa aktarın.
+- Bazı uygulamaların parola korumalı yedeklerini kendi parolalarıyla açın. Şifreli yedekleri burada açılamayan uygulamalarda önce o uygulamadan şifrelenmemiş bir yedek dışa aktarın.
 
 **İhtiyacınız olan yerde açın**
 - Araç çubuğundaki açılır pencereyi, ayrı bir pencereyi veya yan paneli (Firefox'ta kenar çubuğu) kullanın.
 - Alana göre veya birden çok kelimeyle arama, A'dan Z'ye sıralama, gruplar, sabitlenmiş hesaplar, simgeler ve sıkışık görünüm uzun listeleri düzenli tutar.
-- Açık olan sitenin hesabını görün ve kodunu tek tıkla, sağ tıkla veya klavye kısayoluyla doldurun.
+- Açık olan sitenin hesabını görün ve kodunu tek tıkla, sağ tıkla veya klavye kısayoluyla doldurun. Bir sitenin kodunu kopyalamak için sayfanın herhangi bir yerine sağ tıklayın.
 - Genel kısayollar, tarayıcı arka plandayken bile ilk üç önemli hesabınızın kodlarını kopyalar (Chrome, Edge, Whale).
 - Seçtiğiniz sitelerde kod alanlarının yanında isteğe bağlı düğmeler.
-- Birden çok hesabı seçip birlikte çöp kutusuna taşıyın, bir grubun tamamını tek seferde yeniden adlandırın veya dağıtın ve bir hesabın adını kopyalayın.
+- Birden çok hesabı seçip birlikte başka bir gruba veya çöp kutusuna taşıyın ve hemen geri alın. Bir grubun tamamını tek seferde yeniden adlandırın veya dağıtın ve bir hesabın adını kopyalayın.
+- Bir hesabın simgesi olarak kendi görselinizi kullanın. Görsel bu cihazda kalır.
 
 **Hesapları istediğiniz gibi ekleyin**
 - Geçerli sekmeden, başka bir uygulamanın penceresinden, kameradan, bir görselden veya panodan QR kodu tarayın.
@@ -34,6 +35,7 @@ Popout Authenticator, iki faktörlü kimlik doğrulama (2FA) için tek kullanım
 - Hesaplar cihazınızda AES-256-GCM ile şifrelenmiş bir kasada saklanır. Kasanın anahtarını korumak için bir parola belirleyin: parola olmadan anahtar cihazda verilerin yanında tutulur.
 - Parolayla kilitleme (Argon2id), kurtarma kodu ve isteğe bağlı geçiş anahtarıyla kilit açma (Firefox'ta yok). Ne zaman otomatik kilitleneceğini seçin.
 - İsterseniz bir kod kullanılmadan önce cihaz doğrulaması isteyin (Firefox'ta yok) ve kodları belirlediğiniz bir klavye kısayoluyla gizleyin.
+- Adresi yalnızca hesabın sitesine benzeyen bir sitede kod kullanılmadan önce uyarı alın.
 - Kopyalanan kodlar 30 saniye, 1, 2 veya 5 dakika sonra panodan silinebilir (Safari'de yok).
 - Analiz yok, reklam yok, geliştirici sunucusu yok. Kaynak kodu herkese açıktır.
 
@@ -50,7 +52,7 @@ Popout Authenticator, iki faktörlü kimlik doğrulama (2FA) için tek kullanım
 - Geliştiricinin işlettiği bir bulut yedeği yoktur. Yedekler sizin sakladığınız dosyalardır; eşitleme tarayıcınız üzerinden yapılır.
 - Geçiş anahtarıyla kilit açma ve cihaz doğrulaması Firefox'ta yoktur. Safari sürümü yalnızca macOS içindir.
 
-20 dilde kullanılabilir. Kuruluşlar için yönetilen ilkeleri destekler.
+43 dilde kullanılabilir. Kuruluşlar için yönetilen ilkeleri destekler.
 
 Popout Authenticator bağımsız bir geliştirici tarafından yapılmıştır. Authenticator uzantısının (authenticator.cc) MIT lisanslı kodu ve çevirileri üzerine kuruludur ve yazarlarıyla bir bağlantısı yoktur.
 

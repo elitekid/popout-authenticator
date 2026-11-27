@@ -15,15 +15,16 @@ Popout Authenticator muestra sus códigos de un solo uso de autenticación en do
 - Importa el archivo de copia de seguridad de la extensión Authenticator (authenticator.cc), también las copias protegidas con contraseña.
 - Compatible con los códigos QR de exportación de Google Authenticator™.
 - Importa copias de seguridad sin cifrar de otras aplicaciones de autenticación, además de archivos del formato estándar de intercambio de credenciales (CXF). Aplicaciones compatibles (en inglés): https://elitekid.github.io/popout-authenticator/guides/from-authy-and-other-apps/
-- Las copias cifradas de algunas aplicaciones no se pueden abrir aquí. En ese caso, exporte primero una copia sin cifrar desde esa aplicación.
+- Abre con su contraseña las copias protegidas con contraseña de algunas aplicaciones. Si las copias cifradas de una aplicación no se pueden abrir aquí, exporte primero una copia sin cifrar desde esa aplicación.
 
 **Ábralo donde lo necesite**
 - Úselo en la ventana emergente de la barra de herramientas, en una ventana aparte o en el panel lateral (barra lateral en Firefox).
 - La búsqueda por campo o con varias palabras, el orden alfabético, los grupos, las cuentas fijadas, los iconos y la vista compacta mantienen ordenadas las listas largas.
-- Muestra primero la cuenta del sitio en el que está y rellena su código con un clic, con el menú contextual o con un atajo de teclado.
+- Muestra primero la cuenta del sitio en el que está y rellena su código con un clic, con el menú contextual o con un atajo de teclado. Haga clic derecho en cualquier parte de una página para copiar el código de ese sitio.
 - Los atajos globales copian los códigos de sus tres primeras cuentas importantes, incluso con el navegador en segundo plano (Chrome, Edge, Whale).
 - Botones opcionales junto a los campos de código en los sitios que usted elija.
-- Seleccione varias cuentas para moverlas juntas a la papelera, cambie el nombre de un grupo entero o desagrúpelo de una vez y copie el nombre de una cuenta.
+- Seleccione varias cuentas para moverlas juntas a otro grupo o a la papelera, y deshágalo al momento. Cambie el nombre de un grupo entero o desagrúpelo de una vez y copie el nombre de una cuenta.
+- Use su propia imagen como icono de una cuenta. Se queda en este equipo.
 
 **Añada cuentas como prefiera**
 - Escanee un código QR de la pestaña actual, de la ventana de otra aplicación, de la cámara, de una imagen o del portapapeles.
@@ -34,6 +35,7 @@ Popout Authenticator muestra sus códigos de un solo uso de autenticación en do
 - Las cuentas se guardan en su equipo en una bóveda cifrada con AES-256-GCM. Defina una contraseña para proteger su clave: sin contraseña, la clave se guarda en el equipo junto a los datos.
 - Bloquéela con una contraseña (Argon2id), un código de recuperación y, si quiere, desbloqueo con clave de acceso (no disponible en Firefox). Elija cuándo se bloquea automáticamente.
 - Si quiere, pida una verificación del dispositivo antes de usar un código (no disponible en Firefox) y oculte los códigos con un atajo que usted asigne.
+- Recibe un aviso antes de usar un código en un sitio cuya dirección solo se parece a la del sitio de la cuenta.
 - Los códigos copiados pueden borrarse del portapapeles tras 30 segundos, 1, 2 o 5 minutos (no disponible en Safari).
 - Sin analítica, sin anuncios, sin servidor del desarrollador. El código fuente es público.
 
@@ -50,7 +52,7 @@ Popout Authenticator muestra sus códigos de un solo uso de autenticación en do
 - No hay copia de seguridad en la nube gestionada por el desarrollador. Las copias son archivos que usted guarda; la sincronización usa la del propio navegador.
 - El desbloqueo con clave de acceso y la verificación del dispositivo no están disponibles en Firefox. La versión para Safari es solo para macOS.
 
-Disponible en 20 idiomas. Admite directivas administradas para organizaciones.
+Disponible en 43 idiomas. Admite directivas administradas para organizaciones.
 
 Popout Authenticator lo crea un desarrollador independiente. Se basa en el código y las traducciones con licencia MIT de la extensión Authenticator (authenticator.cc) y no tiene relación con sus autores.
 

@@ -1,0 +1,29 @@
+{
+  "appName": { "message": "Popout Authenticator — Codis 2FA i OTP" },
+  "appShortName": { "message": "Popout Authenticator" },
+  "appDesc": { "message": "Autenticador 2FA de codi obert. Codis d'un sol ús en finestra emergent, finestra o tauler lateral, amb bloqueig i importació." },
+  "cmdExecuteAction": { "message": "Obre la finestra emergent" },
+  "cmdQuickFill": { "message": "Emplena el codi 2FA en aquesta pàgina" },
+  "cmdScanQr": { "message": "Escaneja un codi QR de la pantalla" },
+  "cmdAutofill": { "message": "Emplena el codi del compte que coincideix millor" },
+  "cmdHideCodes": { "message": "Amaga o mostra els codis" },
+  "cmdOpenWindow": { "message": "Obre en una finestra a part" },
+  "menuOpenWindow": { "message": "Obre en una finestra a part" },
+  "menuQuickFill": { "message": "Emplena el codi 2FA" },
+  "menuQuickCopy": { "message": "Copia el codi 2FA d'aquest lloc web" },
+  "fillCopied": { "message": "S'ha copiat el codi. Enganxeu-lo al camp d'entrada." },
+  "fillManual": {
+    "message": "Codi: $CODE$",
+    "placeholders": { "code": { "content": "$1" } }
+  },
+  "cmdCopyPinned1": { "message": "Copia el codi del compte important 1" },
+  "cmdCopyPinned2": { "message": "Copia el codi del compte important 2" },
+  "cmdCopyPinned3": { "message": "Copia el codi del compte important 3" },
+  "shortcutCopied": { "message": "S'ha copiat el codi." },
+  "shortcutLocked": { "message": "Primer desbloquegeu Popout Authenticator." },
+  "shortcutMissing": { "message": "No hi ha cap compte important per a aquesta drecera." },
+  "shortcutSiteWarn": { "message": "No s'ha copiat: l'adreça d'aquesta pàgina sembla una imitació del lloc web del compte. Si esteu segur que és real, copieu el codi des de la finestra de l'extensió." },
+  "shortcutFailed": { "message": "No s'ha pogut copiar el codi." },
+  "fillPickAccount": { "message": "Trieu un compte." },
+  "fieldFillButton": { "message": "Emplena el codi" }
+}

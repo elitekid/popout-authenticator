@@ -105,3 +105,35 @@ describe('감사 반영', () => {
     expect(fillCandidate(list, { url: 'https://acme.com/', usage })).toBeNull();
   });
 });
+
+describe('가장 구체적인 사이트 우선', () => {
+  const list = [
+    acc('main', 'Main', ['main.com']),
+    acc('sub', 'Main Sub', ['sub1.main.com']),
+    acc('wild', 'Other', ['*.main.com']),
+  ];
+
+  it('하위 도메인에 따로 묶인 계정이 있으면 그것만 지정 사이트로 본다', () => {
+    expect(fillCandidate(list, { url: 'https://sub1.main.com/' })).toBe('sub');
+    expect(suggestAccountIds(list, { url: 'https://sub1.main.com/' })[0]).toBe('sub');
+  });
+
+  it('따로 묶이지 않은 하위 도메인·부모 도메인은 부모 계정들 사이에서 고른다', () => {
+    expect(suggestAccountIds(list, { url: 'https://sub2.main.com/' }).slice(0, 2)).toEqual(['main', 'wild']);
+    expect(fillCandidate(list, { url: 'https://main.com/' })).toBeNull();
+    const usage: SiteUsage = { 'main.com': { wild: { s: 1, c: 0 } } };
+    expect(fillCandidate(list, { url: 'https://main.com/', usage })).toBe('wild');
+  });
+
+  it('다른 사이트에만 묶인 계정은 이름·사용 기록으로 추천하지 않는다', () => {
+    const accounts = [acc('bound', 'Acme', ['acme-other.com']), acc('free', 'Acme Cloud'), acc('used', 'X', ['elsewhere.com'])];
+    const usage: SiteUsage = { 'acme.com': { used: { s: 4, c: 2 }, free: { s: 0, c: 1 } } };
+    expect(suggestAccountIds(accounts, { url: 'https://acme.com/', usage })).toEqual(['free']);
+  });
+
+  it('묶인 사이트가 맞으면 그 계정이 먼저 온다', () => {
+    const accounts = [acc('free', 'Acme'), acc('bound', 'Acme', ['login.acme.com'])];
+    expect(suggestAccountIds(accounts, { url: 'https://login.acme.com/' })).toEqual(['bound', 'free']);
+    expect(suggestAccountIds(accounts, { url: 'https://www.acme.com/' })).toEqual(['free']);
+  });
+});

@@ -601,6 +601,38 @@ body:has(.popup) {
   color: var(--fg);
 }
 
+/* 선택 모드 그룹 옮기기 패널 */
+.popup .sel-tools .sel-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.popup .sel-tools .sel-group button {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.popup .sel-tools .sel-group-new {
+  display: flex;
+  flex: 1;
+  gap: 6px;
+  min-width: 0;
+}
+
+.popup .sel-tools .sel-group-new .field {
+  flex: 1;
+  min-width: 0;
+  height: 28px;
+  border-radius: 8px;
+}
+
+.popup .sel-tools .sel-group-new .field[aria-invalid='true'] {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--danger, #d33) 50%, transparent);
+}
+
 .popup .row input.pick {
   flex: none;
   width: 18px;
@@ -760,18 +792,58 @@ body:has(.popup) {
   to { transform: translateX(100%); }
 }
 
-.popup .note.line {
-  flex-wrap: nowrap;
-  height: 40px;
-  padding-top: 0;
-  padding-bottom: 0;
+/* 가짜 사이트 경고: 경고색 테두리, 글은 여러 줄로 다 보인다. */
+.popup .note.site-warn {
+  border: 1px solid color-mix(in srgb, var(--warn) 60%, transparent);
+  background: color-mix(in srgb, var(--warn) 8%, var(--surface));
+  align-items: flex-start;
+  padding: 10px 8px 8px 12px;
 }
 
+.popup .note.site-warn > p {
+  flex-basis: 100%;
+}
+
+.popup .note.site-warn > p.title {
+  color: var(--warn);
+  font-weight: 700;
+}
+
+.popup .note.site-warn > p:not(.title) {
+  overflow-wrap: anywhere;
+}
+
+.popup .note.site-warn > .actions {
+  flex-basis: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.popup .note.site-warn button.primary,
+.popup .note.site-warn button.primary:hover {
+  background: var(--accent);
+  color: var(--on-strong);
+  padding: 0 12px;
+}
+
+.popup .note.line {
+  flex-wrap: nowrap;
+  min-height: 40px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+/* 긴 언어(그리스어·헝가리어 등)에서 문장이 잘려 뜻이 사라지지 않게 두 줄까지 보인다. */
 .popup .note.line > span {
   flex: 1;
+  min-width: 0;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
 }
 
 .popup .card > .note {
@@ -1052,6 +1124,19 @@ body:has(.popup) {
   height: 59%;
 }
 
+/* 사용자 그림 타일 */
+.img-tile {
+  overflow: hidden;
+  background: var(--fill);
+}
+
+.img-tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
 /* 아이콘 없는 줄도 같은 자리를 차지하도록 보이지 않는 타일 */
 .popup .tile.tile-gap {
   visibility: hidden;
@@ -1310,6 +1395,43 @@ body:has(.popup) {
   font-weight: 500;
   padding: 9px 14px;
   border-radius: 999px;
+}
+
+/* 복사 알림과 되돌리기 알림이 함께 보이면 복사 알림을 위로 올린다. */
+.popup .toast.raised {
+  bottom: 62px;
+}
+
+.popup .toast.undo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  pointer-events: auto;
+  padding: 4px 6px 4px 14px;
+}
+
+.popup .toast.undo .undo-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.popup .toast.undo button {
+  flex: none;
+  height: 30px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.popup .toast.undo button:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 1px;
 }
 
 :root[data-theme='dark'] .popup .toast {
@@ -2996,6 +3118,12 @@ body:has(.popup) {
 
 .camera select.field {
   max-width: 260px;
+}
+
+.camera-halt-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 /* 화면 QR 캡처 창 */

@@ -10,6 +10,7 @@
   "cmdOpenWindow": { "message": "在独立窗口中打开" },
   "menuOpenWindow": { "message": "在独立窗口中打开" },
   "menuQuickFill": { "message": "填入 2FA 验证码" },
+  "menuQuickCopy": { "message": "复制此网站的 2FA 验证码" },
   "fillCopied": { "message": "验证码已复制。请粘贴到网站中。" },
   "fillManual": {
     "message": "验证码：$CODE$",
@@ -32,6 +33,9 @@
   },
   "shortcutMissing": {
     "message": "此快捷键没有对应的加星标账户。"
+  },
+  "shortcutSiteWarn": {
+    "message": "未复制：此页面的网址看起来像在仿冒账户网站。如果确定是真网站，请在扩展窗口中复制。"
   },
   "shortcutFailed": {
     "message": "无法复制验证码。"

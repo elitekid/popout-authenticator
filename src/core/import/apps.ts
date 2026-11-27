@@ -1,8 +1,10 @@
 // 다른 인증 앱의 평문 백업(Aegis·2FAS·Bitwarden·FreeOTP+·andOTP·Raivo·Authy 덤프) 해석.
-// 암호화된 파일은 풀지 않고 ImportRejectedError('encrypted') 로 거절한다.
+// 비밀번호를 건 Aegis·2FAS 는 index.ts 가 sealed.ts 로 먼저 열어 평문 모양으로 넘긴다. 그 밖의 암호 파일은 거절한다.
 import { algorithmFrom, makeDraft } from '../account';
 import { decodeBase32, parseSecret } from '../base32';
 import { parseOtpauth } from '../uri';
+import { freeOtpTokenDraft } from './freeotp';
+import { isSealed2fas } from './sealed';
 import {
   asInt,
   asString,
@@ -104,7 +106,7 @@ function parseAegis(file: Json): ImportOutcome {
 
 // ---- 2FAS ----
 function parse2fas(file: Json): ImportOutcome {
-  if (typeof file.servicesEncrypted === 'string') throw new ImportRejectedError('encrypted', DISPLAY['2fas']);
+  if (isSealed2fas(file)) throw new ImportRejectedError('encrypted', DISPLAY['2fas']);
   const groups = new Map<string, string>();
   if (Array.isArray(file.groups)) {
     for (const g of file.groups) {
@@ -205,29 +207,10 @@ function parseFreeOtpPlus(file: Json): ImportOutcome {
     return { t, i, issuer, label, pos: at >= 0 ? at : Number.MAX_SAFE_INTEGER };
   });
   keyed.sort((a, b) => a.pos - b.pos || a.i - b.i);
-  for (const { t, issuer, label } of keyed) {
-    try {
-      const type = asString(t.type).toLowerCase();
-      if (type !== 'totp' && type !== 'hotp') throw new Error(`unsupported type: ${type}`);
-      const bytes = Uint8Array.from((t.secret as unknown[]).map((b) => Number(b) & 0xff));
-      const digits = asInt(t.digits);
-      const period = asInt(t.period);
-      const counter = asInt(t.counter);
-      out.add(
-        makeDraft({
-          type,
-          issuer,
-          label,
-          secret: bytes,
-          algorithm: algorithmOf(t.algo),
-          ...(digits !== undefined ? { digits } : {}),
-          ...(period !== undefined ? { period } : {}),
-          ...(counter !== undefined ? { counter } : {}),
-        }),
-      );
-    } catch (e) {
-      out.fail(name(issuer, label), e);
-    }
+  for (const { t } of keyed) {
+    const r = freeOtpTokenDraft(t);
+    if ('draft' in r) out.add(r.draft);
+    else out.fail(r.source, r.error);
   }
   return out.outcome('freeotp+');
 }

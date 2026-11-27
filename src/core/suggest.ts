@@ -34,10 +34,36 @@ export function hostOf(url: string | undefined): string | undefined {
   }
 }
 
-// 저장한 호스트와 같거나 그 하위 도메인일 때만 같은 사이트로 본다.
-function matchesHost(entry: string, host: string, _base?: string): boolean {
+// 저장한 호스트가 이 호스트를 얼마나 구체적으로 덮는지: 같거나 상위 도메인이면 그 길이, 아니면 -1.
+// 상위 도메인은 늘 하위의 끝부분이라 길수록 구체적이다.
+function coverage(entry: string, host: string): number {
   const e = entry.trim().toLowerCase().replace(/^\*\./, '');
-  return e !== '' && (host === e || host.endsWith(`.${e}`));
+  return e !== '' && (host === e || host.endsWith(`.${e}`)) ? e.length : -1;
+}
+
+// 저장한 호스트와 같거나 그 하위 도메인일 때만 같은 사이트로 본다.
+function matchesHost(entry: string, host: string): boolean {
+  return coverage(entry, host) >= 0;
+}
+
+function bestCoverage(a: Pick<Account, 'matchHosts'>, host: string): number {
+  let best = -1;
+  for (const m of a.matchHosts) best = Math.max(best, coverage(m, host));
+  return best;
+}
+
+// 이 사이트에 묶인 계정 중 가장 구체적인 사이트를 가진 것만(목록 순서 그대로).
+// main.com 계정과 sub1.main.com 계정이 있으면 sub1.main.com 에서는 뒤의 것만, 나머지 하위 도메인에서는 앞의 것만.
+// authenticator-sh/2fa (MIT) src/utils/account-sites.ts 의 accountsForSite 를 옮겼다.
+function boundHere<A extends Pick<Account, 'matchHosts'>>(live: A[], host: string): A[] {
+  const scored = live.map((a) => bestCoverage(a, host));
+  const best = Math.max(-1, ...scored);
+  return best < 0 ? [] : live.filter((_, i) => scored[i] === best);
+}
+
+// 다른 사이트에만 묶인 계정. 사용자가 쓸 곳을 정했으니 이 사이트의 이름 추측·사용 기록 추천에서 뺀다.
+function boundElsewhere(a: Pick<Account, 'matchHosts'>, host: string): boolean {
+  return a.matchHosts.some((m) => m.trim() !== '') && bestCoverage(a, host) < 0;
 }
 
 // 호스트가 들어 있는 계정이 이 사이트와 맞는지(다른 모듈이 '기억할까요' 판단에 쓴다).
@@ -88,13 +114,15 @@ function unique(ids: string[]): string[] {
 export function suggestAccountIds(accounts: Suggestable[], ctx: SuggestContext): string[] {
   const p = parts(accounts, ctx.url);
   if (!p) return [];
-  const byHost = p.live.filter((a) => a.matchHosts.some((m) => matchesHost(m, p.host, p.base)));
-  const byName = p.live.filter((a) => nameMatches(a, p.base));
+  const byHost = boundHere(p.live, p.host);
+  // 이 사이트에 묶인 계정 밖의 추측은 다른 사이트에 묶인 계정을 뺀 나머지에서만 한다.
+  const guessable = p.live.filter((a) => !boundElsewhere(a, p.host));
+  const byName = guessable.filter((a) => nameMatches(a, p.base));
   return unique([
     ...byHost.map((a) => a.id),
-    ...byCount(p.live, ctx.usage, p.host, 's').map((a) => a.id),
+    ...byCount(guessable, ctx.usage, p.host, 's').map((a) => a.id),
     ...byName.map((a) => a.id),
-    ...byCount(p.live, ctx.usage, p.host, 'c').map((a) => a.id),
+    ...byCount(guessable, ctx.usage, p.host, 'c').map((a) => a.id),
   ]);
 }
 
@@ -103,7 +131,7 @@ export function suggestAccountIds(accounts: Suggestable[], ctx: SuggestContext):
 export function fillCandidate(accounts: Suggestable[], ctx: SuggestContext): string | null {
   const p = parts(accounts, ctx.url);
   if (!p) return null;
-  const byHost = p.live.filter((a) => a.matchHosts.some((m) => matchesHost(m, p.host, p.base)));
+  const byHost = boundHere(p.live, p.host);
   if (byHost.length === 1) return byHost[0]!.id;
   if (byHost.length === 0) return null;
   // 지정 사이트 후보가 여럿이면 그 안에서만 넣은 기록으로 고르고, 없으면 고르지 않는다.

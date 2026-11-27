@@ -10,6 +10,7 @@
   "cmdOpenWindow": { "message": "Openen in een apart venster" },
   "menuOpenWindow": { "message": "Openen in een apart venster" },
   "menuQuickFill": { "message": "2FA-code invullen" },
+  "menuQuickCopy": { "message": "2FA-code voor deze site kopiëren" },
   "fillCopied": { "message": "Code gekopieerd. Plak hem erin." },
   "fillManual": {
     "message": "Code: $CODE$",
@@ -32,6 +33,9 @@
   },
   "shortcutMissing": {
     "message": "Geen account met ster voor deze sneltoets."
+  },
+  "shortcutSiteWarn": {
+    "message": "Niet gekopieerd: het adres van deze pagina lijkt een namaak van de site van het account. Weet je zeker dat het de echte is, kopieer de code dan vanuit het venster van de extensie."
   },
   "shortcutFailed": {
     "message": "De code kon niet worden gekopieerd."

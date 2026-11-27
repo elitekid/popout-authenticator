@@ -1,7 +1,7 @@
 # Scheda dello store — Italiano
 
 ## Nome (manifest appName, 1.0.1)
-Popout Authenticator
+Popout Authenticator — autenticatore 2FA
 
 ## Riepilogo (manifest appDesc, massimo 132 caratteri)
 Autenticatore 2FA per il tuo browser. Genera codici monouso e si apre come popup o finestra separata.
@@ -15,15 +15,16 @@ Popout Authenticator mostra i codici monouso per l'autenticazione a due fattori 
 - Importa il file di backup dell'estensione Authenticator (authenticator.cc), anche i backup protetti da password.
 - Compatibile con i codici QR di esportazione di Google Authenticator™.
 - Importa i backup in chiaro di altre app di autenticazione e i file nel formato standard Credential Exchange (CXF). App supportate (in inglese): https://elitekid.github.io/popout-authenticator/guides/from-authy-and-other-apps/
-- I backup crittografati di alcune app non si possono aprire qui. In questi casi esporta prima un backup in chiaro da quell'app.
+- Apre con la loro password i backup protetti da password di alcune app. Per le app i cui backup crittografati non si possono aprire qui, esporta prima un backup in chiaro da quell'app.
 
 **Aprilo dove ti serve**
 - Usalo nel popup della barra degli strumenti, in una finestra separata o nel pannello laterale (barra laterale in Firefox).
 - Ricerca per campo o con più parole, ordinamento dalla A alla Z, gruppi, account fissati, icone e vista compatta mantengono in ordine anche gli elenchi lunghi.
-- Mostra l'account del sito che stai visitando e ne inserisce il codice con un clic, con il tasto destro o con una scorciatoia da tastiera.
+- Mostra l'account del sito che stai visitando e ne inserisce il codice con un clic, con il tasto destro o con una scorciatoia da tastiera. Fai clic con il tasto destro in un punto qualsiasi della pagina per copiare il codice di quel sito.
 - Le scorciatoie globali copiano i codici dei tuoi primi tre account importanti, anche con il browser in background (Chrome, Edge, Whale).
 - Pulsanti facoltativi accanto ai campi del codice sui siti che scegli.
-- Seleziona più account per spostarli insieme nel cestino, rinomina o sciogli un intero gruppo in una volta e copia il nome di un account.
+- Seleziona più account per spostarli insieme in un altro gruppo o nel cestino, e annulla subito se serve. Rinomina o sciogli un intero gruppo in una volta e copia il nome di un account.
+- Usa una tua immagine come icona di un account. Resta su questo dispositivo.
 
 **Aggiungi gli account come preferisci**
 - Scansiona un codice QR dalla scheda corrente, dalla finestra di un'altra app, dalla fotocamera, da un'immagine o dagli appunti.
@@ -34,6 +35,7 @@ Popout Authenticator mostra i codici monouso per l'autenticazione a due fattori 
 - Gli account sono salvati sul tuo dispositivo in una cassaforte crittografata con AES-256-GCM. Imposta una password per proteggerne la chiave: senza password, la chiave resta sul dispositivo accanto ai dati.
 - Blocca con password (Argon2id), codice di ripristino e sblocco facoltativo con passkey (non disponibile in Firefox). Scegli quando bloccarlo automaticamente.
 - Puoi richiedere la verifica del dispositivo prima di usare un codice (non disponibile in Firefox) e nascondere i codici con una scorciatoia da tastiera a tua scelta.
+- Ricevi un avviso prima di usare un codice su un sito il cui indirizzo somiglia soltanto a quello del sito dell'account.
 - I codici copiati possono essere cancellati dagli appunti dopo 30 secondi, 1, 2 o 5 minuti (non disponibile in Safari).
 - Niente analisi, niente pubblicità, nessun server dello sviluppatore. Il codice sorgente è pubblico.
 
@@ -50,7 +52,7 @@ Popout Authenticator mostra i codici monouso per l'autenticazione a due fattori 
 - Non esiste un backup cloud gestito dallo sviluppatore. I backup sono file che conservi tu; la sincronizzazione passa per quella del browser.
 - Lo sblocco con passkey e la verifica del dispositivo non sono disponibili in Firefox. La versione per Safari è solo per macOS.
 
-Disponibile in 20 lingue. Supporta i criteri gestiti per le organizzazioni.
+Disponibile in 43 lingue. Supporta i criteri gestiti per le organizzazioni.
 
 Popout Authenticator è realizzato da uno sviluppatore indipendente. Si basa sul codice e sulle traduzioni con licenza MIT dell'estensione Authenticator (authenticator.cc) e non è affiliato ai suoi autori.
 

@@ -15,15 +15,16 @@ Popout Authenticator zeigt Ihre Einmalcodes für die Zwei-Faktor-Authentifizieru
 - Importiert die Sicherungsdatei der Erweiterung Authenticator (authenticator.cc), auch passwortgeschützte Sicherungen.
 - Kompatibel mit Export-QR-Codes von Google Authenticator™.
 - Importiert unverschlüsselte Sicherungen anderer Authenticator-Apps sowie Dateien im Standardformat Credential Exchange (CXF). Unterstützte Apps (Englisch): https://elitekid.github.io/popout-authenticator/guides/from-authy-and-other-apps/
-- Verschlüsselte Sicherungen mancher Apps lassen sich hier nicht öffnen. Exportieren Sie in diesem Fall zuerst eine unverschlüsselte Sicherung aus der App.
+- Öffnet passwortgeschützte Sicherungen mancher Apps mit deren Passwort. Bei Apps, deren verschlüsselte Sicherungen sich hier nicht öffnen lassen, exportieren Sie zuerst eine unverschlüsselte Sicherung aus der App.
 
 **Dort öffnen, wo Sie es brauchen**
 - Öffnen im Popup der Symbolleiste, in einem eigenen Fenster oder in der Seitenleiste (Sidebar in Firefox).
 - Suche nach Feld oder mit mehreren Wörtern, Sortierung von A bis Z, Gruppen, angeheftete Konten, Symbole und eine kompakte Ansicht halten auch lange Listen übersichtlich.
-- Zeigt zuerst das Konto zur geöffneten Website und fügt dessen Code per Klick, Rechtsklick oder Tastenkürzel ein.
+- Zeigt zuerst das Konto zur geöffneten Website und fügt dessen Code per Klick, Rechtsklick oder Tastenkürzel ein. Mit einem Rechtsklick an beliebiger Stelle der Seite kopieren Sie den Code dieser Website.
 - Globale Tastenkürzel kopieren die Codes Ihrer ersten drei wichtigen Konten, auch wenn der Browser im Hintergrund ist (Chrome, Edge, Whale).
 - Optional Schaltflächen neben Codefeldern auf den Websites, die Sie auswählen.
-- Mehrere Konten auswählen und gemeinsam in den Papierkorb verschieben, eine ganze Gruppe auf einmal umbenennen oder auflösen und den Namen eines Kontos kopieren.
+- Mehrere Konten auswählen, gemeinsam in eine andere Gruppe oder in den Papierkorb verschieben und das sofort rückgängig machen. Eine ganze Gruppe auf einmal umbenennen oder auflösen und den Namen eines Kontos kopieren.
+- Ein eigenes Bild als Kontosymbol verwenden. Es bleibt auf diesem Gerät.
 
 **Konten hinzufügen, wie es Ihnen passt**
 - QR-Code aus dem aktuellen Tab, aus dem Fenster einer anderen App, mit der Kamera, aus einem Bild oder aus der Zwischenablage scannen.
@@ -34,6 +35,7 @@ Popout Authenticator zeigt Ihre Einmalcodes für die Zwei-Faktor-Authentifizieru
 - Konten werden auf Ihrem Gerät in einem mit AES-256-GCM verschlüsselten Tresor gespeichert. Legen Sie ein Passwort fest, um dessen Schlüssel zu schützen: Ohne Passwort liegt der Schlüssel neben den Daten auf dem Gerät.
 - Sperren mit Passwort (Argon2id), Wiederherstellungscode und optionaler Entsperrung per Passkey (nicht in Firefox). Sie wählen, wann automatisch gesperrt wird.
 - Optional eine Geräteprüfung verlangen, bevor ein Code verwendet wird (nicht in Firefox), und Codes mit einem eigenen Tastenkürzel ausblenden.
+- Warnt, bevor ein Code auf einer Website verwendet wird, deren Adresse der Website des Kontos nur ähnelt.
 - Kopierte Codes können nach 30 Sekunden, 1, 2 oder 5 Minuten aus der Zwischenablage gelöscht werden (nicht in Safari).
 - Keine Analyse, keine Werbung, kein Server des Entwicklers. Der Quellcode ist öffentlich.
 
@@ -50,7 +52,7 @@ Popout Authenticator zeigt Ihre Einmalcodes für die Zwei-Faktor-Authentifizieru
 - Es gibt keine Cloud-Sicherung des Entwicklers. Sicherungen sind Dateien, die Sie selbst aufbewahren; synchronisiert wird über den Browser.
 - Entsperrung per Passkey und Geräteprüfung sind in Firefox nicht verfügbar. Die Safari-Version gibt es nur für macOS.
 
-In 20 Sprachen verfügbar. Unterstützt verwaltete Richtlinien für Organisationen.
+In 43 Sprachen verfügbar. Unterstützt verwaltete Richtlinien für Organisationen.
 
 Popout Authenticator wird von einem unabhängigen Entwickler erstellt. Es baut auf dem MIT-lizenzierten Code und den Übersetzungen der Erweiterung Authenticator (authenticator.cc) auf und steht in keiner Verbindung zu deren Autoren.
 

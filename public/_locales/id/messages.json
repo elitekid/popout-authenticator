@@ -10,6 +10,7 @@
   "cmdOpenWindow": { "message": "Buka di jendela terpisah" },
   "menuOpenWindow": { "message": "Buka di jendela terpisah" },
   "menuQuickFill": { "message": "Isi kode 2FA" },
+  "menuQuickCopy": { "message": "Salin kode 2FA untuk situs ini" },
   "fillCopied": { "message": "Kode telah disalin. Tempelkan di situs." },
   "fillManual": {
     "message": "Kode: $CODE$",
@@ -32,6 +33,9 @@
   },
   "shortcutMissing": {
     "message": "Tidak ada akun bintang untuk pintasan ini."
+  },
+  "shortcutSiteWarn": {
+    "message": "Tidak disalin: alamat halaman ini tampak seperti tiruan situs akun. Jika Anda yakin situs ini asli, salin kodenya dari jendela ekstensi."
   },
   "shortcutFailed": {
     "message": "Tidak dapat menyalin kode."

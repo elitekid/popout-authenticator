@@ -104,7 +104,7 @@ export async function enableLock(
     } finally { next.fill(0); }
   }));
   // 잠금을 켜면 방문 사이트 기록을 디스크에 남기지 않는다(이후는 session 에만).
-  await chrome.storage.local.remove('siteUsage');
+  await chrome.storage.local.remove(['siteUsage', 'siteWarnTrusted']);
   return { recoveryCode };
 }
 

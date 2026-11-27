@@ -10,6 +10,7 @@
   "cmdOpenWindow": { "message": "Abrir en una ventana independiente" },
   "menuOpenWindow": { "message": "Abrir en una ventana independiente" },
   "menuQuickFill": { "message": "Introducir código 2FA" },
+  "menuQuickCopy": { "message": "Copiar código 2FA de este sitio" },
   "fillCopied": { "message": "Código copiado. Péguelo." },
   "fillManual": {
     "message": "Código: $CODE$",
@@ -32,6 +33,9 @@
   },
   "shortcutMissing": {
     "message": "No hay ninguna cuenta destacada para este atajo."
+  },
+  "shortcutSiteWarn": {
+    "message": "No se copió: la dirección de esta página parece una imitación del sitio de la cuenta. Si está seguro de que es el real, copie el código desde la ventana de la extensión."
   },
   "shortcutFailed": {
     "message": "No se pudo copiar el código."

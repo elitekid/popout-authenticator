@@ -1,6 +1,6 @@
 import qrcode from 'qrcode-generator';
 import { describe, expect, it } from 'vitest';
-import { boxDownscale, decodeQrAll, type Rgba } from '../../src/core/qr';
+import { boxDownscale, decodeQrAll, isAuthenticatorQr, isMicrosoftQr, type Rgba } from '../../src/core/qr';
 
 const LINK_A = 'otpauth://totp/Example:alice?secret=JBSWY3DPEHPK3PXP&issuer=Example';
 const LINK_B = 'otpauth://totp/Corp:ops?secret=GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ&issuer=Corp';
@@ -104,5 +104,18 @@ describe('boxDownscale', () => {
     expect(small.height).toBe(2);
     expect(Array.from(small.data.slice(0, 4))).toEqual([0, 0, 0, 255]);
     expect(Array.from(small.data.slice(4, 8))).toEqual([200, 200, 200, 255]);
+  });
+});
+
+describe('QR kinds', () => {
+  it('tells a Microsoft-only QR apart from an authenticator QR', () => {
+    const ms = 'phonefactor://activate_account?code=000000000&url=https://example.invalid/activate';
+    expect(isMicrosoftQr(ms)).toBe(true);
+    expect(isMicrosoftQr(` PHONEFACTOR://x`)).toBe(true);
+    expect(isAuthenticatorQr(ms)).toBe(false);
+    expect(isAuthenticatorQr(LINK_A)).toBe(true);
+    expect(isAuthenticatorQr('otpauth-migration://offline?data=AA')).toBe(true);
+    expect(isMicrosoftQr(LINK_A)).toBe(false);
+    expect(isMicrosoftQr('https://example.com/phonefactor://x')).toBe(false);
   });
 });

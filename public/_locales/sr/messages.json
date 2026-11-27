@@ -1,0 +1,79 @@
+{
+  "appName": {
+    "message": "Popout Authenticator — 2FA и OTP кодови"
+  },
+  "appShortName": {
+    "message": "Popout Authenticator"
+  },
+  "appDesc": {
+    "message": "2FA аутентификатор отвореног кода. Једнократни кодови у искачућем прозору или бочној табли, уз закључавање лозинком и увоз копија."
+  },
+  "cmdExecuteAction": {
+    "message": "Отвори искачући прозор"
+  },
+  "cmdQuickFill": {
+    "message": "Попуни 2FA код на овој страници"
+  },
+  "cmdScanQr": {
+    "message": "Скенирај QR код на екрану"
+  },
+  "cmdAutofill": {
+    "message": "Попуни код налога који се најбоље подудара"
+  },
+  "cmdHideCodes": {
+    "message": "Сакриј или прикажи кодове"
+  },
+  "cmdOpenWindow": {
+    "message": "Отвори у посебном прозору"
+  },
+  "menuOpenWindow": {
+    "message": "Отвори у посебном прозору"
+  },
+  "menuQuickFill": {
+    "message": "Попуни 2FA код"
+  },
+  "menuQuickCopy": {
+    "message": "Копирај 2FA код за овај сајт"
+  },
+  "fillCopied": {
+    "message": "Код је копиран. Налепите га у поље за унос."
+  },
+  "fillManual": {
+    "message": "Код: $CODE$",
+    "placeholders": {
+      "code": {
+        "content": "$1"
+      }
+    }
+  },
+  "cmdCopyPinned1": {
+    "message": "Копирај код важног налога 1"
+  },
+  "cmdCopyPinned2": {
+    "message": "Копирај код важног налога 2"
+  },
+  "cmdCopyPinned3": {
+    "message": "Копирај код важног налога 3"
+  },
+  "shortcutCopied": {
+    "message": "Код је копиран."
+  },
+  "shortcutLocked": {
+    "message": "Прво откључајте Popout Authenticator."
+  },
+  "shortcutMissing": {
+    "message": "Нема важног налога за ову пречицу."
+  },
+  "shortcutSiteWarn": {
+    "message": "Није копирано: адреса ове странице личи на лажни сајт налога. Ако сте сигурни да је прави, копирајте из прозора проширења."
+  },
+  "shortcutFailed": {
+    "message": "Копирање кода није успело."
+  },
+  "fillPickAccount": {
+    "message": "Изаберите налог."
+  },
+  "fieldFillButton": {
+    "message": "Попуни код"
+  }
+}

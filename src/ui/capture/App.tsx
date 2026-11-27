@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 import type { AccountDraft } from '../../core/account';
-import { decodeQrAll, decodeQrAllAsync } from '../../core/qr';
+import { decodeQrAll, decodeQrAllAsync, isMicrosoftQr } from '../../core/qr';
 import { parseLinks } from '../../core/uri';
 import { LockedError } from '../../store/errors';
 import { redeemOneTimeKey } from '../../store/lock';
@@ -25,7 +25,8 @@ export function App() {
   const [phase, setPhase] = useState<Phase>('loading');
   const [src, setSrc] = useState('');
   const [sel, setSel] = useState<Rect | null>(null);
-  const [missed, setMissed] = useState(false);
+  // 'microsoft' 는 Microsoft 전용 QR, 'damaged' 는 읽었지만 계정을 하나도 못 꺼낸 인증 QR.
+  const [missed, setMissed] = useState<boolean | 'microsoft' | 'damaged'>(false);
   const [result, setResult] = useState<Result | null>(null);
   const [saveError, setSaveError] = useState(false);
   const [locked, setLocked] = useState<{ retry: () => void } | null>(null);
@@ -159,7 +160,7 @@ export function App() {
       const found = accountsFrom(texts);
       // 저장할 계정이 있을 때만 바로 저장한다. 실패 줄뿐이면 영역 선택을 남긴다.
       if (found && found.drafts.length > 0) await save(found.drafts, found.failed);
-      else setMissed(true);
+      else setMissed(found ? 'damaged' : texts.some(isMicrosoftQr) ? 'microsoft' : true);
     } catch {
       setMissed(true);
     }
@@ -268,10 +269,15 @@ export function App() {
         crop: { x, y, w, h },
         scale: REGION_SCALE,
       });
-      const found = accountsFrom(decodeQrAll(rgba));
+      const texts = decodeQrAll(rgba);
+      const found = accountsFrom(texts);
       if (found) {
         setMissed(false);
         await save(found.drafts, found.failed);
+        return;
+      }
+      if (texts.some(isMicrosoftQr)) {
+        setMissed('microsoft');
         return;
       }
     } catch {
@@ -337,7 +343,15 @@ export function App() {
       )}
       {phase === 'pick' && src !== '' && (
         <>
-          <p data-role="capture-hint">{missed ? t('capture.notFound') : t('capture.hint')}</p>
+          <p data-role="capture-hint" data-missed={typeof missed === 'string' ? missed : undefined}>
+            {missed === 'microsoft'
+              ? t('add.qr.microsoft')
+              : missed === 'damaged'
+                ? t('add.qr.damaged')
+                : missed
+                  ? t('capture.notFound')
+                  : t('capture.hint')}
+          </p>
           <div
             class="capture-stage"
             data-role="capture-stage"

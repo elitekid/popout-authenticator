@@ -69,6 +69,8 @@ export const settings = {
   'settings.clipboard.denied': '클립보드 읽기 권한을 얻지 못해 켜지 않았습니다.',
   'settings.autofillOnCopy': '코드를 복사할 때 입력칸에도 넣기',
   'settings.suggestions': '사이트에 맞는 계정 추천 (끄면 사이트 사용 기록 삭제)',
+  'settings.siteWarn': '가짜 사이트 경고',
+  'settings.siteWarn.desc': '계정 사이트를 흉내 낸 주소(githuh.com, github-login.com 등)의 페이지에 코드를 넘기기 전에 확인합니다. 이 기기 안에서만 판정하고 아무것도 보내지 않습니다.',
 
   'settings.about.version': '버전 {version}',
   'settings.about.help': '도움말',

@@ -1,0 +1,29 @@
+{
+  "appName": { "message": "Popout Authenticator — 2FA- ja OTP-koodit" },
+  "appShortName": { "message": "Popout Authenticator" },
+  "appDesc": { "message": "Avoimen lähdekoodin 2FA-todennussovellus. Kertakoodit ponnahdusikkunassa, ikkunassa tai sivupaneelissa, salasanalukitus ja tuonti." },
+  "cmdExecuteAction": { "message": "Avaa ponnahdusikkuna" },
+  "cmdQuickFill": { "message": "Täytä 2FA-koodi tälle sivulle" },
+  "cmdScanQr": { "message": "Skannaa näytöllä oleva QR-koodi" },
+  "cmdAutofill": { "message": "Täytä parhaiten vastaavan tilin koodi" },
+  "cmdHideCodes": { "message": "Piilota tai näytä koodit" },
+  "cmdOpenWindow": { "message": "Avaa erillisessä ikkunassa" },
+  "menuOpenWindow": { "message": "Avaa erillisessä ikkunassa" },
+  "menuQuickFill": { "message": "Täytä 2FA-koodi" },
+  "menuQuickCopy": { "message": "Kopioi tämän sivuston 2FA-koodi" },
+  "fillCopied": { "message": "Koodi kopioitu. Liitä se syöttökenttään." },
+  "fillManual": {
+    "message": "Koodi: $CODE$",
+    "placeholders": { "code": { "content": "$1" } }
+  },
+  "cmdCopyPinned1": { "message": "Kopioi tärkeän tilin 1 koodi" },
+  "cmdCopyPinned2": { "message": "Kopioi tärkeän tilin 2 koodi" },
+  "cmdCopyPinned3": { "message": "Kopioi tärkeän tilin 3 koodi" },
+  "shortcutCopied": { "message": "Koodi kopioitu." },
+  "shortcutLocked": { "message": "Avaa ensin Popout Authenticator -laajennuksen lukitus." },
+  "shortcutMissing": { "message": "Tälle pikanäppäimelle ei ole tärkeää tiliä." },
+  "shortcutSiteWarn": { "message": "Ei kopioitu: tämän sivun osoite näyttää tilin sivuston väärennökseltä. Jos olet varma, että se on oikea, kopioi laajennuksen ikkunasta." },
+  "shortcutFailed": { "message": "Koodia ei voitu kopioida." },
+  "fillPickAccount": { "message": "Valitse tili." },
+  "fieldFillButton": { "message": "Täytä koodi" }
+}

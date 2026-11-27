@@ -5,7 +5,9 @@ import { readClockCorrection } from '../store/clock';
 import { isLocked } from '../store/lock';
 import { withSessionLock } from '../store/session';
 import { loadSettings } from '../store/settings';
+import { checkSite } from '../store/site-warn';
 import { loadAccounts } from '../store/vault';
+import { hostOf } from '../core/suggest';
 import { fillActiveTab } from './fill';
 import { scheduleClipboardClear, writeClipboardViaOffscreen } from './clipboard';
 
@@ -22,7 +24,7 @@ export function pickPinnedAccount(accounts: Account[], n: number): PinnedPick {
   return account.type === 'hotp' ? { kind: 'hotp' } : { kind: 'ok', account };
 }
 
-type Outcome = 'shortcutCopied' | 'shortcutLocked' | 'shortcutMissing' | 'shortcutFailed';
+type Outcome = 'shortcutCopied' | 'shortcutLocked' | 'shortcutMissing' | 'shortcutFailed' | 'shortcutSiteWarn';
 
 let restoreTimer: ReturnType<typeof setTimeout> | undefined;
 let saved: { text: string; title: string } | undefined;
@@ -46,11 +48,24 @@ async function notify(outcome: Outcome): Promise<void> {
   }
 }
 
+// 단축키를 누른 창의 지금 탭(activeTab 으로 주소를 읽을 수 있다). 브라우저가 뒤에 있으면 마지막 창.
+async function activeTabHost(): Promise<string | undefined> {
+  try {
+    const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
+    return hostOf(tab?.url);
+  } catch {
+    return undefined;
+  }
+}
+
 async function copyPinned(n: number): Promise<Outcome> {
   if (await isLocked()) return 'shortcutLocked';
-  const pick = pickPinnedAccount(await loadAccounts(), n);
+  const accounts = await loadAccounts();
+  const pick = pickPinnedAccount(accounts, n);
   if (pick.kind === 'missing') return 'shortcutMissing';
   if (pick.kind === 'hotp') return 'shortcutFailed';
+  // 단축키에는 확인 창이 없으니, 지금 탭이 이 계정 사이트를 흉내 내면 복사하지 않고 알린다.
+  if (await checkSite(await activeTabHost(), pick.account, accounts)) return 'shortcutSiteWarn';
   const code = await generateCode(pick.account, Date.now() + (await readClockCorrection()));
   // 코드를 만드는 사이 잠겼으면 쓰지 않는다. 확인부터 쓰기 끝까지 lockNow 와 줄을 세워 그 사이 잠기지 않게 한다.
   const written = await withSessionLock(async (): Promise<Outcome | null> => {

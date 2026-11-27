@@ -28,6 +28,21 @@ export async function aesGcmDecrypt(
   return new Uint8Array(out);
 }
 
+// 다른 앱 백업용: 덧붙인 인증 데이터·태그 길이(비트)를 줄 수 있다. 태그는 ciphertext 끝에 있다.
+export async function aesGcmOpen(
+  key: Uint8Array,
+  iv: Uint8Array,
+  ciphertext: Uint8Array,
+  options: { additionalData?: Uint8Array; tagLength?: number } = {},
+): Promise<Uint8Array> {
+  const k = await importAes(key, 'AES-GCM', 'decrypt');
+  const params: AesGcmParams = { name: 'AES-GCM', iv: iv as BufferSource };
+  if (options.additionalData) params.additionalData = options.additionalData as BufferSource;
+  if (options.tagLength !== undefined) params.tagLength = options.tagLength;
+  const out = await subtle().decrypt(params, k, ciphertext as BufferSource);
+  return new Uint8Array(out);
+}
+
 // PKCS7 패딩 제거까지 WebCrypto 가 한다. 실패는 예외.
 export async function aesCbcDecrypt(
   key: Uint8Array,

@@ -4,9 +4,10 @@ import { duplicateKey } from '../../../core/account';
 import { encodeBase32, parseSecret } from '../../../core/base32';
 import { generateCode } from '../../../core/otp';
 import { knownSiteHosts } from '../../../core/known-sites';
-import { ACCOUNT_ICONS, accountIcon, type Account, type Algorithm } from '../../../core/types';
+import { ACCOUNT_ICONS, accountIcon, accountImage, type Account, type Algorithm } from '../../../core/types';
 import { avatarInitial } from '../../popup/logic';
 import { AccountIconSvg } from '../../shared/AccountIcon';
+import { fileToIconImage, ICON_IMAGE_ACCEPT } from '../../shared/icon-image';
 import { LockedError } from '../../../store/errors';
 import {
   addPendingFieldButton,
@@ -25,7 +26,7 @@ import { moveToTrash } from '../../../store/trash';
 import { loadAccounts, onVaultChanged, updateAccounts } from '../../../store/vault';
 import { UnlockForm } from '../../shared/UnlockForm';
 import { useT } from '../../shared/use-t';
-import { useScreenContext } from '../../shared/screen-context';
+import { openTaskWindow, useScreenContext } from '../../shared/screen-context';
 
 import { HistoryPanel } from './HistoryPanel';
 
@@ -153,6 +154,7 @@ export function AccountsSection({ initialEditId, onDone, onEdit, onHistory }: { 
         <ul class="accounts-list">
           {list.map((a) => {
             const icon = accountIcon(a.iconId);
+            const image = accountImage(a);
             return (
               <li key={a.id}>
                 <button
@@ -161,7 +163,9 @@ export function AccountsSection({ initialEditId, onDone, onEdit, onHistory }: { 
                   data-account-id={a.id}
                   onClick={() => onEdit ? onEdit(a.id) : setEditId(a.id)}
                 >
-                  {icon && (
+                  {image ? (
+                    <span class="account-icon img-tile" aria-hidden="true"><img src={image} alt="" /></span>
+                  ) : icon && (
                     <span class="account-icon ai-tile" style={`--ih:${icon.hue}`} aria-hidden="true">
                       <AccountIconSvg icon={icon} />
                     </span>
@@ -215,6 +219,20 @@ function AccountEditor({ t, account, all, hideBack, onHistory, onLocked, onDone,
   const [pinned, setPinned] = useState(account.pinned);
   // '' = 자동(이니셜). 모르는 값은 그대로 들고 있다가 저장해도 지우지 않는다.
   const [iconId, setIconId] = useState(account.iconId ?? '');
+  // '' = 그림 없음. 그림은 이 기기에만 있고, 있으면 iconId 보다 앞선다(iconId 는 다른 기기용으로 남는다).
+  const [iconImage, setIconImage] = useState(account.iconImage ?? '');
+  const [imageMsg, setImageMsg] = useState<string | null>(null);
+  const imageInput = useRef<HTMLInputElement>(null);
+  const shownImage = accountImage({ iconImage });
+  const pickImage = async (file: File) => {
+    try {
+      setIconImage(await fileToIconImage(file));
+      setImageMsg(null);
+    } catch (error) {
+      console.warn('icon image', error);
+      setImageMsg('accounts.icon.imageError');
+    }
+  };
   const [shown, setShown] = useState(false);
   const [broken, setBroken] = useState(account.secret.length === 0);
   const [newSecret, setNewSecret] = useState('');
@@ -278,7 +296,7 @@ function AccountEditor({ t, account, all, hideBack, onHistory, onLocked, onDone,
 
   const hasDraft = issuer !== base.issuer || label !== base.label || group !== (base.group ?? '')
     || note !== base.note || hosts !== base.matchHosts.join('\n') || pinned !== base.pinned
-    || iconId !== (base.iconId ?? '')
+    || iconId !== (base.iconId ?? '') || iconImage !== (base.iconImage ?? '')
     || (!fixed && (algorithm !== base.algorithm || digits !== String(base.digits)
       || (account.type === 'totp' && period !== String(base.period))))
     || (account.type === 'hotp' && counter !== String(base.counter ?? 0))
@@ -373,6 +391,7 @@ function AccountEditor({ t, account, all, hideBack, onHistory, onLocked, onDone,
     if (pinned !== base.pinned) patch.pinned = pinned;
     if (groupText !== (base.group ?? '')) patch.group = groupText !== '' ? groupText : null;
     if (iconId !== (base.iconId ?? '')) patch.iconId = iconId !== '' ? iconId : null;
+    if (iconImage !== (base.iconImage ?? '')) patch.iconImage = iconImage !== '' ? iconImage : null;
     if (!fixed) {
       if (algorithm !== base.algorithm) patch.algorithm = algorithm;
       if (Number(digits) !== base.digits) patch.digits = Number(digits);
@@ -394,7 +413,11 @@ function AccountEditor({ t, account, all, hideBack, onHistory, onLocked, onDone,
     const deferField = secret !== undefined && toolbarPopup;
     let fieldRequest: Promise<boolean | 'error'> | null = null;
     if (!deferField && fieldOn && fieldNext.hosts.length > 0 && fieldNext.hosts.join('\n') !== fieldHosts.join('\n')) {
-      void addPendingFieldButton(account.id, fieldNext.hosts, fieldNext.patterns, Date.now(), patch)
+      // 대기 항목은 잠금과 상관없이 디스크에 평문으로 남으니 새 그림은 넣지 않는다.
+      // 그림은 툴바 팝업에서 고를 수 없고(작은 창으로 넘긴다), 살아 있는 이 문서가 저장할 때 함께 들어간다.
+      const { iconImage: newImage, ...pendingPatch } = patch;
+      void addPendingFieldButton(account.id, fieldNext.hosts, fieldNext.patterns, Date.now(),
+        newImage === null ? patch : pendingPatch)
         .catch((error: unknown) => console.warn('field pending', error));
       try {
         fieldRequest = chrome.permissions.request({ origins: fieldNext.patterns }).catch((error: unknown) => {
@@ -545,12 +568,23 @@ function AccountEditor({ t, account, all, hideBack, onHistory, onLocked, onDone,
       <div class="icon-pick-field">
         <span>{t('accounts.icon')}</span>
         <div class="icon-pick" role="group" aria-label={t('accounts.icon')} data-role="icon">
+          {iconImage !== '' && (
+            <button
+              type="button"
+              data-icon-id="image"
+              aria-pressed="true"
+              title={t('accounts.icon.image')}
+            >
+              <span class="t img-tile">{shownImage && <img src={shownImage} alt="" />}</span>
+              <span class="nm">{t('accounts.icon.image')}</span>
+            </button>
+          )}
           <button
             type="button"
             data-icon-id=""
-            aria-pressed={iconId === ''}
+            aria-pressed={iconImage === '' && iconId === ''}
             title={t('accounts.icon.auto')}
-            onClick={() => setIconId('')}
+            onClick={() => { setIconImage(''); setIconId(''); }}
           >
             <span class="t auto">{avatarInitial(issuer)}</span>
             <span class="nm">{t('accounts.icon.auto')}</span>
@@ -561,9 +595,9 @@ function AccountEditor({ t, account, all, hideBack, onHistory, onLocked, onDone,
               key={i.id}
               type="button"
               data-icon-id={i.id}
-              aria-pressed={iconId === i.id}
+              aria-pressed={iconImage === '' && iconId === i.id}
               title={t(`accounts.icon.${i.id}`)}
-              onClick={() => setIconId(i.id)}
+              onClick={() => { setIconImage(''); setIconId(i.id); }}
             >
               <span class="t ai-tile" style={`--ih:${i.hue}`}>
                 <AccountIconSvg icon={i} />
@@ -571,7 +605,43 @@ function AccountEditor({ t, account, all, hideBack, onHistory, onLocked, onDone,
               <span class="nm">{t(`accounts.icon.${i.id}`)}</span>
             </button>
           ))}
+          {/* 툴바 팝업은 파일 창이 뜨면 닫히니 작은 창에서 고른다. */}
+          <button
+            type="button"
+            data-role="icon-image-choose"
+            disabled={busy || (toolbarPopup && hasDraft)}
+            title={t('accounts.icon.choose')}
+            onClick={() => {
+              setImageMsg(null);
+              if (toolbarPopup) {
+                void openTaskWindow('accounts', { edit: account.id }).then(() => window.close(), () => setImageMsg('common.actionError'));
+                return;
+              }
+              imageInput.current?.click();
+            }}
+          >
+            <span class="t auto" aria-hidden="true">+</span>
+            <span class="nm">{t('accounts.icon.choose')}</span>
+          </button>
         </div>
+        {!toolbarPopup && (
+          <input
+            ref={imageInput}
+            type="file"
+            hidden
+            accept={ICON_IMAGE_ACCEPT}
+            data-role="icon-image-file"
+            onChange={(e) => {
+              const input = e.currentTarget;
+              const file = input.files?.[0];
+              input.value = '';
+              if (file) void pickImage(file);
+            }}
+          />
+        )}
+        {iconImage !== '' && <p class="muted" data-role="icon-image-note">{t('accounts.icon.imageNote')}</p>}
+        {toolbarPopup && hasDraft && <p class="muted">{t('accounts.icon.saveFirst')}</p>}
+        {imageMsg && <p class="error" role="alert" data-role="icon-image-error">{t(imageMsg)}</p>}
       </div>
       <label>
         <span>{t('accounts.note')}</span>

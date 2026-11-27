@@ -16,6 +16,7 @@ import { runShareScenario } from './share.mjs';
 import { runLockScenario, runCodeAccessScenario } from './lock.mjs';
 import { runResetScenario } from './reset.mjs';
 import { runRecoveryToolsScenario } from './recovery-tools.mjs';
+import { SITE_WARN_HOSTS, runSiteWarnScenario } from './site-warn.mjs';
 
 const chromePath = process.env.CHROME_PATH;
 if (!chromePath) {
@@ -46,7 +47,7 @@ fs.cpSync(distDir, testDist, { recursive: true });
 {
   const manifestPath = path.join(testDist, 'manifest.json');
   const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-  manifest.host_permissions = ['*://127.0.0.1/*', ...['github.com', 'gitlab.com', 'accounts.google.com', 'dash.cloudflare.com', 'www.dropbox.com', 'dropbox.com', 'account.jetbrains.com'].map(host => `https://${host}/*`)];
+  manifest.host_permissions = ['*://127.0.0.1/*', ...SITE_WARN_HOSTS.map((host) => `https://${host}/*`), ...['github.com', 'gitlab.com', 'accounts.google.com', 'dash.cloudflare.com', 'www.dropbox.com', 'dropbox.com', 'account.jetbrains.com'].map(host => `https://${host}/*`)];
   manifest.permissions = [...manifest.permissions, 'clipboardRead'];
   fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
 }
@@ -126,6 +127,14 @@ try {
     for (const problem of fillProblems) console.error(`  ${problem}`);
   } else {
     console.log('ok   fill scenario');
+  }
+  const siteWarnProblems = await runSiteWarnScenario(session);
+  if (siteWarnProblems.length > 0) {
+    failed = true;
+    console.error('FAIL site-warn scenario');
+    for (const problem of siteWarnProblems) console.error(`  ${problem}`);
+  } else {
+    console.log('ok   site-warn scenario');
   }
   const fieldButtonProblems = await runFieldButtonScenario(session);
   if (fieldButtonProblems.length > 0) {

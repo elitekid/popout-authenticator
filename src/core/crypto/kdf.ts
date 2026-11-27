@@ -1,4 +1,4 @@
-import { argon2id } from 'hash-wasm';
+import { argon2id, scrypt } from 'hash-wasm';
 import { utf8Encode } from './bytes';
 
 export type Argon2Params = {
@@ -31,7 +31,7 @@ export async function pbkdf2Key(
   password: string,
   salt: Uint8Array,
   iterations: number,
-  hash: 'SHA-256' = 'SHA-256',
+  hash: 'SHA-1' | 'SHA-256' | 'SHA-512' = 'SHA-256',
 ): Promise<Uint8Array> {
   const base = await subtle().importKey('raw', utf8Encode(password) as BufferSource, 'PBKDF2', false, [
     'deriveBits',
@@ -52,4 +52,15 @@ export async function hkdfKey(ikm: Uint8Array, salt: Uint8Array, info: string): 
     256,
   );
   return new Uint8Array(bits);
+}
+
+// 다른 앱(Aegis) 백업을 여는 데만 쓴다. 비용 상한은 부르는 쪽이 먼저 확인한다.
+export async function scryptKey(
+  password: Uint8Array,
+  salt: Uint8Array,
+  n: number,
+  r: number,
+  p: number,
+): Promise<Uint8Array> {
+  return scrypt({ password, salt, costFactor: n, blockSize: r, parallelism: p, hashLength: 32, outputType: 'binary' });
 }

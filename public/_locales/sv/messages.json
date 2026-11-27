@@ -10,6 +10,7 @@
   "cmdOpenWindow": { "message": "Öppna i ett separat fönster" },
   "menuOpenWindow": { "message": "Öppna i ett separat fönster" },
   "menuQuickFill": { "message": "Fyll i 2FA-kod" },
+  "menuQuickCopy": { "message": "Kopiera 2FA-kod för den här webbplatsen" },
   "fillCopied": { "message": "Koden har kopierats. Klistra in den." },
   "fillManual": {
     "message": "Kod: $CODE$",
@@ -32,6 +33,9 @@
   },
   "shortcutMissing": {
     "message": "Inget stjärnmarkerat konto för det här kortkommandot."
+  },
+  "shortcutSiteWarn": {
+    "message": "Inte kopierad: sidans adress ser ut att efterlikna kontots webbplats. Om du är säker på att den är äkta kopierar du från tilläggets fönster."
   },
   "shortcutFailed": {
     "message": "Det gick inte att kopiera koden."

@@ -20,5 +20,6 @@ export const reset = {
   'advisor.password': 'Lock your vault with a password',
   'advisor.backup': 'Save a backup file',
   'advisor.sync': "Turn on sync to use accounts on other devices signed in to the same browser account.",
+  'advisor.siteWarn': 'Turn on the look-alike site warning so a code isn’t handed to a fake sign-in page.',
   'advisor.suggestions': 'Turn on site suggestions to find accounts for the current site without changing their order.',
 };

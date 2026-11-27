@@ -12,6 +12,7 @@ import { lastNormalWindow } from '../store/browser-window';
 import { getSessionKey, withSessionLock } from '../store/session';
 import { loadSettings } from '../store/settings';
 import { readSiteUsage, recordSiteUse } from '../store/site-usage';
+import { checkSite } from '../store/site-warn';
 import { commitVaultFile, loadAccounts, updateAccounts, withVaultWriteLock } from '../store/vault';
 import { applyOpenMode } from './open-mode';
 import { scheduleClipboardClear } from './clipboard';
@@ -107,7 +108,7 @@ async function inject(
   frameId: number | undefined,
   code: string | null,
   documentId?: string,
-  gate?: { expiresAt?: number; documentUrl: string; pinId?: string },
+  gate?: { expiresAt?: number; documentUrl?: string; origin?: string; pinId?: string; copyOnly?: boolean },
   submit = true,
   beforeInject?: () => Promise<void>,
 ): Promise<QuickFillOutcome | undefined> {
@@ -266,6 +267,41 @@ export async function runFill(req: FillRequest, requester?: chrome.runtime.Messa
     const host = hostOf(req.pageUrl);
     if (host !== undefined) await recordSiteUse(host, account.id, 'site').catch(() => undefined);
   }
+  return outcome;
+}
+
+export type CopyRequest = Pick<FillRequest, 'tabId' | 'pageUrl' | 'windowId'>;
+
+// '이 사이트 코드 복사' 메뉴: 지정 사이트가 맞는 계정 하나의 코드를 클립보드에만 둔다(입력칸에는 넣지 않는다).
+// 최상위 주소로 고른다(코드 칸이 다른 사이트 iframe 에 있어도 계정은 사용자가 보는 사이트의 것).
+// 고를 수 없거나 가짜 사이트로 보이면 팝업에 맡긴다. 팝업이 추천을 보여 주고 경고를 다시 묻는다.
+export async function runCopy(req: CopyRequest): Promise<QuickFillOutcome | 'handed-over'> {
+  const fallback = async () => {
+    await handOver({ ...req, frameId: 0 });
+    return 'handed-over' as const;
+  };
+  // 넣기와 같이 보안 연결(https·이 기기)에서만 코드를 꺼낸다.
+  if (req.pageUrl === undefined || !secureUrl(req.pageUrl)) return fallback();
+  if (await isLocked()) return fallback();
+  const accounts = await loadAccounts();
+  const live = accounts.filter((a) => a.deletedAt === undefined);
+  const id = fillCandidate(live, { url: req.pageUrl, usage: await readSiteUsage() });
+  const account = live.find((a) => a.id === id);
+  const host = hostOf(req.pageUrl);
+  if (!account || host === undefined) return fallback();
+  if (await checkSite(host, account, accounts)) return fallback();
+  const { code, account: used } = await currentCode(account);
+  if (await isLocked()) return fallback();
+  const period = used.type === 'totp' ? used.period : 30;
+  const correction = await readClockCorrection();
+  // 주입이 늦어도 지난 코드는 복사하지 않는다(HOTP 는 시간으로 바뀌지 않는다).
+  const expiresAt = used.type === 'hotp' ? undefined
+    : (Math.floor((Date.now() + correction) / (period * 1000)) + 1) * period * 1000 - correction;
+  // 코드를 기다리는 사이 탭이 다른 사이트로 넘어갔으면 그 페이지에서 복사하지 않는다.
+  const origin = new URL(req.pageUrl).origin;
+  const outcome = (await inject(req.tabId, 0, code, undefined, { expiresAt, origin, copyOnly: true }, false)) ?? 'shown';
+  if (outcome === 'expired') return fallback();
+  if (outcome === 'copied') await recordSiteUse(host, used.id, 'copy').catch(() => undefined);
   return outcome;
 }
 

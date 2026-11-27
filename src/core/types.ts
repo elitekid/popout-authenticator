@@ -18,6 +18,8 @@ export type Account = {
   pinned: boolean;
   matchHosts: string[];
   iconId?: string; // 내장 아이콘 id(ACCOUNT_ICONS). 없거나 모르는 값이면 이니셜 타일
+  // 사용자가 고른 그림(64px data URL). 이 기기 금고·자체 백업에만 두고 동기화·공유하지 않는다. 있으면 iconId 보다 앞선다.
+  iconImage?: string;
   lastUsedAt?: number;
   createdAt: number;
   updatedAt: number;
@@ -122,6 +124,18 @@ export function accountIcon(iconId: string | undefined): (typeof ACCOUNT_ICONS)[
   return ACCOUNT_ICONS.find((i) => i.id === iconId);
 }
 
+// 계정 그림은 다시 그린 작은 래스터만 받는다(svg·외부 주소 없음). 64px 사진은 보통 10KB 안쪽이다.
+export const ICON_IMAGE_SIZE = 64;
+export const ICON_IMAGE_MAX_LENGTH = 32768;
+const ICON_IMAGE_RE = /^data:image\/(?:png|jpeg|webp);base64,[A-Za-z0-9+/]+={0,2}$/;
+export function isIconImage(value: unknown): value is string {
+  return typeof value === 'string' && value.length <= ICON_IMAGE_MAX_LENGTH && ICON_IMAGE_RE.test(value);
+}
+// 화면에 그릴 그림. 형식이 맞지 않는 값은 그리지 않는다.
+export function accountImage(account: Pick<Account, 'iconImage'>): string | undefined {
+  return isIconImage(account.iconImage) ? account.iconImage : undefined;
+}
+
 export type WrappedKey = {
   kind: 'none' | 'password' | 'prf' | 'recovery';
   kdf?: {
@@ -174,6 +188,7 @@ export type Settings = {
   autofillOnCopy: boolean;
   autoSubmit: boolean;
   suggestionsEnabled: boolean;
+  siteWarnEnabled: boolean; // 계정 사이트를 흉내 낸 주소에 코드를 넘기기 전에 묻기
   clockCheck: boolean;
   lockTiming: LockTiming;
 };
@@ -199,6 +214,7 @@ export const DEFAULT_SETTINGS: Settings = {
   autofillOnCopy: false,
   autoSubmit: true,
   suggestionsEnabled: true,
+  siteWarnEnabled: true,
   clockCheck: true,
   lockTiming: 15,
 };

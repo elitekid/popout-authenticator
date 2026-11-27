@@ -10,6 +10,7 @@
   "cmdOpenWindow": { "message": "Ouvrir dans une fenêtre séparée" },
   "menuOpenWindow": { "message": "Ouvrir dans une fenêtre séparée" },
   "menuQuickFill": { "message": "Saisir le code 2FA" },
+  "menuQuickCopy": { "message": "Copier le code 2FA de ce site" },
   "fillCopied": { "message": "Code copié. Collez-le." },
   "fillManual": {
     "message": "Code : $CODE$",
@@ -32,6 +33,9 @@
   },
   "shortcutMissing": {
     "message": "Aucun compte étoilé pour ce raccourci."
+  },
+  "shortcutSiteWarn": {
+    "message": "Code non copié : l’adresse de cette page semble imiter le site du compte. Si vous êtes sûr qu’elle est authentique, copiez le code depuis la fenêtre de l’extension."
   },
   "shortcutFailed": {
     "message": "Impossible de copier le code."

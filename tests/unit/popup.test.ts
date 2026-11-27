@@ -7,6 +7,8 @@ import {
   groupSections,
   normalizeGroupName,
   pruneFolded,
+  regroup,
+  restorePlacements,
   shouldShowBackupReminder,
   shouldShowReview,
   siteUrl,
@@ -290,6 +292,17 @@ describe('whatsNewFor', () => {
     expect(whatsNewFor('firefox')).not.toHaveProperty('1.0.4');
     expect(whatsNewFor('safari')).not.toHaveProperty('1.0.4');
   });
+
+  it('1.0.5 는 모든 브라우저에 같은 4줄', () => {
+    for (const target of ['chrome', 'edge', 'firefox', 'safari'] as const) {
+      expect(whatsNewFor(target)['1.0.5']).toEqual([
+        'popup.whatsNew.v105.import',
+        'popup.whatsNew.v105.siteWarn',
+        'popup.whatsNew.v105.organize',
+        'popup.whatsNew.v105.languages',
+      ]);
+    }
+  });
 });
 
 describe('sortByName', () => {
@@ -318,5 +331,50 @@ describe('siteUrl', () => {
   it('한국어 화면이면 /ko/ 쪽, 그 밖에는 영어 쪽을 연다', () => {
     expect(siteUrl('ko', 'guides')).toBe(`https://elitekid.github.io/popout-authenticator/ko/guides/${utm}`);
     expect(siteUrl('en', 'home')).toBe(`https://elitekid.github.io/popout-authenticator/${utm}`);
+  });
+});
+
+describe('여러 계정 그룹 옮기기·되돌리기', () => {
+  type G = { id: string; group?: string; deletedAt?: number; updatedAt: number };
+  const list: G[] = [
+    { id: 'a', group: '업무', updatedAt: 1 },
+    { id: 'b', updatedAt: 1 },
+    { id: 'c', group: '집', updatedAt: 1 },
+    { id: 'd', group: '업무', deletedAt: 5, updatedAt: 5 },
+  ];
+  const ids = (set: string[]) => (x: G) => set.includes(x.id);
+
+  it('고른 활성 계정만 옮기고, 이미 그 그룹이거나 휴지통인 계정은 건드리지 않는다', () => {
+    const { next, before } = regroup(list, ids(['a', 'b', 'c', 'd']), '집', 9);
+    expect(next.map((x) => x.group)).toEqual(['집', '집', '집', '업무']);
+    expect(next[2]).toBe(list[2]);
+    expect(next[3]).toBe(list[3]);
+    expect(next[1]!.updatedAt).toBe(9);
+    expect(before).toEqual([{ id: 'a', group: '업무' }, { id: 'b' }]);
+  });
+
+  it('그룹 빼기는 group 칸을 지운다', () => {
+    const { next, before } = regroup(list, ids(['a', 'b']), undefined, 9);
+    expect('group' in next[0]!).toBe(false);
+    expect(next[1]).toBe(list[1]);
+    expect(before).toEqual([{ id: 'a', group: '업무' }]);
+  });
+
+  it('되돌리기는 아직 옮긴 그룹에 있는 활성 계정만 원래 자리로', () => {
+    const { next, before } = regroup(list, ids(['a', 'b', 'c']), '새', 9);
+    // 그사이 b 는 다른 그룹으로 다시 옮기고 c 는 휴지통으로 보냈다.
+    const changed = next.map((x) =>
+      x.id === 'b' ? { ...x, group: '딴곳' } : x.id === 'c' ? { ...x, deletedAt: 10 } : x,
+    );
+    const back = restorePlacements(changed, before, '새', 11);
+    expect(back.map((x) => x.group)).toEqual(['업무', '딴곳', '새', '업무']);
+    expect(back[0]!.updatedAt).toBe(11);
+    expect(back[1]).toBe(changed[1]);
+  });
+
+  it('그룹 빼기를 되돌리면 그룹이 다시 붙는다', () => {
+    const { next, before } = regroup(list, ids(['a', 'c']), undefined, 9);
+    const back = restorePlacements(next, before, undefined, 11);
+    expect(back.map((x) => x.group)).toEqual(['업무', undefined, '집', '업무']);
   });
 });

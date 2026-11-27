@@ -85,6 +85,47 @@ export function normalizeGroupName(input: string): string | null {
   return length >= 1 && length <= GROUP_MAX ? name : null;
 }
 
+// 그룹을 바꾸기 전 계정 하나의 자리. 되돌리기에 쓴다. group 이 없으면 그룹 없음.
+export type GroupPlacement = { id: string; group?: string };
+
+type Groupable = Pick<Account, 'id' | 'group' | 'deletedAt' | 'updatedAt'>;
+
+function withGroup<T extends Groupable>(a: T, group: string | undefined, at: number): T {
+  const { group: _group, ...rest } = a;
+  return (group === undefined ? { ...rest, updatedAt: at } : { ...rest, group, updatedAt: at }) as T;
+}
+
+// 활성 계정 중 pick 이 고른 것을 group(undefined 면 그룹 없음)으로 옮긴다. 이미 그 자리인 계정은 건드리지 않는다.
+// before 는 실제로 바뀐 계정의 원래 자리.
+export function regroup<T extends Groupable>(
+  list: T[],
+  pick: (a: T) => boolean,
+  group: string | undefined,
+  at: number,
+): { next: T[]; before: GroupPlacement[] } {
+  const before: GroupPlacement[] = [];
+  const next = list.map((a) => {
+    if (a.deletedAt !== undefined || !pick(a) || (a.group || undefined) === group) return a;
+    before.push(a.group ? { id: a.id, group: a.group } : { id: a.id });
+    return withGroup(a, group, at);
+  });
+  return { next, before };
+}
+
+// before 의 계정을 원래 그룹으로 돌린다. 그사이 휴지통에 갔거나 movedTo 가 아닌 곳으로 다시 옮긴 계정은 그대로 둔다.
+export function restorePlacements<T extends Groupable>(
+  list: T[],
+  before: GroupPlacement[],
+  movedTo: string | undefined,
+  at: number,
+): T[] {
+  const from = new Map(before.map((p) => [p.id, p.group]));
+  return list.map((a) => {
+    if (!from.has(a.id) || a.deletedAt !== undefined || (a.group || undefined) !== movedTo) return a;
+    return withGroup(a, from.get(a.id), at);
+  });
+}
+
 export type GroupSection<T> = {
   // 그룹 이름. 그룹 없는 계정 묶음은 null.
   name: string | null;
@@ -258,6 +299,7 @@ export function whatsNewFor(target: BrowserTarget = BROWSER_TARGET): Record<stri
     '1.0.2': ['popup.whatsNew.v102.organize', 'popup.whatsNew.v102.capture', ...copy],
     '1.0.3': ['popup.whatsNew.v103.about', 'popup.whatsNew.v103.icons', 'popup.whatsNew.v103.name'],
     ...(copy.length ? { '1.0.4': ['popup.whatsNew.v104.shortcuts'] } : {}),
+    '1.0.5': ['popup.whatsNew.v105.import', 'popup.whatsNew.v105.siteWarn', 'popup.whatsNew.v105.organize', 'popup.whatsNew.v105.languages'],
   };
 }
 export const WHATS_NEW: Record<string, string[]> = whatsNewFor();

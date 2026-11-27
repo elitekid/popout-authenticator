@@ -1,7 +1,7 @@
 // '칸 옆 넣기 단추'를 켠 계정과 사이트. 금고 밖(chrome.storage.local)이라 비밀은 없고,
 // 잠겨 있어도 서비스 워커가 읽을 수 있다. 브라우저 API 만 쓴다.
 import { KNOWN_FIELD_ORIGINS, knownSiteHosts } from '../core/known-sites';
-import type { Account } from '../core/types';
+import { isIconImage, type Account } from '../core/types';
 
 const KEY = 'fieldButtons';
 const AUTO_KEY = 'autoFieldButtons';
@@ -168,7 +168,7 @@ export function setFieldButton(accountId: string, hosts: string[]): Promise<void
 // group 은 문자열이면 바꾸고 null 이면 지운다.
 export type AccountEditPatch = Partial<Pick<Account,
   'issuer' | 'label' | 'note' | 'matchHosts' | 'pinned' | 'algorithm' | 'digits' | 'period' | 'counter'>> &
-  { group?: string | null; iconId?: string | null };
+  { group?: string | null; iconId?: string | null; iconImage?: string | null };
 export type PendingFieldButton = { id: string; hosts: string[]; patterns: string[]; at: number; patch?: AccountEditPatch };
 // 계정마다 따로 둔 키라서 읽지 않고 바로 쓸 수 있다. 팝업이 닫히기 전에 쓰기 요청이 나가야 한다.
 const PENDING_PREFIX = 'pendingFieldButton:';
@@ -190,12 +190,13 @@ function asPatch(raw: unknown): AccountEditPatch | undefined {
   if (src.algorithm === 'SHA-1' || src.algorithm === 'SHA-256' || src.algorithm === 'SHA-512') out.algorithm = src.algorithm;
   if (typeof src.group === 'string' || src.group === null) out.group = src.group;
   if ((typeof src.iconId === 'string' && src.iconId.length <= 64) || src.iconId === null) out.iconId = src.iconId;
+  if (isIconImage(src.iconImage) || src.iconImage === null) out.iconImage = src.iconImage;
   return out as AccountEditPatch;
 }
 
 // 바뀐 칸만 최신 계정에 적용한다. 이미 같은 값이면 계정 객체를 그대로 돌려줘 두 번 적용해도 같다.
 export function applyAccountEditPatch(account: Account, patch: AccountEditPatch, now: number): Account {
-  const { group, iconId, ...fields } = patch;
+  const { group, iconId, iconImage, ...fields } = patch;
   const next: Account = { ...account };
   let changed = false;
   for (const [key, value] of Object.entries(fields)) {
@@ -216,6 +217,11 @@ export function applyAccountEditPatch(account: Account, patch: AccountEditPatch,
   if (iconId !== undefined && iconId !== (account.iconId ?? null)) {
     if (iconId === null) delete next.iconId;
     else next.iconId = iconId;
+    changed = true;
+  }
+  if (iconImage !== undefined && iconImage !== (account.iconImage ?? null)) {
+    if (iconImage === null) delete next.iconImage;
+    else next.iconImage = iconImage;
     changed = true;
   }
   return changed ? { ...next, updatedAt: now } : account;

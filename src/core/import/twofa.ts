@@ -14,7 +14,9 @@ import {
   asString,
   Collector,
   isObject,
+  importHosts,
   NeedsPasswordError,
+  type ImportMeta,
   type ImportOutcome,
   type Json,
 } from './types';
@@ -50,9 +52,17 @@ export function parseTwoFaPlain(file: Json): ImportOutcome {
       const digits = asInt(raw.digits);
       const period = asInt(raw.period);
       const group = asString(raw.group).trim();
+      const kind = raw.type === undefined || raw.type === null ? '' : asString(raw.type).toLowerCase();
+      if (kind !== '' && kind !== 'totp' && kind !== 'steam') throw new Error(`unsupported type: ${kind}`);
+      // 1.16 부터 Steam(type 'steam', 5자리)·고정·연결 사이트를 적는다. 그룹 순서(groupRank)는 우리에게 그룹 순서가 없어 버린다.
+      const meta: ImportMeta = {};
+      if (group) meta.group = group;
+      if (raw.pinned === true) meta.pinned = true;
+      const hosts = importHosts(raw.sites);
+      if (hosts.length > 0) meta.matchHosts = hosts;
       out.add(
         makeDraft({
-          type: 'totp',
+          type: kind === 'steam' ? 'steam' : 'totp',
           issuer,
           label,
           secret: parseSecret(asString(raw.secret)),
@@ -60,7 +70,7 @@ export function parseTwoFaPlain(file: Json): ImportOutcome {
           ...(digits !== undefined ? { digits } : {}),
           ...(period !== undefined ? { period } : {}),
         }),
-        group ? { group } : {},
+        meta,
       );
     } catch (e) {
       out.fail(issuer && label ? `${issuer}:${label}` : issuer || label || 'entry', e);

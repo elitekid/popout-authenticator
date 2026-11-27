@@ -1,4 +1,5 @@
-import { focusPage } from './browser.mjs';
+import fs from 'node:fs/promises';
+import { focusPage, uploadFixture } from './browser.mjs';
 // 계정 정리: 삭제·복원, 평소 목록 끌기·복사 뒤 순서 유지·재열기, 간결 보기 끌기.
 import { randomUUID, webcrypto } from 'node:crypto';
 import { makeNoneVault, totp } from './vault-fixture.mjs';
@@ -130,6 +131,10 @@ export async function runAccountsScenario(session) {
     await popup
       .waitForFunction(() => document.querySelectorAll('[data-account-id]').length === 2, { timeout: 10000 })
       .catch(() => problems.push('삭제 뒤 줄이 2개가 안 됨'));
+    // 한 계정 삭제 뒤에도 되돌리기 알림이 뜬다(여기서는 누르지 않고 휴지통 복원을 시험한다).
+    await popup
+      .waitForSelector('[data-role="undo-notice"] [data-role="undo"]', { visible: true, timeout: 5000 })
+      .catch(() => problems.push('한 계정 삭제 뒤 되돌리기 알림이 안 뜸'));
     await close(popup);
 
     const manage = await open('manage.html#trash', '[data-section="trash"] [data-role="trash-row"]');
@@ -309,6 +314,13 @@ export async function runAccountsScenario(session) {
     list = await waitVault(popup, (l) => !byIssuer(l, 'Acme Mail')?.group, '그룹 해제');
     if (byIssuer(list, 'Wingtip Cloud')?.group) problems.push('해제 뒤 둘째 계정에 group 이 남음');
     if (byIssuer(list, 'Contoso Vault')?.group !== 'Home') problems.push('해제가 다른 그룹까지 건드림');
+    // 해제 직후 되돌리기: Team 두 계정이 다시 Team 으로.
+    await popup.waitForSelector('[data-role="undo"]', { visible: true, timeout: 5000 });
+    await popup.click('[data-role="undo"]');
+    list = await waitVault(popup, (l) => byIssuer(l, 'Acme Mail')?.group === 'Team', '그룹 해제 되돌리기');
+    if (byIssuer(list, 'Wingtip Cloud')?.group !== 'Team') problems.push('해제 되돌리기 뒤 둘째 계정이 Team 이 아님');
+    if (byIssuer(list, 'Contoso Vault')?.group !== 'Home') problems.push('해제 되돌리기가 다른 그룹까지 건드림');
+    if (await popup.$('[data-role="undo-notice"]')) problems.push('되돌린 뒤에도 되돌리기 알림이 남음');
     await close(popup);
 
     // (e) 선택 모드: 3개 중 2개를 한 번에 휴지통으로
@@ -318,7 +330,7 @@ export async function runAccountsScenario(session) {
     await popup.waitForFunction(() => document.querySelectorAll('[data-account-id]').length === 3, {
       timeout: 10000,
     });
-    await popup.click('[data-role="select-start"]');
+    await (await popup.waitForSelector('[data-role="select-start"]', { visible: true, timeout: 5000 })).click();
     await popup.waitForSelector('[data-role="select-count"]', { visible: true });
     // 선택 모드에서 행(코드) 클릭은 복사가 아니라 체크
     await popup.click(`[data-account-id="${picks[0].id}"] .code`);
@@ -340,6 +352,144 @@ export async function runAccountsScenario(session) {
       .waitForFunction(() => document.querySelectorAll('[data-account-id]').length === 1, { timeout: 10000 })
       .catch(() => problems.push('휴지통 이동 뒤 목록이 1줄이 아님'));
     if (await popup.$('[data-role="select-count"]')) problems.push('휴지통 이동 뒤 선택 모드가 안 끝남');
+
+    // 휴지통 보내기 직후 되돌리기: 두 계정이 원래 자리로.
+    await popup.waitForSelector('[data-role="undo"]', { visible: true, timeout: 5000 });
+    await popup.click('[data-role="undo"]');
+    list = await waitVault(popup, (l) => l.every((a) => a.deletedAt === undefined), '휴지통 되돌리기');
+    if (list.map((a) => a.id).join() !== picks.map((a) => a.id).join()) problems.push('휴지통 되돌리기 뒤 순서가 바뀜');
+    await popup
+      .waitForFunction(() => document.querySelectorAll('[data-account-id]').length === 3, { timeout: 10000 })
+      .catch(() => problems.push('휴지통 되돌리기 뒤 목록이 3줄이 아님'));
+
+    // (f) 여러 계정을 한 번에 새 그룹으로 옮기고 되돌리기, 있는 그룹으로 옮기기, 그룹에서 빼기
+    await (await popup.waitForSelector('[data-role="select-start"]', { visible: true, timeout: 5000 })).click();
+    await popup.click(`[data-account-id="${picks[0].id}"] input.pick`);
+    await popup.click(`[data-account-id="${picks[1].id}"] input.pick`);
+    await popup.click('[data-role="select-group"]');
+    await popup.waitForSelector('[data-role="select-group-panel"]', { visible: true });
+    if (await popup.$('[data-role="select-group-remove"]')) problems.push('그룹이 하나도 없는데 그룹 빼기가 보임');
+    await popup.keyboard.press('Escape');
+    if (await popup.$('[data-role="select-group-panel"]')) problems.push('Esc 로 그룹 패널이 안 닫힘');
+    if (!(await popup.$('[data-role="select-count"]'))) problems.push('Esc 한 번에 선택 모드까지 끝남');
+    await popup.click('[data-role="select-group"]');
+    await popup.click('[data-role="select-group-new"]');
+    await popup.waitForSelector('[data-role="select-group-input"]', { visible: true });
+    await popup.type('[data-role="select-group-input"]', '   ');
+    await popup.click('[data-role="select-group-save"]');
+    if ((await popup.$eval('[data-role="select-group-input"]', (el) => el.getAttribute('aria-invalid'))) !== 'true') {
+      problems.push('빈 그룹 이름이 거절되지 않음');
+    }
+    await popup.$eval('[data-role="select-group-input"]', (el) => { el.value = ''; });
+    await popup.type('[data-role="select-group-input"]', 'Work');
+    await popup.keyboard.press('Enter');
+    list = await waitVault(popup, (l) => byIssuer(l, 'Acme Mail')?.group === 'Work', '여러 계정 새 그룹');
+    if (byIssuer(list, 'Wingtip Cloud')?.group !== 'Work') problems.push('둘째 고른 계정이 Work 로 안 감');
+    if (byIssuer(list, 'Contoso Vault')?.group) problems.push('고르지 않은 계정에 그룹이 붙음');
+    await popup.waitForFunction(() => !document.querySelector('[data-role="select-count"]'), { timeout: 5000 })
+      .catch(() => problems.push('그룹 옮긴 뒤 선택 모드가 안 끝남'));
+    await popup.waitForSelector('[data-role="undo"]', { visible: true, timeout: 5000 });
+    await popup.click('[data-role="undo"]');
+    list = await waitVault(popup, (l) => l.every((a) => !a.group), '그룹 옮기기 되돌리기');
+
+    // 있는 그룹으로: Contoso 를 Home 에 넣어 두고 나머지 둘을 Home 으로, 그다음 셋 다 빼기.
+    await (await popup.waitForSelector('[data-role="select-start"]', { visible: true, timeout: 5000 })).click();
+    await popup.click(`[data-account-id="${picks[2].id}"] input.pick`);
+    await popup.click('[data-role="select-group"]');
+    await popup.click('[data-role="select-group-new"]');
+    await popup.type('[data-role="select-group-input"]', 'Home');
+    await popup.keyboard.press('Enter');
+    await waitVault(popup, (l) => byIssuer(l, 'Contoso Vault')?.group === 'Home', '한 계정 Home');
+    await (await popup.waitForSelector('[data-role="select-start"]', { visible: true, timeout: 5000 })).click();
+    await popup.click('[data-role="select-all"]');
+    await popup.click('[data-role="select-group"]');
+    const choices = await popup.$$eval('[data-role="select-group-pick"]', (els) => els.map((e) => e.textContent));
+    if (choices.join() !== 'Home') problems.push(`그룹 고르기 목록이 다름: ${choices.join()}`);
+    await popup.click('[data-role="select-group-pick"]');
+    list = await waitVault(popup, (l) => l.every((a) => a.group === 'Home'), '있는 그룹으로 옮기기');
+    // 저장이 먼저 보이고 알림은 뒤따라 바뀔 수 있어 알림이 바뀔 때까지 기다린다.
+    await popup.waitForFunction(() => document.querySelector('[data-role="undo-notice"] .undo-text')?.textContent?.includes('2'), { timeout: 5000 })
+      .catch(async () => problems.push(`이미 Home 인 계정까지 센 알림: ${await popup.$eval('[data-role="undo-notice"] .undo-text', (el) => el.textContent ?? '').catch(() => '(없음)')}`));
+    // 되돌리면 원래 Home 이던 Contoso 는 그대로 Home.
+    await popup.click('[data-role="undo"]');
+    list = await waitVault(popup, (l) => !byIssuer(l, 'Acme Mail')?.group, '있는 그룹 옮기기 되돌리기');
+    if (byIssuer(list, 'Contoso Vault')?.group !== 'Home') problems.push('되돌리기가 원래 Home 이던 계정까지 뺌');
+    await (await popup.waitForSelector('[data-role="select-start"]', { visible: true, timeout: 5000 })).click();
+    await popup.click('[data-role="select-all"]');
+    await popup.click('[data-role="select-group"]');
+    await popup.click('[data-role="select-group-remove"]');
+    list = await waitVault(popup, (l) => l.every((a) => !a.group), '여러 계정 그룹 빼기');
+
+    // (g) 계정 그림: 읽을 수 없는 파일은 안내, 그림은 64px 로 다시 그려 저장, 팝업 타일에 보임, 내장 아이콘을 고르면 지워짐.
+    const editor = await open('manage.html#accounts', '[data-role="account-row"]');
+    const acmeId = byIssuer(list, 'Acme Mail')?.id;
+    await editor.click(`[data-role="account-row"][data-account-id="${acmeId}"]`);
+    await editor.waitForSelector('[data-role="icon-image-choose"]', { visible: true });
+    if (await editor.$('[data-icon-id="image"]')) problems.push('그림이 없는데 내 그림 칸이 보임');
+    const wide = await editor.evaluate(() => {
+      const c = document.createElement('canvas');
+      c.width = 120;
+      c.height = 60;
+      const x = c.getContext('2d');
+      x.fillStyle = '#d00';
+      x.fillRect(0, 0, 60, 60);
+      x.fillStyle = '#00d';
+      x.fillRect(60, 0, 60, 60);
+      return c.toDataURL('image/png').split(',')[1];
+    });
+    const goodFile = `/tmp/otp-e2e-icon-${randomUUID()}.png`;
+    const badFile = `/tmp/otp-e2e-icon-${randomUUID()}.png`;
+    await fs.writeFile(goodFile, Buffer.from(wide, 'base64'));
+    await fs.writeFile(badFile, 'not an image');
+    try {
+      const input = await editor.$('[data-role="icon-image-file"]');
+      await uploadFixture(input, badFile, session);
+      await editor.waitForSelector('[data-role="icon-image-error"]', { visible: true, timeout: 5000 })
+        .catch(() => problems.push('그림이 아닌 파일에 안내가 없음'));
+      await uploadFixture(input, goodFile, session);
+      await editor.waitForSelector('[data-icon-id="image"] img', { visible: true, timeout: 5000 });
+      if (await editor.$('[data-role="icon-image-error"]')) problems.push('그림을 읽은 뒤에도 오류 안내가 남음');
+      if (!(await editor.$('[data-role="icon-image-note"]'))) problems.push('그림은 동기화되지 않는다는 안내가 없음');
+    } finally {
+      await fs.rm(goodFile, { force: true });
+      await fs.rm(badFile, { force: true });
+    }
+    await editor.click('[data-role="save"]');
+    list = await waitVault(editor, (l) => byIssuer(l, 'Acme Mail')?.iconImage?.startsWith('data:image/'), '계정 그림 저장');
+    const saved = byIssuer(list, 'Acme Mail')?.iconImage ?? '';
+    if (saved.length > 32768) problems.push(`그림이 너무 큼: ${saved.length}`);
+    const shape = await editor.evaluate(async (src) => {
+      const img = new Image();
+      img.src = src;
+      await img.decode();
+      const c = document.createElement('canvas');
+      c.width = img.naturalWidth;
+      c.height = img.naturalHeight;
+      const x = c.getContext('2d');
+      x.drawImage(img, 0, 0);
+      const left = x.getImageData(8, 32, 1, 1).data;
+      const right = x.getImageData(56, 32, 1, 1).data;
+      return { w: img.naturalWidth, h: img.naturalHeight, left: [...left], right: [...right] };
+    }, saved);
+    if (shape.w !== 64 || shape.h !== 64) problems.push(`그림 크기가 64px 이 아님: ${shape.w}x${shape.h}`);
+    // 가운데 정사각을 잘랐으니 왼쪽은 빨강, 오른쪽은 파랑.
+    if (!(shape.left[0] > 150 && shape.left[2] < 80 && shape.right[2] > 150 && shape.right[0] < 80)) {
+      problems.push(`그림 가운데 자르기가 다름: ${shape.left} / ${shape.right}`);
+    }
+    await editor.waitForSelector(`[data-account-id="${acmeId}"] .account-icon.img-tile img`, { timeout: 5000 })
+      .catch(() => problems.push('관리 목록에 그림이 안 보임'));
+    await popup.waitForSelector(`[data-account-id="${acmeId}"] .tile.img-tile img`, { timeout: 5000 })
+      .catch(() => problems.push('팝업 타일에 그림이 안 보임'));
+    // 그림 없는 다른 줄에도 타일 자리가 생긴다(이니셜 타일 꺼짐).
+    const gap = await popup.$$eval('.row.no-tile', (els) => els.length);
+    if (gap !== 0) problems.push(`그림 계정이 있는데 타일 자리가 없는 줄: ${gap}`);
+    await editor.click(`[data-role="account-row"][data-account-id="${acmeId}"]`);
+    await editor.waitForSelector('[data-icon-id="key"]', { visible: true });
+    await editor.click('[data-icon-id="key"]');
+    if (await editor.$('[data-icon-id="image"]')) problems.push('내장 아이콘을 골라도 내 그림 칸이 남음');
+    await editor.click('[data-role="save"]');
+    list = await waitVault(editor, (l) => byIssuer(l, 'Acme Mail')?.iconImage === undefined, '그림 지우기');
+    if (byIssuer(list, 'Acme Mail')?.iconId !== 'key') problems.push('그림을 지우며 고른 내장 아이콘이 저장되지 않음');
   } catch (error) {
     problems.push(`시나리오 오류: ${error instanceof Error ? error.message : String(error)}`);
   } finally {

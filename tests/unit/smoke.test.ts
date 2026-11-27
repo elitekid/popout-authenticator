@@ -76,6 +76,19 @@ describe('i18n', () => {
     expect(pickLanguage('auto', 'fr-CA')).toBe('fr');
     expect(pickLanguage('auto', 'xx')).toBe('en');
     expect(pickLanguage('auto', undefined)).toBe('en');
+    // 1.0.5: 번체·옛 코드·지역 변형
+    expect(pickLanguage('auto', 'zh-TW')).toBe('zh-TW');
+    expect(pickLanguage('auto', 'zh-HK')).toBe('zh-TW');
+    expect(pickLanguage('auto', 'zh-Hant')).toBe('zh-TW');
+    expect(pickLanguage('auto', 'zh-Hans-HK')).toBe('zh');
+    expect(pickLanguage('auto', 'zh-CN')).toBe('zh');
+    expect(pickLanguage('auto', 'zh')).toBe('zh');
+    expect(pickLanguage('zh-TW')).toBe('zh-TW');
+    expect(pickLanguage('auto', 'nb-NO')).toBe('no');
+    expect(pickLanguage('auto', 'iw')).toBe('he');
+    expect(pickLanguage('auto', 'fil-PH')).toBe('fil');
+    expect(pickLanguage('auto', 'tl')).toBe('fil');
+    expect(pickLanguage('auto', 'ur-PK')).toBe('ur');
   });
 });
 

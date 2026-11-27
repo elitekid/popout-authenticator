@@ -3,6 +3,11 @@ import jsQR from 'jsqr';
 
 export type Rgba = { data: Uint8ClampedArray; width: number; height: number };
 
+// 인증 계정을 넣는 QR(otpauth 링크·Google 내보내기)인가.
+export const isAuthenticatorQr = (text: string): boolean => /^\s*otpauth(-migration)?:\/\//i.test(text);
+// Microsoft 계정 설정 화면이 먼저 보여 주는 자기 앱 전용 QR. 같은 화면의 다른 링크 뒤에 일반 QR 이 있다.
+export const isMicrosoftQr = (text: string): boolean => /^\s*phonefactor:\/\//i.test(text);
+
 // 큰 그림에서 못 읽을 때 줄여 보는 긴 변 크기(내림차순).
 const TARGET_SIZES = [2000, 1600, 1024, 640];
 

@@ -57,6 +57,7 @@ export async function runResetScenario(session) {
   const problems = [];
   const pages = [];
   const dir = session.downloadDir ?? fs.mkdtempSync('/tmp/otp-e2e-reset-dl-');
+  let wrongDir;
 
   try {
     const vault = await makeNoneVault([fakeAccount()]);
@@ -107,7 +108,7 @@ export async function runResetScenario(session) {
     if (!(await runDisabled(page))) problems.push('파일을 확인하지 않았는데 초기화 단추가 눌릴 수 있음');
 
     // 틀린 파일이면 막힌 채 mismatch 가 보여야 한다.
-    const wrongDir = fs.mkdtempSync('/tmp/otp-e2e-wrong-');
+    wrongDir = fs.mkdtempSync('/tmp/otp-e2e-wrong-');
     const wrong = `${wrongDir}/wrong.json`;
     fs.writeFileSync(wrong, `${fs.readFileSync(saved, 'utf8')} `);
     await uploadFixture(await page.$('[data-role="reset-backup-file"]'), wrong, session);
@@ -172,6 +173,9 @@ export async function runResetScenario(session) {
         // 이미 닫힘
       }
     }
+    // 이 시나리오가 만든 임시 폴더만 지운다(브라우저 내려받기 폴더는 프로필과 함께 지워진다).
+    if (!session.downloadDir) fs.rmSync(dir, { recursive: true, force: true });
+    if (wrongDir) fs.rmSync(wrongDir, { recursive: true, force: true });
   }
   return problems;
 }

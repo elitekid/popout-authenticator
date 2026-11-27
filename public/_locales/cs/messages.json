@@ -1,0 +1,29 @@
+{
+  "appName": { "message": "Popout Authenticator — kódy 2FA a OTP" },
+  "appShortName": { "message": "Popout Authenticator" },
+  "appDesc": { "message": "Open-source ověřovač 2FA. Jednorázové kódy ve vyskakovacím okně, samostatném okně či postranním panelu, se zámkem a importem záloh." },
+  "cmdExecuteAction": { "message": "Otevřít vyskakovací okno" },
+  "cmdQuickFill": { "message": "Vyplnit kód 2FA na této stránce" },
+  "cmdScanQr": { "message": "Naskenovat QR kód na obrazovce" },
+  "cmdAutofill": { "message": "Vyplnit kód nejlépe odpovídajícího účtu" },
+  "cmdHideCodes": { "message": "Skrýt nebo zobrazit kódy" },
+  "cmdOpenWindow": { "message": "Otevřít v samostatném okně" },
+  "menuOpenWindow": { "message": "Otevřít v samostatném okně" },
+  "menuQuickFill": { "message": "Vyplnit kód 2FA" },
+  "menuQuickCopy": { "message": "Kopírovat kód 2FA pro tento web" },
+  "fillCopied": { "message": "Kód zkopírován. Vložte ho do pole pro zadání." },
+  "fillManual": {
+    "message": "Kód: $CODE$",
+    "placeholders": { "code": { "content": "$1" } }
+  },
+  "cmdCopyPinned1": { "message": "Kopírovat kód důležitého účtu 1" },
+  "cmdCopyPinned2": { "message": "Kopírovat kód důležitého účtu 2" },
+  "cmdCopyPinned3": { "message": "Kopírovat kód důležitého účtu 3" },
+  "shortcutCopied": { "message": "Kód zkopírován." },
+  "shortcutLocked": { "message": "Nejprve odemkněte Popout Authenticator." },
+  "shortcutMissing": { "message": "Pro tuto zkratku není žádný důležitý účet." },
+  "shortcutSiteWarn": { "message": "Nezkopírováno: adresa této stránky vypadá jako napodobenina webu účtu. Pokud jste si jisti, že je pravá, kopírujte z okna rozšíření." },
+  "shortcutFailed": { "message": "Kód nelze zkopírovat." },
+  "fillPickAccount": { "message": "Vyberte účet." },
+  "fieldFillButton": { "message": "Vyplnit kód" }
+}

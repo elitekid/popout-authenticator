@@ -26,16 +26,19 @@ export async function sizePage(page, viewport) {
   }, viewport);
 }
 
+// file 은 경로 하나나 여러 개.
 export async function uploadFixture(input, file, session) {
-  if (session.browserName !== 'firefox') return input.uploadFile(file);
-  const data = await fs.readFile(file);
-  await input.evaluate((element, { name, bytes }) => {
+  const list = Array.isArray(file) ? file : [file];
+  if (session.browserName !== 'firefox') return input.uploadFile(...list);
+  const items = [];
+  for (const f of list) items.push({ name: path.basename(f), bytes: [...(await fs.readFile(f))] });
+  await input.evaluate((element, items) => {
     const files = new DataTransfer();
-    files.items.add(new File([new Uint8Array(bytes)], name, { type: 'application/json' }));
+    for (const { name, bytes } of items) files.items.add(new File([new Uint8Array(bytes)], name, { type: 'application/json' }));
     element.files = files.files;
     element.dispatchEvent(new Event('input', { bubbles: true }));
     element.dispatchEvent(new Event('change', { bubbles: true }));
-  }, { name: path.basename(file), bytes: [...data] });
+  }, items);
 }
 
 export async function launchWithExtension({ chromePath, distDir, extraArgs = [], browserName = 'chrome' }) {

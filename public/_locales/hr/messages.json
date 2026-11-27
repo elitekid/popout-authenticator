@@ -1,0 +1,45 @@
+{
+  "appName": { "message": "Popout Authenticator — 2FA i OTP kodovi" },
+  "appShortName": { "message": "Popout Authenticator" },
+  "appDesc": { "message": "2FA autentifikator otvorenog koda. Jednokratni kodovi u skočnom prozoru ili bočnoj ploči, uz lozinku i uvoz kopija." },
+  "cmdExecuteAction": { "message": "Otvori skočni prozor" },
+  "cmdQuickFill": { "message": "Unesi 2FA kôd na ovoj stranici" },
+  "cmdScanQr": { "message": "Skeniraj QR kôd na zaslonu" },
+  "cmdAutofill": { "message": "Unesi kôd računa koji najbolje odgovara" },
+  "cmdHideCodes": { "message": "Sakrij ili prikaži kodove" },
+  "cmdOpenWindow": { "message": "Otvori u zasebnom prozoru" },
+  "menuOpenWindow": { "message": "Otvori u zasebnom prozoru" },
+  "menuQuickFill": { "message": "Unesi 2FA kôd" },
+  "menuQuickCopy": { "message": "Kopiraj 2FA kôd za ovu web-lokaciju" },
+  "fillCopied": { "message": "Kôd je kopiran. Zalijepite ga u polje za unos." },
+  "fillManual": {
+    "message": "Kôd: $CODE$",
+    "placeholders": { "code": { "content": "$1" } }
+  },
+  "cmdCopyPinned1": {
+    "message": "Kopiraj kôd važnog računa 1"
+  },
+  "cmdCopyPinned2": {
+    "message": "Kopiraj kôd važnog računa 2"
+  },
+  "cmdCopyPinned3": {
+    "message": "Kopiraj kôd važnog računa 3"
+  },
+  "shortcutCopied": {
+    "message": "Kôd je kopiran."
+  },
+  "shortcutLocked": {
+    "message": "Najprije otključajte Popout Authenticator."
+  },
+  "shortcutMissing": {
+    "message": "Za ovaj prečac nema važnog računa."
+  },
+  "shortcutSiteWarn": {
+    "message": "Nije kopirano: adresa ove stranice nalikuje lažnoj inačici web-lokacije računa. Ako ste sigurni da je prava, kopirajte iz prozora proširenja."
+  },
+  "shortcutFailed": {
+    "message": "Kôd nije moguće kopirati."
+  },
+  "fillPickAccount": { "message": "Odaberite račun." },
+  "fieldFillButton": { "message": "Unesi kôd" }
+}

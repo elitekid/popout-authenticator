@@ -1,0 +1,29 @@
+{
+  "appName": { "message": "Popout Authenticator — 2FA ir OTP kodai" },
+  "appShortName": { "message": "Popout Authenticator" },
+  "appDesc": { "message": "Atvirojo kodo 2FA autentifikatorius. Vienkartiniai kodai iššokančiajame lange ar šoniniame skydelyje, su užraktu ir kopijų importu." },
+  "cmdExecuteAction": { "message": "Atidaryti iššokantįjį langą" },
+  "cmdQuickFill": { "message": "Įrašyti 2FA kodą šiame puslapyje" },
+  "cmdScanQr": { "message": "Nuskaityti QR kodą ekrane" },
+  "cmdAutofill": { "message": "Įrašyti geriausiai atitinkančios paskyros kodą" },
+  "cmdHideCodes": { "message": "Slėpti arba rodyti kodus" },
+  "cmdOpenWindow": { "message": "Atidaryti atskirame lange" },
+  "menuOpenWindow": { "message": "Atidaryti atskirame lange" },
+  "menuQuickFill": { "message": "Įrašyti 2FA kodą" },
+  "menuQuickCopy": { "message": "Kopijuoti šios svetainės 2FA kodą" },
+  "fillCopied": { "message": "Kodas nukopijuotas. Įklijuokite jį į įvesties lauką." },
+  "fillManual": {
+    "message": "Kodas: $CODE$",
+    "placeholders": { "code": { "content": "$1" } }
+  },
+  "cmdCopyPinned1": { "message": "Kopijuoti 1-osios svarbios paskyros kodą" },
+  "cmdCopyPinned2": { "message": "Kopijuoti 2-osios svarbios paskyros kodą" },
+  "cmdCopyPinned3": { "message": "Kopijuoti 3-iosios svarbios paskyros kodą" },
+  "shortcutCopied": { "message": "Kodas nukopijuotas." },
+  "shortcutLocked": { "message": "Pirmiausia atrakinkite Popout Authenticator." },
+  "shortcutMissing": { "message": "Šiam spartiajam klavišui nepriskirta svarbi paskyra." },
+  "shortcutSiteWarn": { "message": "Nenukopijuota: šio puslapio adresas atrodo kaip netikra paskyros svetainės kopija. Jei esate tikri, kad svetainė tikra, kopijuokite iš plėtinio lango." },
+  "shortcutFailed": { "message": "Nepavyko nukopijuoti kodo." },
+  "fillPickAccount": { "message": "Pasirinkite paskyrą." },
+  "fieldFillButton": { "message": "Įrašyti kodą" }
+}

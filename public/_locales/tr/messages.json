@@ -10,6 +10,7 @@
   "cmdOpenWindow": { "message": "Ayrı pencerede aç" },
   "menuOpenWindow": { "message": "Ayrı pencerede aç" },
   "menuQuickFill": { "message": "2FA kodunu doldur" },
+  "menuQuickCopy": { "message": "Bu sitenin 2FA kodunu kopyala" },
   "fillCopied": { "message": "Kod kopyalandı. Kodu siteye yapıştırın." },
   "fillManual": {
     "message": "Kod: $CODE$",
@@ -32,6 +33,9 @@
   },
   "shortcutMissing": {
     "message": "Bu kısayol için yıldızlı hesap yok."
+  },
+  "shortcutSiteWarn": {
+    "message": "Kopyalanmadı: bu sayfanın adresi hesabın sitesinin sahtesi gibi görünüyor. Gerçek olduğundan eminseniz uzantı penceresinden kopyalayın."
   },
   "shortcutFailed": {
     "message": "Kod kopyalanamadı."

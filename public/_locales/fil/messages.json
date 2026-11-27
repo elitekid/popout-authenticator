@@ -1,0 +1,29 @@
+{
+  "appName": { "message": "Popout Authenticator — Mga 2FA at OTP Code" },
+  "appShortName": { "message": "Popout Authenticator" },
+  "appDesc": { "message": "Open-source na 2FA authenticator. Mga one-time code sa popup, window o side panel, may password lock at pag-import ng backup." },
+  "cmdExecuteAction": { "message": "Buksan ang popup" },
+  "cmdQuickFill": { "message": "Punan ang 2FA code sa page na ito" },
+  "cmdScanQr": { "message": "I-scan ang QR code sa screen" },
+  "cmdAutofill": { "message": "Punan ang code ng pinakatugmang account" },
+  "cmdHideCodes": { "message": "Itago o ipakita ang mga code" },
+  "cmdOpenWindow": { "message": "Buksan sa hiwalay na window" },
+  "menuOpenWindow": { "message": "Buksan sa hiwalay na window" },
+  "menuQuickFill": { "message": "Punan ang 2FA code" },
+  "menuQuickCopy": { "message": "Kopyahin ang 2FA code ng site na ito" },
+  "fillCopied": { "message": "Nakopya ang code. I-paste ito sa input field." },
+  "fillManual": {
+    "message": "Code: $CODE$",
+    "placeholders": { "code": { "content": "$1" } }
+  },
+  "cmdCopyPinned1": { "message": "Kopyahin ang code ng mahalagang account 1" },
+  "cmdCopyPinned2": { "message": "Kopyahin ang code ng mahalagang account 2" },
+  "cmdCopyPinned3": { "message": "Kopyahin ang code ng mahalagang account 3" },
+  "shortcutCopied": { "message": "Nakopya ang code." },
+  "shortcutLocked": { "message": "I-unlock muna ang Popout Authenticator." },
+  "shortcutMissing": { "message": "Walang mahalagang account para sa shortcut na ito." },
+  "shortcutSiteWarn": { "message": "Hindi nakopya: mukhang ginagaya ng address ng page na ito ang site ng account. Kung sigurado kang totoong site ito, kopyahin mula sa window ng extension." },
+  "shortcutFailed": { "message": "Hindi makopya ang code." },
+  "fillPickAccount": { "message": "Pumili ng account." },
+  "fieldFillButton": { "message": "Punan ang code" }
+}

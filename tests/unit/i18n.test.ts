@@ -20,9 +20,9 @@ const files = import.meta.glob<{ messages: Record<string, string> }>('../../src/
 const locales = import.meta.glob<Record<string, unknown>>('../../public/_locales/*/messages.json', { import: 'default', eager: true });
 
 describe('다국어', () => {
-  it('_locales 20개 폴더가 en 의 키를 모두 가진다', () => {
+  it('_locales 43개 폴더가 en 의 키를 모두 가진다', () => {
     const entries = Object.entries(locales);
-    expect(entries).toHaveLength(20);
+    expect(entries).toHaveLength(43);
     const enKeys = Object.keys(locales['../../public/_locales/en/messages.json']!);
     for (const [path, messages] of entries) {
       for (const key of enKeys) expect(messages, `${path} ${key}`).toHaveProperty(key);
@@ -35,6 +35,7 @@ describe('다국어', () => {
       expect(en(key), `en ${key}`).not.toBe(key);
       expect(params(en(key)), `en ${key} 자리 표시`).toBe(params(ko[key]!));
     }
+    expect(LANGS).toHaveLength(43);
     for (const [lang] of LANGS) {
       if (lang === 'en' || lang === 'ko') continue;
       const file = files[`../../src/i18n/${lang}/messages.ts`];

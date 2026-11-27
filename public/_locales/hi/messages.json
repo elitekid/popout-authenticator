@@ -10,6 +10,7 @@
   "cmdOpenWindow": { "message": "अलग विंडो में खोलें" },
   "menuOpenWindow": { "message": "अलग विंडो में खोलें" },
   "menuQuickFill": { "message": "2FA कोड भरें" },
+  "menuQuickCopy": { "message": "इस साइट का 2FA कोड कॉपी करें" },
   "fillCopied": { "message": "कोड कॉपी हो गया। इसे साइट पर चिपकाएँ।" },
   "fillManual": {
     "message": "कोड: $CODE$",
@@ -32,6 +33,9 @@
   },
   "shortcutMissing": {
     "message": "इस शॉर्टकट के लिए कोई स्टार वाला खाता नहीं है।"
+  },
+  "shortcutSiteWarn": {
+    "message": "कॉपी नहीं किया गया: इस पेज का पता खाते की साइट की नकल जैसा दिखता है। अगर आपको पक्का पता है कि यह असली है, तो एक्सटेंशन विंडो से कॉपी करें।"
   },
   "shortcutFailed": {
     "message": "कोड कॉपी नहीं हो सका।"

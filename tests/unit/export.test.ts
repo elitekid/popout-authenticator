@@ -94,6 +94,29 @@ describe('own backup', () => {
     expect(imported.meta?.map((m) => m.iconId)).toEqual(['bank', undefined, 'xyz']);
   });
 
+  it('keeps a valid iconImage and drops a malformed one without losing the account', async () => {
+    const png = 'data:image/png;base64,iVBORw0KGgo=';
+    const input = [
+      account(1, { issuer: 'Acme Mail', secret: decodeBase32('JBSWY3DPEHPK3PXP'), iconImage: png }),
+      account(2, { issuer: 'Wingtip Cloud', secret: decodeBase32('KRUGS4ZANFZSAYJAMZQWWZJAONSWG4TF'), iconImage: 'data:image/svg+xml;base64,PHN2Zz4=' }),
+    ];
+    const text = buildPlainBackup(input);
+    const stored = JSON.parse(text).accounts;
+    expect(stored[0].iconImage).toBe(png);
+    expect(stored[1]).not.toHaveProperty('iconImage');
+    // 손으로 고친 파일: 바깥 주소·너무 긴 값·svg 는 그림만 빠진다.
+    for (const bad of ['https://example.com/a.png', `data:image/png;base64,${'A'.repeat(40000)}`, 'data:image/svg+xml;base64,PHN2Zz4=', 'javascript:alert(1)']) {
+      stored[1].iconImage = bad;
+      const out = await readOwnBackup(JSON.stringify({ ...JSON.parse(text), accounts: stored }));
+      expect(out).toHaveLength(2);
+      expect(out[1]).not.toHaveProperty('iconImage');
+    }
+    const out = await readOwnBackup(text);
+    expect(out[0]!.iconImage).toBe(png);
+    const imported = await importText(text);
+    expect(imported.meta?.map((m) => m.iconImage)).toEqual([png, undefined]);
+  });
+
   it('round-trips an encrypted file and hides the contents', async () => {
     const input = sample();
     const text = await buildEncryptedBackup(input, 'fake-pass-1234', FAST);

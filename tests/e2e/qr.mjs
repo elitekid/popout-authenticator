@@ -1,14 +1,28 @@
 // QR 시나리오: 그림 붙여넣기(Google 내보내기 QR 2개 계정), 카메라(가짜 영상, 묶음 2장 12개 계정).
 import fs from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
+import qrcode from 'qrcode-generator';
 
 const FIXTURE = fileURLToPath(new URL('../fixtures/migration-qr.png', import.meta.url));
+
+// 가짜 값(Microsoft 계정 설정 화면의 자기 앱 전용 QR 모양).
+const MICROSOFT_QR = 'phonefactor://activate_account?code=000000000&url=https://example.invalid/activate';
 
 // 가짜 카메라가 차례로 보여 줄 Google 내보내기 링크(가짜 계정 12개, 2장).
 export const CAMERA_LINKS = [
   'otpauth-migration://offline?data=Ci8KCkhlbGxvId6tvhASFEZha2UxOnFyQGV4YW1wbGUuY29tGgVGYWtlMSABKAEwAgovCgpIZWxsbyHerb4REhRGYWtlMjpxckBleGFtcGxlLmNvbRoFRmFrZTIgASgBMAIKLwoKSGVsbG8h3q2%2BEhIURmFrZTM6cXJAZXhhbXBsZS5jb20aBUZha2UzIAEoATACCi8KCkhlbGxvId6tvhMSFEZha2U0OnFyQGV4YW1wbGUuY29tGgVGYWtlNCABKAEwAgovCgpIZWxsbyHerb4UEhRGYWtlNTpxckBleGFtcGxlLmNvbRoFRmFrZTUgASgBMAIKLwoKSGVsbG8h3q2%2BFRIURmFrZTY6cXJAZXhhbXBsZS5jb20aBUZha2U2IAEoATACCi8KCkhlbGxvId6tvhYSFEZha2U3OnFyQGV4YW1wbGUuY29tGgVGYWtlNyABKAEwAgovCgpIZWxsbyHerb4XEhRGYWtlODpxckBleGFtcGxlLmNvbRoFRmFrZTggASgBMAIKLwoKSGVsbG8h3q2%2BGBIURmFrZTk6cXJAZXhhbXBsZS5jb20aBUZha2U5IAEoATACCjEKCkhlbGxvId6tvhkSFUZha2UxMDpxckBleGFtcGxlLmNvbRoGRmFrZTEwIAEoATACEAEYAiAAKJIh',
   'otpauth-migration://offline?data=CjEKCkhlbGxvId6tvhoSFUZha2UxMTpxckBleGFtcGxlLmNvbRoGRmFrZTExIAEoATACCjEKCkhlbGxvId6tvhsSFUZha2UxMjpxckBleGFtcGxlLmNvbRoGRmFrZTEyIAEoATACEAEYAiABKJIh',
+  // 가짜 Microsoft 전용 QR. 카메라는 여기서 멈추고 안내를 보여야 한다.
+  MICROSOFT_QR,
 ];
+
+// 문자열을 QR GIF(base64)로 만든다.
+function qrGifBase64(text) {
+  const qr = qrcode(0, 'L');
+  qr.addData(text);
+  qr.make();
+  return qr.createDataURL(8, 32).replace(/^data:image\/gif;base64,/, '');
+}
 
 export async function runQrScenario(session, screenshotDir) {
   const { browser, extensionId } = session;
@@ -98,6 +112,17 @@ export async function runQrScenario(session, screenshotDir) {
     await paste.waitForFunction(() => document.querySelector('[data-role="result"]')?.getAttribute('data-duplicates') === '2');
     const duplicateAdded = await paste.$eval('[data-role="result"]', (el) => el.getAttribute('data-added'));
     if (duplicateAdded !== '0' || await paste.$('[data-role="verify-toggle"]')) problems.push('중복만 읽었는데 추가/코드 확인을 표시함');
+    // Microsoft 전용 QR 그림은 '인증 QR 아님' 대신 다른 QR 을 띄우라는 안내로 실패 줄을 남긴다.
+    await paste.evaluate((b64) => {
+      const dt = new DataTransfer();
+      dt.items.add(new File([Uint8Array.from(atob(b64), (c) => c.charCodeAt(0))], 'microsoft.gif', { type: 'image/gif' }));
+      document.dispatchEvent(new ClipboardEvent('paste', { clipboardData: dt, bubbles: true, cancelable: true }));
+    }, qrGifBase64(MICROSOFT_QR));
+    await paste.waitForFunction(() => document.querySelector('[data-role="result"]')?.getAttribute('data-failed') === '1', { timeout: 10000 });
+    const msText = await paste.$eval('[data-role="result"] .add-result-failures', (el) => el.textContent ?? '');
+    if (!msText.includes('microsoft.gif') || !msText.includes('Microsoft Authenticator')) {
+      problems.push(`붙여넣기: Microsoft QR 안내가 없음(${msText.slice(0, 120)})`);
+    }
     // 완료하면 작업 창이 닫히고 window.html 로 바뀌지 않는다.
     const closed = new Promise((resolve) => paste.once('close', resolve));
     await paste.click('[data-role="add-done"]');
@@ -131,6 +156,17 @@ export async function runQrScenario(session, screenshotDir) {
       { timeout: 10000 },
     );
     if (await cam.$('[data-role="verify-row"]')) problems.push('카메라 스캔 중 코드 확인 목록이 기본 표시됨');
+    // 영상의 마지막 Microsoft QR 에서 카메라가 멈추고 안내와 다시 스캔 단추를 보인다.
+    await cam.waitForSelector('[data-role="camera"][data-halt="microsoft"] [data-role="camera-halt"]', { timeout: 15000 });
+    if (await cam.$('.camera-video')) problems.push('Microsoft QR 에서 멈춘 뒤에도 카메라 영상이 남음');
+    if (screenshotDir) await cam.screenshot({ path: `${screenshotDir}/qr-camera-microsoft-320.png` });
+    await cam.click('[data-role="camera-again"]');
+    await cam.waitForSelector('[data-role="camera"]:not([data-halt]) .camera-video', { timeout: 5000 });
+    // 다시 스캔해도 같은 Microsoft QR 이면 다시 멈춘다(앞서 읽은 내보내기 QR 은 중복으로만 센다).
+    await cam.waitForSelector('[data-role="camera"][data-halt="microsoft"]', { timeout: 20000 });
+    if (await cam.$eval('[data-role="result"]', (el) => el.getAttribute('data-added')) !== '12') {
+      problems.push('다시 스캔 뒤 추가 수가 바뀜');
+    }
     await cam.click('[data-role="camera-stop"]');
     await cam.click('[data-role="verify-toggle"]');
     await cam.waitForSelector('[data-role="verify-row"]');
@@ -198,6 +234,27 @@ export async function runQrScenario(session, screenshotDir) {
       return JSON.stringify(file ?? '').length > 2;
     });
     if (!added) problems.push('화면 선택으로 계정이 저장되지 않음');
+
+    // Microsoft 전용 QR 화면: 'QR 을 못 찾음' 대신 다른 QR 을 띄우라는 안내, 탭은 남는다.
+    const ms = await openDisplayTab();
+    await ms.evaluate((b64) => {
+      navigator.mediaDevices.getDisplayMedia = async () => {
+        const img = new Image();
+        img.src = `data:image/gif;base64,${b64}`;
+        await img.decode();
+        const canvas = document.createElement('canvas');
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        const draw = () => canvas.getContext('2d').drawImage(img, 0, 0);
+        draw();
+        setInterval(draw, 100);
+        return canvas.captureStream(10);
+      };
+    }, qrGifBase64(MICROSOFT_QR));
+    await ms.click('[data-role="capture-choose"]');
+    await ms.waitForSelector('[data-role="capture-hint"][data-missed="microsoft"]', { timeout: 10000 });
+    await ms.close();
+    pages.pop();
 
     // 거절: NotAllowedError → 안내 문구와 닫기 단추, 닫으면 원래 탭으로 복귀
     const denied = await openDisplayTab();

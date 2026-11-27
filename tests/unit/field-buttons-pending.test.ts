@@ -119,6 +119,26 @@ describe('대기 중인 단추 설정', () => {
     expect(applyPatch).toHaveBeenCalledWith('a1', { iconId: 'mail' });
   });
 
+  it('iconImage 는 형식이 맞는 값만 대기 항목에서 받고 null 이면 지운다', async () => {
+    const png = 'data:image/png;base64,iVBORw0KGgo=';
+    const account = {
+      id: 'a1', issuer: 'Acme Mail', label: 'alex@example.com', note: '', matchHosts: [], pinned: false,
+      algorithm: 'SHA-1', digits: 6, period: 30, updatedAt: 1, iconImage: png,
+    } as unknown as Account;
+    const cleared = applyAccountEditPatch(account, { iconImage: null }, 5);
+    expect('iconImage' in cleared).toBe(false);
+    expect(applyAccountEditPatch(account, { iconImage: png }, 9)).toBe(account);
+    await addPendingFieldButton('a1', ['example.com'], ['https://*.example.com/*'], 1000, { iconImage: null });
+    await addPendingFieldButton('b1', ['example.org'], ['https://*.example.org/*'], 1000,
+      { iconImage: 'https://example.org/x.png' as unknown as string });
+    granted.add('https://*.example.com/*');
+    granted.add('https://*.example.org/*');
+    const applyPatch = vi.fn(async () => true);
+    await applyPendingFieldButtons(3000, applyPatch);
+    expect(applyPatch).toHaveBeenCalledWith('a1', { iconImage: null });
+    expect(applyPatch).toHaveBeenCalledWith('b1', {});
+  });
+
   it('거절된 앞 계정의 대기는 같은 사이트를 다른 계정이 허용해도 켜지지 않는다', async () => {
     await addPendingFieldButton('a1', ['example.com'], ['https://*.example.com/*'], 1000);
     await addPendingFieldButton('b1', ['example.com'], ['https://*.example.com/*'], 2000);

@@ -20,5 +20,6 @@ export const reset = {
   'advisor.password': '비밀번호로 잠금을 설정해 주세요.',
   'advisor.backup': '백업 파일을 저장해 주세요.',
   'advisor.sync': '동기화를 켜면 같은 브라우저 계정의 다른 기기에서도 사용할 수 있습니다.',
+  'advisor.siteWarn': '가짜 사이트 경고를 켜면 계정 사이트를 흉내 낸 로그인 페이지에 코드를 넘기기 전에 알려 줍니다.',
   'advisor.suggestions': '사이트 추천을 켜면 현재 사이트에 맞는 계정을 쉽게 찾을 수 있습니다.',
 };

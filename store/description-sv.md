@@ -1,7 +1,7 @@
 # Butiksinformation — Svenska
 
 ## Namn (manifest appName, 1.0.1)
-Popout Authenticator
+Popout Authenticator — 2FA-autentiserare
 
 ## Sammanfattning (manifest appDesc, högst 132 tecken)
 2FA-autentiserare för din webbläsare. Skapar engångskoder och öppnas som popup eller separat fönster.
@@ -15,15 +15,16 @@ Popout Authenticator visar dina engångskoder för tvåfaktorsautentisering (2FA
 - Importera säkerhetskopian från tillägget Authenticator (authenticator.cc), även lösenordsskyddade säkerhetskopior.
 - Kompatibel med export-QR-koder från Google Authenticator™.
 - Importera okrypterade säkerhetskopior från andra autentiseringsappar samt filer i standardformatet Credential Exchange (CXF). Appar som stöds (på engelska): https://elitekid.github.io/popout-authenticator/guides/from-authy-and-other-apps/
-- Krypterade säkerhetskopior från vissa appar går inte att öppna här. Exportera då först en okrypterad säkerhetskopia i den appen.
+- Öppna lösenordsskyddade säkerhetskopior från vissa appar med deras lösenord. För appar vars krypterade säkerhetskopior inte går att öppna här exporterar du först en okrypterad säkerhetskopia i den appen.
 
 **Öppna det där du behöver det**
 - Använd verktygsfältets popup, ett separat fönster eller sidopanelen (sidofältet i Firefox).
 - Sökning per fält eller med flera ord, sortering A–Ö, grupper, fästa konton, ikoner och en kompakt vy håller långa listor överskådliga.
-- Se vilket konto som hör till webbplatsen du är på och fyll i koden med ett klick, ett högerklick eller ett kortkommando.
+- Se vilket konto som hör till webbplatsen du är på och fyll i koden med ett klick, ett högerklick eller ett kortkommando. Högerklicka var som helst på en sida för att kopiera webbplatsens kod.
 - Globala kortkommandon kopierar koderna för dina tre första viktiga konton, även när webbläsaren ligger i bakgrunden (Chrome, Edge, Whale).
 - Valfria knappar bredvid kodfält på webbplatser du väljer.
-- Markera flera konton och flytta dem till papperskorgen tillsammans, byt namn på eller dela upp en hel grupp på en gång och kopiera ett kontos namn.
+- Markera flera konton och flytta dem till en annan grupp eller till papperskorgen tillsammans, och ångra direkt. Byt namn på eller dela upp en hel grupp på en gång och kopiera ett kontos namn.
+- Använd en egen bild som ikon för ett konto. Den stannar på den här enheten.
 
 **Lägg till konton som du vill**
 - Skanna en QR-kod från aktuell flik, från en annan apps fönster, med kameran, från en bild eller från urklipp.
@@ -34,6 +35,7 @@ Popout Authenticator visar dina engångskoder för tvåfaktorsautentisering (2FA
 - Konton lagras på din enhet i ett valv som krypteras med AES-256-GCM. Ange ett lösenord för att skydda dess nyckel: utan lösenord ligger nyckeln på enheten bredvid data.
 - Lås med lösenord (Argon2id), återställningskod och valfri upplåsning med passkey (inte i Firefox). Välj när det låses automatiskt.
 - Kräv vid behov enhetsverifiering innan en kod används (inte i Firefox), och dölj koder med ett kortkommando du väljer.
+- Få en varning innan en kod används på en webbplats vars adress bara liknar kontots webbplats.
 - Kopierade koder kan rensas från urklipp efter 30 sekunder, 1, 2 eller 5 minuter (inte i Safari).
 - Ingen analys, ingen reklam, ingen server hos utvecklaren. Källkoden är öppen.
 
@@ -50,7 +52,7 @@ Popout Authenticator visar dina engångskoder för tvåfaktorsautentisering (2FA
 - Det finns ingen molnsäkerhetskopia som drivs av utvecklaren. Säkerhetskopior är filer som du själv sparar; synkronisering sker via webbläsaren.
 - Upplåsning med passkey och enhetsverifiering finns inte i Firefox. Safari-versionen är endast för macOS.
 
-Finns på 20 språk. Stöder hanterade policyer för organisationer.
+Finns på 43 språk. Stöder hanterade policyer för organisationer.
 
 Popout Authenticator är gjort av en oberoende utvecklare. Det bygger på MIT-licensierad kod och översättningar från tillägget Authenticator (authenticator.cc) och har ingen koppling till dess upphovspersoner.
 

@@ -1,0 +1,29 @@
+{
+  "appName": { "message": "Popout Authenticator — Kod 2FA & OTP" },
+  "appShortName": { "message": "Popout Authenticator" },
+  "appDesc": { "message": "Pengesah 2FA sumber terbuka. Kod OTP di tetingkap timbul, tetingkap sendiri atau panel sisi, kunci kata laluan dan import sandaran." },
+  "cmdExecuteAction": { "message": "Buka tetingkap timbul" },
+  "cmdQuickFill": { "message": "Isi kod 2FA pada halaman ini" },
+  "cmdScanQr": { "message": "Imbas kod QR pada skrin" },
+  "cmdAutofill": { "message": "Isi kod akaun yang paling sepadan" },
+  "cmdHideCodes": { "message": "Sembunyikan atau tunjukkan kod" },
+  "cmdOpenWindow": { "message": "Buka dalam tetingkap berasingan" },
+  "menuOpenWindow": { "message": "Buka dalam tetingkap berasingan" },
+  "menuQuickFill": { "message": "Isi kod 2FA" },
+  "menuQuickCopy": { "message": "Salin kod 2FA untuk tapak ini" },
+  "fillCopied": { "message": "Kod disalin. Tampalkannya ke dalam medan input." },
+  "fillManual": {
+    "message": "Kod: $CODE$",
+    "placeholders": { "code": { "content": "$1" } }
+  },
+  "cmdCopyPinned1": { "message": "Salin kod akaun penting 1" },
+  "cmdCopyPinned2": { "message": "Salin kod akaun penting 2" },
+  "cmdCopyPinned3": { "message": "Salin kod akaun penting 3" },
+  "shortcutCopied": { "message": "Kod disalin." },
+  "shortcutLocked": { "message": "Buka kunci Popout Authenticator dahulu." },
+  "shortcutMissing": { "message": "Tiada akaun penting untuk pintasan ini." },
+  "shortcutSiteWarn": { "message": "Tidak disalin: alamat halaman ini kelihatan seperti meniru tapak akaun tersebut. Jika anda pasti ini tapak sebenar, salin daripada tetingkap sambungan." },
+  "shortcutFailed": { "message": "Tidak dapat menyalin kod." },
+  "fillPickAccount": { "message": "Pilih akaun." },
+  "fieldFillButton": { "message": "Isi kod" }
+}

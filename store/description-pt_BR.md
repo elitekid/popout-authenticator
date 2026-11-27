@@ -15,15 +15,16 @@ O Popout Authenticator mostra seus códigos de uso único de verificação em du
 - Importa o arquivo de backup da extensão Authenticator (authenticator.cc), inclusive backups protegidos por senha.
 - Compatível com os QR codes de exportação do Google Authenticator™.
 - Importa backups em texto simples de outros apps autenticadores, além de arquivos no formato padrão de troca de credenciais (CXF). Apps compatíveis (em inglês): https://elitekid.github.io/popout-authenticator/guides/from-authy-and-other-apps/
-- Backups criptografados de alguns apps não podem ser abertos aqui. Nesse caso, exporte antes um backup em texto simples nesse app.
+- Abra backups protegidos por senha de alguns apps com a senha deles. Para apps cujos backups criptografados não podem ser abertos aqui, exporte antes um backup em texto simples nesse app.
 
 **Abra onde você precisar**
 - Use no pop-up da barra de ferramentas, em uma janela separada ou no painel lateral (barra lateral no Firefox).
 - Busca por campo ou com várias palavras, ordem de A a Z, grupos, contas fixadas, ícones e visualização compacta mantêm listas longas organizadas.
-- Mostra primeiro a conta do site em que você está e preenche o código com um clique, pelo menu do botão direito ou com um atalho de teclado.
+- Mostra primeiro a conta do site em que você está e preenche o código com um clique, pelo menu do botão direito ou com um atalho de teclado. Clique com o botão direito em qualquer lugar de uma página para copiar o código desse site.
 - Atalhos globais copiam os códigos das suas três primeiras contas importantes, mesmo com o navegador em segundo plano (Chrome, Edge, Whale).
 - Botões opcionais ao lado dos campos de código nos sites que você escolher.
-- Selecione várias contas para movê-las juntas para a lixeira, renomeie ou desfaça um grupo inteiro de uma vez e copie o nome de uma conta.
+- Selecione várias contas para movê-las juntas para outro grupo ou para a lixeira e desfaça a ação na hora. Renomeie ou desfaça um grupo inteiro de uma vez e copie o nome de uma conta.
+- Use sua própria imagem como ícone de uma conta. Ela fica neste dispositivo.
 
 **Adicione contas do seu jeito**
 - Leia um QR code da aba atual, da janela de outro app, da câmera, de uma imagem ou da área de transferência.
@@ -34,6 +35,7 @@ O Popout Authenticator mostra seus códigos de uso único de verificação em du
 - As contas ficam no seu dispositivo em um cofre criptografado com AES-256-GCM. Defina uma senha para proteger a chave dele: sem senha, a chave fica no dispositivo junto com os dados.
 - Bloqueie com senha (Argon2id), código de recuperação e, se quiser, desbloqueio por chave de acesso (indisponível no Firefox). Escolha quando ele bloqueia automaticamente.
 - Se quiser, exija a verificação do dispositivo antes de usar um código (indisponível no Firefox) e oculte os códigos com um atalho definido por você.
+- Receba um aviso antes de usar um código em um site cujo endereço só se parece com o site da conta.
 - Os códigos copiados podem ser apagados da área de transferência após 30 segundos, 1, 2 ou 5 minutos (indisponível no Safari).
 - Sem análise de uso, sem anúncios, sem servidor do desenvolvedor. O código-fonte é público.
 
@@ -50,7 +52,7 @@ O Popout Authenticator mostra seus códigos de uso único de verificação em du
 - Não há backup na nuvem mantido pelo desenvolvedor. Os backups são arquivos que você guarda; a sincronização usa a do próprio navegador.
 - O desbloqueio por chave de acesso e a verificação do dispositivo não estão disponíveis no Firefox. A versão para Safari é só para macOS.
 
-Disponível em 20 idiomas. Suporta políticas gerenciadas para organizações.
+Disponível em 43 idiomas. Suporta políticas gerenciadas para organizações.
 
 O Popout Authenticator é feito por um desenvolvedor independente. Ele se baseia no código e nas traduções com licença MIT da extensão Authenticator (authenticator.cc) e não tem relação com os autores dela.
 

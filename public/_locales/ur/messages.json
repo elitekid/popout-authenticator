@@ -1,0 +1,29 @@
+{
+  "appName": { "message": "Popout Authenticator — 2FA اور OTP کوڈز" },
+  "appShortName": { "message": "Popout Authenticator" },
+  "appDesc": { "message": "اوپن سورس 2FA تصدیق کنندہ۔ پاپ اپ، ونڈو یا سائیڈ پینل میں ایک بار کے کوڈ، ساتھ میں پاس ورڈ لاک اور بیک اپ درآمد۔" },
+  "cmdExecuteAction": { "message": "پاپ اپ کھولیں" },
+  "cmdQuickFill": { "message": "اس صفحے پر 2FA کوڈ پُر کریں" },
+  "cmdScanQr": { "message": "اسکرین پر QR کوڈ اسکین کریں" },
+  "cmdAutofill": { "message": "سب سے زیادہ مماثل اکاؤنٹ کا کوڈ پُر کریں" },
+  "cmdHideCodes": { "message": "کوڈ چھپائیں یا دکھائیں" },
+  "cmdOpenWindow": { "message": "الگ ونڈو میں کھولیں" },
+  "menuOpenWindow": { "message": "الگ ونڈو میں کھولیں" },
+  "menuQuickFill": { "message": "2FA کوڈ پُر کریں" },
+  "menuQuickCopy": { "message": "اس سائٹ کا 2FA کوڈ کاپی کریں" },
+  "fillCopied": { "message": "کوڈ کاپی ہو گیا۔ اسے ان پٹ خانے میں پیسٹ کریں۔" },
+  "fillManual": {
+    "message": "کوڈ: $CODE$",
+    "placeholders": { "code": { "content": "$1" } }
+  },
+  "cmdCopyPinned1": { "message": "اہم اکاؤنٹ 1 کا کوڈ کاپی کریں" },
+  "cmdCopyPinned2": { "message": "اہم اکاؤنٹ 2 کا کوڈ کاپی کریں" },
+  "cmdCopyPinned3": { "message": "اہم اکاؤنٹ 3 کا کوڈ کاپی کریں" },
+  "shortcutCopied": { "message": "کوڈ کاپی ہو گیا۔" },
+  "shortcutLocked": { "message": "پہلے Popout Authenticator غیر مقفل کریں۔" },
+  "shortcutMissing": { "message": "اس شارٹ کٹ کے لیے کوئی اہم اکاؤنٹ نہیں ہے۔" },
+  "shortcutSiteWarn": { "message": "کاپی نہیں کیا گیا: اس صفحے کا پتہ اکاؤنٹ کی سائٹ کی نقل لگتا ہے۔ اگر آپ کو یقین ہے کہ یہ اصلی ہے تو ایکسٹینشن کی ونڈو سے کاپی کریں۔" },
+  "shortcutFailed": { "message": "کوڈ کاپی نہیں ہو سکا۔" },
+  "fillPickAccount": { "message": "ایک اکاؤنٹ منتخب کریں۔" },
+  "fieldFillButton": { "message": "کوڈ پُر کریں" }
+}

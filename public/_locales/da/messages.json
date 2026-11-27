@@ -1,0 +1,33 @@
+{
+  "appName": { "message": "Popout Authenticator — 2FA- og engangskoder" },
+  "appShortName": { "message": "Popout Authenticator" },
+  "appDesc": { "message": "2FA-godkender med åben kildekode. Engangskoder i pop op, vindue eller sidepanel med adgangskodelås og import af sikkerhedskopier." },
+  "cmdExecuteAction": { "message": "Åbn pop op-vinduet" },
+  "cmdQuickFill": { "message": "Udfyld 2FA-koden på denne side" },
+  "cmdScanQr": { "message": "Scan en QR-kode på skærmen" },
+  "cmdAutofill": { "message": "Udfyld koden for den bedst matchende konto" },
+  "cmdHideCodes": { "message": "Skjul eller vis koder" },
+  "cmdOpenWindow": { "message": "Åbn i et separat vindue" },
+  "menuOpenWindow": { "message": "Åbn i et separat vindue" },
+  "menuQuickFill": { "message": "Udfyld 2FA-kode" },
+  "menuQuickCopy": { "message": "Kopiér 2FA-kode til dette websted" },
+  "fillCopied": { "message": "Koden er kopieret. Indsæt den i indtastningsfeltet." },
+  "fillManual": {
+    "message": "Kode: $CODE$",
+    "placeholders": {
+      "code": {
+        "content": "$1"
+      }
+    }
+  },
+  "cmdCopyPinned1": { "message": "Kopiér koden til vigtig konto 1" },
+  "cmdCopyPinned2": { "message": "Kopiér koden til vigtig konto 2" },
+  "cmdCopyPinned3": { "message": "Kopiér koden til vigtig konto 3" },
+  "shortcutCopied": { "message": "Koden er kopieret." },
+  "shortcutLocked": { "message": "Lås først Popout Authenticator op." },
+  "shortcutMissing": { "message": "Ingen vigtig konto til denne genvej." },
+  "shortcutSiteWarn": { "message": "Ikke kopieret: Sidens adresse ligner en efterligning af kontoens websted. Er du sikker på, at den er ægte, så kopiér fra udvidelsens vindue." },
+  "shortcutFailed": { "message": "Koden kunne ikke kopieres." },
+  "fillPickAccount": { "message": "Vælg en konto." },
+  "fieldFillButton": { "message": "Udfyld kode" }
+}

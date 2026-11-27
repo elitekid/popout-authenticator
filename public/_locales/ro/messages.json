@@ -1,0 +1,29 @@
+{
+  "appName": { "message": "Popout Authenticator — Coduri 2FA și OTP" },
+  "appShortName": { "message": "Popout Authenticator" },
+  "appDesc": { "message": "Autentificator 2FA open source: coduri unice în pop-up, fereastră sau panou lateral, blocare cu parolă, import de copii de rezervă." },
+  "cmdExecuteAction": { "message": "Deschide fereastra pop-up" },
+  "cmdQuickFill": { "message": "Completează codul 2FA pe această pagină" },
+  "cmdScanQr": { "message": "Scanează un cod QR de pe ecran" },
+  "cmdAutofill": { "message": "Completează codul contului cel mai potrivit" },
+  "cmdHideCodes": { "message": "Ascunde sau afișează codurile" },
+  "cmdOpenWindow": { "message": "Deschide într-o fereastră separată" },
+  "menuOpenWindow": { "message": "Deschide într-o fereastră separată" },
+  "menuQuickFill": { "message": "Completează codul 2FA" },
+  "menuQuickCopy": { "message": "Copiază codul 2FA pentru acest site" },
+  "fillCopied": { "message": "Cod copiat. Lipește-l în câmpul de introducere." },
+  "fillManual": {
+    "message": "Cod: $CODE$",
+    "placeholders": { "code": { "content": "$1" } }
+  },
+  "cmdCopyPinned1": { "message": "Copiază codul contului important 1" },
+  "cmdCopyPinned2": { "message": "Copiază codul contului important 2" },
+  "cmdCopyPinned3": { "message": "Copiază codul contului important 3" },
+  "shortcutCopied": { "message": "Cod copiat." },
+  "shortcutLocked": { "message": "Deblochează mai întâi Popout Authenticator." },
+  "shortcutMissing": { "message": "Niciun cont important pentru această comandă rapidă." },
+  "shortcutSiteWarn": { "message": "Nu s-a copiat: adresa acestei pagini pare o imitație a site-ului contului. Dacă ești sigur că este real, copiază din fereastra extensiei." },
+  "shortcutFailed": { "message": "Codul nu a putut fi copiat." },
+  "fillPickAccount": { "message": "Alege un cont." },
+  "fieldFillButton": { "message": "Completează codul" }
+}

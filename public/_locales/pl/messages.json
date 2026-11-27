@@ -10,6 +10,7 @@
   "cmdOpenWindow": { "message": "Otwórz w osobnym oknie" },
   "menuOpenWindow": { "message": "Otwórz w osobnym oknie" },
   "menuQuickFill": { "message": "Wpisz kod 2FA" },
+  "menuQuickCopy": { "message": "Kopiuj kod 2FA dla tej strony" },
   "fillCopied": { "message": "Kod skopiowano. Wklej go." },
   "fillManual": {
     "message": "Kod: $CODE$",
@@ -32,6 +33,9 @@
   },
   "shortcutMissing": {
     "message": "Brak konta z gwiazdką dla tego skrótu."
+  },
+  "shortcutSiteWarn": {
+    "message": "Nie skopiowano: adres tej strony wygląda na podróbkę strony konta. Jeśli masz pewność, że jest prawdziwa, skopiuj kod w oknie rozszerzenia."
   },
   "shortcutFailed": {
     "message": "Nie udało się skopiować kodu."

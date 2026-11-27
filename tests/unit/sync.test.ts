@@ -345,6 +345,44 @@ describe('mergeAccounts', () => {
   });
 });
 
+describe('account image stays on this device', () => {
+  const png = 'data:image/png;base64,iVBORw0KGgo=';
+
+  it('keeps the local image when a newer remote copy wins or a duplicate wins', () => {
+    const local = { ...account(1), iconImage: png };
+    const remote = { ...account(1), id: local.id, label: 'renamed', updatedAt: T0 + MIN };
+    const merged = mergeAccounts([local], [remote], {})[0];
+    expect(merged).toMatchObject({ label: 'renamed', iconImage: png });
+    // 같은 비밀키를 두 기기에서 따로 넣어 다른 id 가 이긴 경우도 그림을 잇는다.
+    const older = { ...account(1, T0 - MIN), id: 'aaa' };
+    const mine = { ...account(1), id: 'bbb', iconImage: png };
+    expect(mergeAccounts([mine], [older], {})).toEqual([expect.objectContaining({ id: 'aaa', iconImage: png })]);
+    // 이 기기에서 그림을 지운 뒤 다른 기기 기록이 와도 되살아나지 않는다.
+    const cleared = { ...account(1), id: local.id, updatedAt: T0 + 2 * MIN };
+    expect(mergeAccounts([cleared], [remote], {})[0]).not.toHaveProperty('iconImage');
+  });
+
+  it('does not put the image in sync records or take one from them', async () => {
+    await plainDevice(a, [draft(1)]);
+    await on(a, () => updateAccounts((list) => list.map((x) => ({ ...x, iconImage: png, updatedAt: T0 + MIN }))));
+    await pushFrom(a, T0 + MIN);
+    const area = await a.storage.sync.get(null);
+    expect(JSON.stringify(area)).not.toContain('iVBORw0KGgo');
+    await plainDevice(b, [draft(2)]);
+    await on(b, async () => {
+      expect(await syncNow(T0 + 5 * MIN)).toBe('ok');
+      const list = await loadAccounts();
+      expect(list).toHaveLength(2);
+      for (const x of list) expect(x).not.toHaveProperty('iconImage');
+    });
+    // a 는 b 의 기록을 받아도 자기 그림을 지킨다.
+    await on(a, async () => {
+      expect(await syncNow(T0 + 6 * MIN)).toBe('ok');
+      expect((await loadAccounts()).find((x) => x.label === 'user1@example.com')?.iconImage).toBe(png);
+    });
+  });
+});
+
 describe('hotp counter merge', () => {
   it('never rolls the counter back, whichever side wins the other fields', () => {
     const base = { ...account(1), type: 'hotp' as const, counter: 10 };
