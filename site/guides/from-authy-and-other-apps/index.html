@@ -69,17 +69,20 @@
   </div>
 
   <h2 id="others">Other apps</h2>
-  <p>Use an unencrypted export unless the table says otherwise. For encrypted Aegis, 2FAS, and Bitwarden files, Popout tells you to export an unencrypted file from that app instead (for example, "Export an unencrypted file from the Aegis app and use that.").</p>
+  <p>Use an unencrypted export unless the table says otherwise. Password-protected backups from Aegis, 2FAS, FreeOTP, and 2FA Authenticator open with their password. For other encrypted files, such as from Bitwarden, Proton Authenticator, or Steam Desktop Authenticator, Popout tells you to export an unencrypted file from that app instead (for example, "Export an unencrypted file from the Bitwarden app and use that.").</p>
   <div class="table-wrap">
     <table class="stack">
       <thead>
         <tr><th scope="col">App</th><th scope="col">What to export</th><th scope="col">Notes</th></tr>
       </thead>
       <tbody>
-        <tr><th scope="row">Aegis</th><td data-label="What to export">Unencrypted vault export (JSON)</td><td data-label="Notes">Encrypted export is not supported.</td></tr>
-        <tr><th scope="row">2FAS</th><td data-label="What to export">2FAS Backup → Export, without setting a password (<a href="https://2fas.com/support/2fas-auth-mobile-app/i-want-to-move-copy-transfer-tokens-codes-between-ios-and-android/">2FAS support</a>, checked 2026-10-15)</td><td data-label="Notes">The file ends in .2fas. If the file picker doesn't let you select it, rename the file to end in .json. From version 1.0.1 the picker also offers .2fas files.</td></tr>
+        <tr><th scope="row">Aegis</th><td data-label="What to export">Vault export (JSON), unencrypted or with a password</td><td data-label="Notes">For a password-protected export, Popout asks for the vault password. From version 1.0.5.</td></tr>
+        <tr><th scope="row">2FAS</th><td data-label="What to export">2FAS Backup → Export, with or without a password (<a href="https://2fas.com/support/2fas-auth-mobile-app/i-want-to-move-copy-transfer-tokens-codes-between-ios-and-android/">2FAS support</a>, checked 2026-10-15)</td><td data-label="Notes">The file ends in .2fas. If the file picker doesn't let you select it, rename the file to end in .json. From version 1.0.1 the picker also offers .2fas files. If you set a password, Popout asks for it (from version 1.0.5).</td></tr>
         <tr><th scope="row">Bitwarden Authenticator</th><td data-label="What to export">Settings → Export → file format .json → Export items (<a href="https://bitwarden.com/help/authenticator-import-export/">Bitwarden help</a>, checked 2026-10-15)</td><td data-label="Notes">CSV is not supported. An unencrypted Bitwarden password-manager JSON export also works (TOTP fields are read).</td></tr>
         <tr><th scope="row">FreeOTP+</th><td data-label="What to export">Its JSON export, or a text file of otpauth:// links</td><td data-label="Notes"></td></tr>
+        <tr><th scope="row">FreeOTP</th><td data-label="What to export">Its backup file (.xml, always password-protected)</td><td data-label="Notes">Popout asks for the backup password. The older FreeOTP 1.x settings file (tokens.xml) also works. From version 1.0.5.</td></tr>
+        <tr><th scope="row">Proton Authenticator</th><td data-label="What to export">Unencrypted export (JSON)</td><td data-label="Notes">Password-protected exports are not supported. From version 1.0.5.</td></tr>
+        <tr><th scope="row">Steam Desktop Authenticator</th><td data-label="What to export">The account's .maFile from the maFiles folder</td><td data-label="Notes">Encrypted .maFile files are not supported; remove the encryption in that app first. manifest.json holds no keys. Codes show as 5-character Steam codes. From version 1.0.5.</td></tr>
         <tr><th scope="row">andOTP</th><td data-label="What to export">Plain (unencrypted) JSON backup</td><td data-label="Notes">Encrypted backups are not supported.</td></tr>
         <tr><th scope="row">Raivo</th><td data-label="What to export">Settings → Export OTPs to ZIP archive (per <a href="https://bitwarden.com/help/authenticator-import-export/">Bitwarden help</a>, checked 2026-10-15)</td><td data-label="Notes">Unzip it with the password you chose, then import raivo-otp-export.json. Popout cannot open the ZIP itself.</td></tr>
         <tr><th scope="row">2FA Authenticator (authenticator.sh)</th><td data-label="What to export">Its backup file, plain or encrypted</td><td data-label="Notes">For an encrypted file, Popout asks for the password.</td></tr>
@@ -91,7 +94,7 @@
   <h2 id="import">Import into Popout</h2>
   <ol>
     <li>In Popout, select + → "Add account" → "Backup file" tab → "Choose a backup file." From the toolbar popup, a small window opens for choosing the file.</li>
-    <li>For an encrypted backup from 2FA Authenticator, Popout asks: "This backup is encrypted. Enter its password." Type it in "Backup password" and select "OK". If the password is wrong, you see "The password is incorrect."</li>
+    <li>For a password-protected backup (Aegis, 2FAS, FreeOTP, or 2FA Authenticator), Popout asks: "This backup is encrypted. Enter its password." Type it in "Backup password" and select "OK". If the password is wrong, you see "The password is incorrect."</li>
     <li>A result message shows how many accounts were added. Accounts that already exist (same type and same secret) are skipped. Existing accounts are never overwritten.</li>
   </ol>
   <p>If the file is not recognized, Popout shows "Unknown format".</p>
